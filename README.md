@@ -15,6 +15,13 @@
 * Tailwind CSS - For styling the frontend
 * MUI - As UI library for the frontend
 
+### Versions
+
+* python 3.12
+* node 21
+* poetry 1.7.1
+* PostgresSQL 16
+
 ## Files Structure
 
 * backend - The backend API
@@ -49,7 +56,6 @@
 * scripts - scripts for production
   * config-nginx.sh - for configuring nginx
   * config-uvicorn.sh - for configuring uvicorn
-  * create-database.sh - for creating the database in PostgresSQL
   * pull.sh - for pulling the latest version of the code, build the application and restart the services
   * restart.sh - for restarting the services
 * docker-compose.yml - for local development
@@ -190,10 +196,10 @@ The project will be saved in: /app/equal-shares
 
 ### Production Requirements
 
-* Linux
-* Python 3.12
+* Linux - Required before installation
+* Python 3.12 - Required before installation
 * Poetry
-* Node 21.5.0
+* NodeJS
 * PostgresSQL
 
 ### Production Installation
@@ -201,7 +207,118 @@ The project will be saved in: /app/equal-shares
 In the next steps we will show how to install the project on new production server.
 
 1. Use SSH for connecting to the server
+2. Run the following commands for update server:
 
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+3. For installing the requirements for backend run the following commands:
+
+```bash
+sudo apt install pipx -y
+pipx ensurepath
+pipx install poetry==1.7.1
+```
+
+4. Exit the SSH and connect again for activating the poetry
+
+For checking the installation of python and poetry run the following commands:
+
+```bash
+python3 -V
+poetry --version
+```
+
+Python should be 3.12 and poetry should be 1.7.1
+
+5. For installing the requirements for frontend run the following commands:
+
+```bash
+curl -sL https://deb.nodesource.com/setup_21.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+For checking the installation of NodeJS and npm run the following commands:
+
+```bash
+node -v
+npm -v
+```
+
+Node should be 21.5.0 or higher version of 21 \
+And npm should be 10.5.0 or higher
+
+6. For installing PostgresSQL run the following commands:
+
+```bash
+apt install -y libpq-dev
+apt install -y postgresql-16
+apt install -y postgresql-client-16
+apt install -y postgresql-doc-16
+apt install -y postgresql-server-dev-16
+```
+
+7. Exit the SSH and connect again for activating the PostgresSQL
+
+For checking the installation of PostgresSQL run the following commands:
+
+```bash
+psql -V
+```
+
+PostgresSQL should be 16
+
+For checking the PostgresSQL run the following commands:
+
+```bash
+sudo -u postgres psql -c "\l"
+```
+
+It will show the table of the databases, that contains the default database `postgres`
+
+8. For installing Nginx run the following commands:
+
+```bash
+sudo apt install -y nginx
+```
+
+Run the following commands for checking the installation of Nginx:
+
+```bash
+nginx -v
+sudo ufw app list
+```
+
+It will show you under Available applications the `Nginx Full`, `Nginx HTTP`, `Nginx HTTPS` and `OpenSSH` \
+
+Now run the following commands for configuring the firewall:
+
+```bash
+sudo ufw allow 'Nginx HTTP'
+sudo ufw allow 'Nginx HTTPS'
+sudo ufw allow 'Nginx Full'
+sudo ufw allow 'OpenSSH'
+sudo ufw enable
+```
+
+For checking the status of the firewall run the following command:
+
+```bash
+sudo ufw status
+```
+
+9. In Web Browser (like Google Chrome) enter the IP of the server and you should see the Nginx welcome page
+10. exit the SSH and connect again
+
+11. For installing the project run the following commands:
+
+```bash
+mkdir /app
+cd /app
+git clone https://github.com/equal-shares/equal-shares.git
+```
 
 ### Production Scripts
 
@@ -220,12 +337,6 @@ For restarting the services run the following command:
 
 ```bash
 bash ./scripts/restart.sh
-```
-
-For creating the database run the following command:
-
-```bash
-bash ./scripts/create-database.sh
 ```
 
 For deleting the database run the following command:
