@@ -1,0 +1,9 @@
+name: equal-shares
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip=23.3.2
+  - pip:
+    - poetry==1.7.1

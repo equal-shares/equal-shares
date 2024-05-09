@@ -1,0 +1,15 @@
+# IDE
+.idea
+
+# python
+__pycache__
+
+# node
+node_modules
+
+# env
+.env
+
+# rsa keys
+backend/equal-shares-api-public-key.pem
+backend/equal-shares-api-private-key.pem

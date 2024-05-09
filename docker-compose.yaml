@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_HOST=http://localhost:8000
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
+    environment:
+      - PG_HOST=db
+      - PG_USER=postgres
+      - PG_PASSWORD=password
+      - PG_DATABASE=postgres
+      - PG_PORT=5432
+      - ADMIN_KEY=7fbae5db-37bb-4dc5-a9f5-115878c6bcb0
+      - API_RSA_PUBLIC_KEY=/app/equal-shares-api-public-key.pem
+      - API_RSA_PRIVATE_KEY=/app/equal-shares-api-private-key.pem
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 10s
+      retries: 120
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password

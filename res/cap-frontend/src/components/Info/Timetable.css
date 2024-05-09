@@ -1,0 +1,26 @@
+table {
+    margin-top: 30px;
+    margin-bottom: 50px;
+    align-items: center;
+}
+
+th  {
+    height: 50px;
+    text-align: center; 
+    vertical-align: middle;
+}
+
+ tr {
+    height: 120px;
+    text-align: center; 
+    vertical-align: middle;
+}
+
+.tableRight {
+color: #6d76f7;
+font-weight: bold;
+}
+
+.inner-cell{
+    width: 100%;
+}

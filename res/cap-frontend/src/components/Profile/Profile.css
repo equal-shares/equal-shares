@@ -1,0 +1,70 @@
+.homepage {
+    min-height: 100vh;
+    text-align: right;
+    background-color: #f8f9fa;
+  }
+  
+.welcome-message {
+  text-shadow: -1px 0 white;
+  color: rgba(85, 83, 83);
+  text-align: center !important;
+  font-size: 3.8em;
+  border-color: #6d76f7;
+  margin-bottom: 1%;
+  margin-top: 1%;
+  font-weight: bold;
+}
+  
+  .headline {
+    text-shadow: -1px 0 white;
+    color: rgba(85, 83, 83);
+    text-align: center !important;
+    font-size: 3.8em;
+    border-color: #6d76f7;
+    margin-bottom: 1%;
+    margin-top: 1%;
+    font-weight: bold;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  
+  .user-details-container {
+    max-width: 650px;
+    border-radius: 2em;
+    background-color: #f8f9fa; /* Nice light gray color */
+    font-size: 14px;
+    padding: 20px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+  }
+  
+  
+  .user-details-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .field-label {
+    flex: 0 0 150px;
+    color: white;
+    font-size: 24px;
+  }
+  
+  
+  .field-value {
+    flex: 1;
+    font-size: 20px;
+    text-align: left;
+  }
+  
+  .loading-message {
+    color: brown;
+    font-size: 20px;
+  }
+  

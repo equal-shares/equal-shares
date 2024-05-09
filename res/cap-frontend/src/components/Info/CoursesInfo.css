@@ -1,0 +1,98 @@
+.App {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+/*background: linear-gradient(80deg, rgba(114,117,121,1) 0%, rgba(230,220,220,1) 70%);*/
+  text-align: center;
+}
+/* h1{
+  text-shadow: -1px 0 #6d76f7;
+  font-family:"Calibri (Body)";
+  color: white;
+  border-color:#6d76f7;
+  font-size: 60px !important;
+} */
+h2{
+  text-align: right !important;
+  margin-top: 30px;
+  color: rgb(85, 83, 83);
+}
+
+/* .App-header {
+  text-align: center;
+  font-size: calc(10px + 2vmin);
+} */
+.Headline {
+  text-shadow: -1px 0 white;
+  color: rgba(85, 83, 83);
+  text-align: center !important;
+  margin-bottom: 70px;
+  margin-top: 50px;
+  font-weight: bold;
+}
+
+.layout{
+  display: center;
+  
+}
+
+
+.list-scroll{
+  max-height: 350px;
+  max-width: max-content;
+}
+.courses{
+  margin-bottom: 5px;
+  padding-bottom: 15px;
+  border-radius: 15px;
+  
+}
+
+ol {
+  width: 100%;
+}
+
+ul {
+  text-align: right;
+  }
+
+
+.itemName{
+  padding-top: 10px;
+  height: 45px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.itemName:hover{
+  background-color: #6d76f7;
+  border-radius: 4px;
+  transition: all 0.2s ease-out ;
+  cursor: pointer;
+}
+
+
+
+.course-list{
+  max-width: 300px;
+}
+.course-option{
+  text-align: right;
+
+  max-width: 250px;
+}
+.con-btn
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 35px;
+  max-width: 200px;
+}
+
+.modal-fc{
+  max-width: fit-content;
+  max-height: fit-content;
+  
+}

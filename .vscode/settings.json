@@ -1,0 +1,8 @@
+{
+    "flake8.args": [
+        "--config=backend/.flake8"
+    ],
+    "files.associations": {
+        "*.css": "scss"
+    }
+}

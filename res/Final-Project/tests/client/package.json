@@ -1,0 +1,21 @@
+{
+  "name": "test_client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tests": "node RunAllTests.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chrome": "^0.1.0",
+    "driver": "^1.0.0",
+    "selenium-webdriver": "^4.8.1",
+    "webdriver": "^8.5.1"
+  },
+  "devDependencies": {
+    "chromedriver": "^110.0.0"
+  }
+}
