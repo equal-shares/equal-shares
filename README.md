@@ -1,5 +1,13 @@
 # equal-shares
 
+## Table of content
+
+- [About](#about)
+- [Technologies](#technologies)
+- [Versions](#versions)
+
+## About
+
 ## Technologies
 
 * python - As programming language for the backend
@@ -187,6 +195,35 @@ In the API Dashbord run /admin/add-projects \
 Get the Projects and Settings as JSON format: \
 In the API Dashbord run /admin/projects
 
+## Deployment
+
+For clean, safe and maintainable deployment exits number of Linters and Formatters. \
+* Formaters - are tools that automatically format and fix the code.
+  * Backend: isort, black
+  * Frontend: Prettier, ESLint
+* Linters - are tools for check the code.
+ * Backend: flake8, black, mypy
+ * Frontend: ESLint
+
+Before running the formatter and linters, make sure conda environment is activated and node version is 21.5.0 \
+For running the formatters and linters run the following commands:
+
+```bash
+make fix-lint
+```
+
+For running only the formatters run the following commands:
+
+```bash
+make fix
+```
+
+For running only the linters run the following commands:
+
+```bash
+make lint
+```
+
 ## Production
 
 On the production server already installed Python 11, Poetry, Node 21.5.0 and PostgresSQL. \
@@ -194,9 +231,46 @@ For managing the server you have scripts under /app/scripts
 
 The project will be saved in: /app/equal-shares
 
+### Production Scripts
+
+This following scripts will: \
+* pull the latest version of the code from GitHub
+* update the dependencies of backend
+* update the dependencies of frontend
+* build the frontend
+* restart the uvicorn and nginx services
+
+```bash
+bash ./scripts/pull.sh
+```
+
+For restarting the services run the following command:
+
+```bash
+bash ./scripts/restart.sh
+```
+
+For deleting the database run the following command:
+
+```bash
+psql -U postgres -c "DROP DATABASE equal_shares;"
+```
+
+For configuring the nginx run the following command:
+
+```bash
+bash ./scripts/config-nginx.sh
+```
+
+For configuring the uvicorn run the following command:
+
+```bash
+bash ./scripts/config-uvicorn.sh
+```
+
 ### Production Requirements
 
-* Linux - Required before installation
+* Linux
 * Python 3.12 - Required before installation
 * Poetry
 * NodeJS
@@ -333,72 +407,6 @@ poetry install
 ```bash
 cd /app/equal-shares/frontend
 npm ci
-```
-
-### Production Scripts
-
-This following scripts will: \
-* pull the latest version of the code from GitHub
-* update the dependencies of backend
-* update the dependencies of frontend
-* build the frontend
-* restart the uvicorn and nginx services
-
-```bash
-bash ./scripts/pull.sh
-```
-
-For restarting the services run the following command:
-
-```bash
-bash ./scripts/restart.sh
-```
-
-For deleting the database run the following command:
-
-```bash
-psql -U postgres -c "DROP DATABASE equal_shares;"
-```
-
-For configuring the nginx run the following command:
-
-```bash
-bash ./scripts/config-nginx.sh
-```
-
-For configuring the uvicorn run the following command:
-
-```bash
-bash ./scripts/config-uvicorn.sh
-```
-
-## Deployment
-
-For clean, safe and maintainable deployment exits number of Linters and Formatters. \
-* Formaters - are tools that automatically format and fix the code.
-  * Backend: isort, black
-  * Frontend: Prettier, ESLint
-* Linters - are tools for check the code.
- * Backend: flake8, black, mypy
- * Frontend: ESLint
-
-Before running the formatter and linters, make sure conda environment is activated and node version is 21.5.0 \
-For running the formatters and linters run the following commands:
-
-```bash
-make fix-lint
-```
-
-For running only the formatters run the following commands:
-
-```bash
-make fix
-```
-
-For running only the linters run the following commands:
-
-```bash
-make lint
 ```
 
 ## Links
