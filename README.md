@@ -191,12 +191,14 @@ The project will be saved in: /app/equal-shares
 ### Production Requirements
 
 * Linux
-* Python 11
+* Python 3.12
 * Poetry
 * Node 21.5.0
 * PostgresSQL
 
 ### Production Installation
+
+In the next steps we will show how to install the project on new production server.
 
 1. Use SSH for connecting to the server
 

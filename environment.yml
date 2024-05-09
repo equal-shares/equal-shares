@@ -3,7 +3,7 @@ channels:
   - defaults
   - conda-forge
 dependencies:
-  - python=3.11
+  - python=3.12
   - pip=23.3.2
   - pip:
     - poetry==1.7.1
