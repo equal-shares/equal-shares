@@ -318,6 +318,21 @@ sudo ufw status
 mkdir /app
 cd /app
 git clone https://github.com/equal-shares/equal-shares.git
+cd equal-shares
+```
+
+12. For installing the backend run the following commands:
+
+```bash
+cd /app/equal-shares/backend
+poetry install
+```
+
+13. For installing the frontend run the following commands:
+
+```bash
+cd /app/equal-shares/frontend
+npm ci
 ```
 
 ### Production Scripts
