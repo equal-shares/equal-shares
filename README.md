@@ -2,9 +2,28 @@
 
 ## Table of content
 
-- [About](#about)
-- [Technologies](#technologies)
-- [Versions](#versions)
+* [About](#about)
+* [Technologies](#technologies)
+  * [Versions](#versions)
+* [Files Structure](#files-structure)
+* [Environment Variables](#environment-variables)
+  * [Backend](#backend)
+  * [Frontend](#frontend)
+* [Requirements](#requirements)
+  * [For Using Locally](#for-using-locally)
+  * [For Development](#for-development)
+* [Installation - Local](#installation---local)
+  * [For Development](#for-development)
+* [Usage](#usage)
+  * [Management](#management)
+* [Development](#Development)
+* [Production](#production)
+  * [Production Scripts](#production-scripts)
+  * [Production Requirements](#production-requirements)
+  * [Production Installation](#production-installation)
+* [Links](#links)
+* [Authors](#authors)
+* [License](#license)
 
 ## About
 
@@ -114,7 +133,7 @@ Table of the required environment variables for the frontend:
 * conda
 * node 21.5.0
 
-## Installation
+## Installation - Local
 
 Create or Copy the RSA keys of the API to the backend directory.
 * ./backend/equal-shares-api-private-key.pem
@@ -195,7 +214,7 @@ In the API Dashbord run /admin/add-projects \
 Get the Projects and Settings as JSON format: \
 In the API Dashbord run /admin/projects
 
-## Deployment
+## Development
 
 For clean, safe and maintainable deployment exits number of Linters and Formatters. \
 * Formaters - are tools that automatically format and fix the code.
