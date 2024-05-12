@@ -181,6 +181,7 @@ conda env create -f environment.yml
 conda activate equal-shares
 
 cd backend
+poetry config virtualenvs.create false
 poetry install
 
 cd ../frontend
@@ -337,6 +338,7 @@ sudo apt upgrade -y
 sudo apt install pipx -y
 pipx ensurepath
 pipx install poetry==1.7.1
+poetry config virtualenvs.create false
 ```
 
 4. Exit the SSH and connect again for activating the poetry
