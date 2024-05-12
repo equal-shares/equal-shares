@@ -6,6 +6,7 @@
 * [Technologies](#technologies)
   * [Versions](#versions)
 * [Files Structure](#files-structure)
+  * [Production Files Structure](#production-files-structure)
 * [Environment Variables](#environment-variables)
   * [Backend](#backend)
   * [Frontend](#frontend)
@@ -33,6 +34,8 @@
 * conda - For managing python environment
 * poetry - For managing python dependencies
 * FastAPI - As framework for the backend
+* uvicorn - For running the backend usinn ASGI
+* gunicorn - For running the backend in production
 * PostgresSQL - As database
 * docker - For development in production of the backend
 * docker compose - For local development
@@ -67,6 +70,7 @@
   * Dockerfile - for building the backend locally
   * equal-shares-api-private-key.pem - private RSA key for the API
   * equal-shares-api-public-key.pem - public RSA key for the API
+  * gunicorn_conf.py - configuration for gunicorn
   * Makefile - commands for development
   * pyproject.toml - configuration and poetry dependencies
 * frontend - The frontend application
@@ -79,10 +83,16 @@
     * schema.ts - schemas of the API
   * Dockerfile - for building the frontend locally
   * package.json - dependencies and commands for development
+* prod - files that copied to the production server
+  * nginx
+    * equal_shares - configuration for nginx
+  * backend.env - environment variables for the backend service, will copy to /app/backend.env
+  * equal_shares.service - config for backend service
+  * frontend.env - environment variables for build the frontend, will copy to /app/frontend.env
 * res - resources
 * scripts - scripts for production
-  * config-nginx.sh - for configuring nginx
-  * config-uvicorn.sh - for configuring uvicorn
+  * config-gunicorn.sh - for update configuring of gunicorn service
+  * config-nginx.sh - for update configuring of nginx service
   * pull.sh - for pulling the latest version of the code, build the application and restart the services
   * restart.sh - for restarting the services
 * docker-compose.yml - for local development
@@ -90,6 +100,20 @@
 * LICENSE - MIT license
 * Makefile - commands for development
 * README.md - this file
+
+### Production Files Structure
+
+* /app - the root directory of the project
+  * /backend.env - environment variables for the backend service
+  * /equal-shares - the project directory
+  * /frontend.env - environment variables for build the frontend
+  * /keys
+    * equal-shares-api-private-key.pem - private RSA key for the API
+    * equal-shares-api-public-key.pem - public RSA key for the API
+  * gunicorn.sock - socket for gunicorn
+  * static - static files for the frontend application
+  * access_log - log file for the access of the API
+  * error_log - log file for the errors of the API
 
 ## Environment Variables
 
@@ -257,7 +281,7 @@ This following scripts will: \
 * update the dependencies of backend
 * update the dependencies of frontend
 * build the frontend
-* restart the uvicorn and nginx services
+* restart the API (gunicorn) service and nginx service
 
 ```bash
 bash ./scripts/pull.sh
@@ -281,10 +305,10 @@ For configuring the nginx run the following command:
 bash ./scripts/config-nginx.sh
 ```
 
-For configuring the uvicorn run the following command:
+For configuring the gunicorn run the following command:
 
 ```bash
-bash ./scripts/config-uvicorn.sh
+bash ./scripts/config-gunicorn.sh
 ```
 
 ### Production Requirements
@@ -440,6 +464,43 @@ For checking the user run the following command:
 id equal-shares
 ```
 
+15. For configuring the environment variables run the following commands:
+
+```bash
+cp /app/equal-shares/prod/backend.env /app/backend.env
+cp /app/equal-shares/prod/frontend.env /app/frontend.env
+```
+
+For creating Admin Key run the following command:
+
+```bash
+python -c "import uuid;print(uuid.uuid4())"
+```
+
+Copy the output and paste it to the /app/backend.env under the ADMIN_KEY using nano:
+  
+```bash
+nano /app/backend.env
+```
+
+Use nano for editing VITE_API_HOST in /app/frontend.env \
+Replace the value of VITE_API_HOST with `http://<server-ip>:8000` the `server-ip` is the IP of the server
+
+```bash
+nano /app/frontend.env
+```
+
+16. For adding the api RSA keys disconnect the SSH \
+    Copy the RSA keys of the API to production server using the following commands:
+
+Note: replace <server-ip> with the IP of the server and you should have the keys in your current directory
+
+```bash
+scp equal-shares-api-private-key.pem equal-shares@<server-ip>:/app/keys/equal-shares-api-private-key.pem
+scp equal-shares-api-public-key.pem equal-shares@<server-ip>:/app/keys/equal-shares-api-public-key.pem
+```
+
+17. 
 
 ## Links
 
