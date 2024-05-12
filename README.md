@@ -417,6 +417,7 @@ sudo ufw allow 'Nginx HTTP'
 sudo ufw allow 'Nginx HTTPS'
 sudo ufw allow 'Nginx Full'
 sudo ufw allow 'OpenSSH'
+sudo ufw allow 8000
 sudo ufw enable
 ```
 
