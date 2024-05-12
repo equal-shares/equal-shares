@@ -428,6 +428,19 @@ cd /app/equal-shares/frontend
 npm ci
 ```
 
+14. Create a non-root user for running the services:
+
+```bash
+sudo adduser --disabled-password --gecos GECOS equal-shares
+```
+
+For checking the user run the following command:
+
+```bash
+id equal-shares
+```
+
+
 ## Links
 
 * [ca website](https://faircourse.csariel.xyz/)
