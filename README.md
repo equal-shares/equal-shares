@@ -395,10 +395,12 @@ sudo -u postgres psql -c "\l"
 
 It will show the table of the databases, that contains the default database `postgres`
 
-8. For installing Nginx run the following commands:
+8. For installing Nginx, Uvicorn and Gunicorn run the following commands:
 
 ```bash
 sudo apt install -y nginx
+sudo apt install -y gunicorn
+sudo apt install -y uvicorn
 ```
 
 Run the following commands for checking the installation of Nginx:
