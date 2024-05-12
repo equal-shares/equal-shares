@@ -1,7 +1,10 @@
 server {
     listen 80;
+    root /app/static;
+
+    index index.html;
 
     location / {
-        root /app/static;
+        try_files $uri $uri/ =404;
     }
 }
