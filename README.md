@@ -517,7 +517,15 @@ bash /app/equal-shares/scripts/config-nginx.sh
 bash /app/equal-shares/scripts/config-gunicorn.sh
 ```
 
-18. For build and start the services run the following commands:
+18. Update the permissions of the directories:
+
+```bash
+chmod 777 /app/access_log
+chmod 777 /app/access_log
+chmod 744 /app/keys
+```
+
+19. For build and start the services run the following commands:
 
 ```bash
 bash /app/equal-shares/scripts/pull.sh
