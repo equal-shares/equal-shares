@@ -507,10 +507,18 @@ scp equal-shares-api-private-key.pem root@<server-ip>:/app/keys/equal-shares-api
 scp equal-shares-api-public-key.pem root@<server-ip>:/app/keys/equal-shares-api-public-key.pem
 ```
 
-17. Connect to the server using SSH and run the following commands:
+17. For config the Nginx and Gunicorn, connect to the serverv and run the following commands:
 
 ```bash
+bash /app/equal-shares/scripts/config-nginx.sh
+bash /app/equal-shares/scripts/config-gunicorn.sh
+```
 
+18. For build and start the services run the following commands:
+
+```bash
+bash /app/equal-shares/scripts/pull.sh
+```
 
 ## Links
 

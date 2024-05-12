@@ -1,6 +1,7 @@
 server {
-    root /app/static;
+    listen: 80;
 
     location / {
+        root /app/static;
     }
 }
