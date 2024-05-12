@@ -5,7 +5,7 @@ git pull
 
 # Update dependencies
 cd /app/equal-shares/backend
-poetry install --sync
+poetry install
 
 cd /app/equal-shares/frontend
 npm ci
