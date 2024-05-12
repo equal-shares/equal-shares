@@ -474,10 +474,11 @@ cp /app/equal-shares/prod/frontend.env /app/frontend.env
 For creating Admin Key run the following command:
 
 ```bash
-python -c "import uuid;print(uuid.uuid4())"
+python3 -c "import uuid;print(uuid.uuid4())"
 ```
 
-Copy the output and paste it to the /app/backend.env under the ADMIN_KEY using nano:
+Save the output of the command, this is the Admin Key for managing the API \
+Copy the output and paste it to the /app/backend.env as value of ADMIN_KEY using nano:
   
 ```bash
 nano /app/backend.env
@@ -490,17 +491,26 @@ Replace the value of VITE_API_HOST with `http://<server-ip>:8000` the `server-ip
 nano /app/frontend.env
 ```
 
+15. Run the folowing commands for create directory for the Keys:
+  
+```bash
+mkdir /app/keys
+```
+
 16. For adding the api RSA keys disconnect the SSH \
     Copy the RSA keys of the API to production server using the following commands:
 
 Note: replace <server-ip> with the IP of the server and you should have the keys in your current directory
 
 ```bash
-scp equal-shares-api-private-key.pem equal-shares@<server-ip>:/app/keys/equal-shares-api-private-key.pem
-scp equal-shares-api-public-key.pem equal-shares@<server-ip>:/app/keys/equal-shares-api-public-key.pem
+scp equal-shares-api-private-key.pem root@<server-ip>:/app/keys/equal-shares-api-private-key.pem
+scp equal-shares-api-public-key.pem root@<server-ip>:/app/keys/equal-shares-api-public-key.pem
 ```
 
-17. 
+17. Connect to the server using SSH and run the following commands:
+
+```bash
+
 
 ## Links
 
