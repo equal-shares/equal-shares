@@ -49,6 +49,7 @@ For Ariel University
 * Vite - As build tool for the frontend
 * Tailwind CSS - For styling the frontend
 * MUI - As UI library for the frontend
+* GitHub Actions - For running the linters
 
 ### Versions
 
