@@ -433,6 +433,9 @@ bash /app/equal-shares/scripts/pull.sh
 For checking the services open in Browser (like Google Chrome) the URL: http://<server-ip>:8000/ \
 And open the URL: http://<server-ip>/
 
+13. For creating the database tables open the URL: http://<server-ip>:8000/ \
+    And run the route `/admin/create-tables`
+
 ## Links
 
 * [ca website](https://faircourse.csariel.xyz/)
