@@ -16,3 +16,7 @@ lint:
 
 # Run the formatters and linters
 fix-lint: fix lint
+
+# development
+serv:
+	docker compose -f dev.docker-compose.yaml up --build
