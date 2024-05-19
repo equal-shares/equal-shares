@@ -414,7 +414,6 @@ chmod 744 /app/keys
 11. For build and start the services run the following commands:
 
 ```bash
-cd /app/equal-shares
 bash /app/equal-shares/scripts/build.sh
 ```
 
