@@ -59,6 +59,9 @@ For Ariel University
 
 ## Files Structure
 
+* .github
+  * workflows
+    * lint.yml - Running the linters
 * backend - The backend API
   * src
     * routers
