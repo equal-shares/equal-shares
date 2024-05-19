@@ -361,12 +361,10 @@ cd /app
 git clone https://github.com/equal-shares/equal-shares.git
 ```
 
-4. For configuring the environment variables run the following commands:
+6. For configuring the environment variables run the following commands:
 
 ```bash
-cp /app/equal-shares/prod/backend.env /app/backend.env
-cp /app/equal-shares/prod/db.env /app/db.env
-cp /app/equal-shares/prod/frontend.env /app/frontend.env
+ash /app/equal-shares/scripts/rest-env-files.sh
 ```
 
 For creating Admin Key run the following command:
@@ -389,13 +387,13 @@ Replace the value of VITE_API_HOST with `http://<server-ip>:8000` the `server-ip
 nano /app/frontend.env
 ```
 
-15. Run the folowing commands for create directory for the Keys:
+7. Run the folowing commands for create directory for the Keys:
   
 ```bash
-mkdir /app/keys
+mkdir -p /app/keys
 ```
 
-16. For adding the api RSA keys disconnect the SSH \
+8. For adding the api RSA keys disconnect the SSH \
     Copy the RSA keys of the API to production server using the following commands:
 
 Note: replace <server-ip> with the IP of the server and you should have the keys in your current directory
@@ -405,22 +403,25 @@ scp equal-shares-api-private-key.pem root@<server-ip>:/app/keys/equal-shares-api
 scp equal-shares-api-public-key.pem root@<server-ip>:/app/keys/equal-shares-api-public-key.pem
 ```
 
-17. For config the Nginx and Gunicorn, connect to the serverv and run the following commands:
+9. Connect to the server using SSH
+
+10. Update the permissions of the directories:
 
 ```bash
-bash /app/equal-shares/scripts/config-nginx.sh
-bash /app/equal-shares/scripts/config-gunicorn.sh
-```
-
-18. Update the permissions of the directories:
-
-```bash
-chmod 777 /app/access_log
-chmod 777 /app/access_log
 chmod 744 /app/keys
 ```
 
-19. For build and start the services run the following commands:
+11. For build and start the services run the following commands:
+
+```bash
+cd /app/equal-shares
+bash /app/equal-shares/scripts/build.sh
+```
+
+For checking the services open in Browser (like Google Chrome) the URL: http://<server-ip>:8000/ \
+And open the URL: http://<server-ip>/
+
+12. For start the services run the following commands:
 
 ```bash
 bash /app/equal-shares/scripts/pull.sh
