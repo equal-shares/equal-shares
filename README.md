@@ -411,20 +411,27 @@ scp equal-shares-api-public-key.pem root@<server-ip>:/app/keys/equal-shares-api-
 chmod 744 /app/**
 ```
 
+11. For open the ports run the following commands:
+
+```bash
+sudo ufw allow 80
+sudo ufw allow 8000
+```
+
 11. For build and start the services run the following commands:
 
 ```bash
 bash /app/equal-shares/scripts/build.sh
 ```
 
-For checking the services open in Browser (like Google Chrome) the URL: http://<server-ip>:8000/ \
-And open the URL: http://<server-ip>/
-
 12. For start the services run the following commands:
 
 ```bash
 bash /app/equal-shares/scripts/pull.sh
 ```
+
+For checking the services open in Browser (like Google Chrome) the URL: http://<server-ip>:8000/ \
+And open the URL: http://<server-ip>/
 
 ## Links
 

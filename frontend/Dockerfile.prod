@@ -23,7 +23,7 @@ COPY src /app/src
 
 RUN npm run build
 
-RUN cp -r /app/dist /usr/share/nginx/html
+RUN cp -r /app/dist/* /usr/share/nginx/html
 
 EXPOSE 80
 
