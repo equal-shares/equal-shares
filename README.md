@@ -408,7 +408,7 @@ scp equal-shares-api-public-key.pem root@<server-ip>:/app/keys/equal-shares-api-
 10. Update the permissions of the directories:
 
 ```bash
-chmod 744 /app/keys
+chmod 744 /app/**
 ```
 
 11. For build and start the services run the following commands:
