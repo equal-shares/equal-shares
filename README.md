@@ -1,5 +1,10 @@
 # equal-shares
 
+## About
+
+This project is a voting application and algorithm based [Equal Shares](https://equalshares.net/) \
+For Ariel University
+
 ## Table of content
 
 * [About](#about)
@@ -22,13 +27,12 @@
 * [Development](#Development)
 * [Production](#production)
   * [Production Scripts](#production-scripts)
+  * [Production Monitoring and Logs](#production-monitoring-and-logs)
   * [Production Requirements](#production-requirements)
   * [Production Installation](#production-installation)
 * [Links](#links)
 * [Authors](#authors)
 * [License](#license)
-
-## About
 
 ## Technologies
 
@@ -326,6 +330,32 @@ For building the services run the following command:
 
 ```bash
 bash /app/equal-shares/scripts/build.sh
+```
+
+### Production Monitoring and Logs
+
+For view all the services run the following command:
+
+```bash
+docker ps
+```
+
+For viewing the logs of the backend service run the following command:
+
+```bash
+docker logs equal-shares-backend-1
+```
+
+For viewing the logs of the frontend service run the following command:
+
+```bash
+docker logs equal-shares-frontend-1
+```
+
+For viewing the logs of the database service run the following command:
+
+```bash
+docker logs equal-shares-db-1
 ```
 
 ### Production Requirements
