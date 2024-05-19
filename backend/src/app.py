@@ -1,7 +1,7 @@
 # Create the FastAPI application
 
 from contextlib import asynccontextmanager
-from typing import Any, AsyncIterator, Any
+from typing import Any, AsyncIterator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
