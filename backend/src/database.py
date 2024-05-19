@@ -44,7 +44,7 @@ def init_db() -> None:
             max_size=2,
             reconnect_failed=lambda conn: print("check", conn),
         )
-        g_pool.wait(5)
+        g_pool.wait()
     except psycopg.OperationalError as e:
         raise CriticalException("Database connection failed") from e
 
