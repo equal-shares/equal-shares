@@ -22,9 +22,6 @@ COPY public /app/public
 COPY src /app/src
 
 RUN npm run build
-RUN ls -l /app
-RUN ls -l ~
-RUN ls -l /app
 
 RUN cp -r /app/dist /usr/share/nginx/html
 
