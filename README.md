@@ -10,6 +10,8 @@
 * [Environment Variables](#environment-variables)
   * [Backend](#backend)
   * [Frontend](#frontend)
+  * [Database](#database)
+* [Database ERD](#database-erd)
 * [Requirements](#requirements)
   * [For Using Locally](#for-using-locally)
   * [For Development](#for-development)
@@ -35,7 +37,6 @@
 * poetry - For managing python dependencies
 * FastAPI - As framework for the backend
 * uvicorn - For running the backend usinn ASGI
-* gunicorn - For running the backend in production
 * PostgresSQL - As database
 * docker - For development in production of the backend
 * docker compose - For local development
@@ -49,7 +50,6 @@
 
 * python 3.12
 * node 21
-* poetry 1.7.1
 * PostgresSQL 16
 
 ## Files Structure
@@ -64,56 +64,59 @@
     * config.py - contains the configuration of the backend. uses environment variables
     * database.py - database connection
     * exceptions.py - custom exceptions
-    * models.py - database models and queries
+    * logger.py - logging configuration
+    * models.py - models and queries for comunicating with the database
     * schemas.py - schemas of the API
     * security.py - security functions
-  * Dockerfile - for building the backend locally
-  * equal-shares-api-private-key.pem - private RSA key for the API
-  * equal-shares-api-public-key.pem - public RSA key for the API
-  * gunicorn_conf.py - configuration for gunicorn
+  * Dockerfile.dev - for building the backend local development
+  * Dockerfile.prod - for building the backend in production
+  * equal-shares-api-private-key.pem - private RSA key for the API for local development, ignored in git
+  * equal-shares-api-public-key.pem - public RSA key for the API for local development, ignored in git
   * Makefile - commands for development
+  * poetry.lock - lock file of the dependencies, dont change manually
   * pyproject.toml - configuration and poetry dependencies
+* docs - documentation and spesification files
 * frontend - The frontend application
   * public - static files
   * src
+    * assets - images and icons
     * components
     * api.ts - for using the backend API
     * App.tsx - the main component
-    * index.tsx - the entry of the frontend application
+    * config.ts - configuration of the frontend at build time
+    * main.tsx - the entry of the frontend application
     * schema.ts - schemas of the API
-  * Dockerfile - for building the frontend locally
+  * Dockerfile.dev - for building the frontend local development
+  * Dockerfile.prod - for building the frontend in production
+  * package-lock.json - lock file of the dependencies, dont change manually
   * package.json - dependencies and commands for development
-* prod - files that copied to the production server
-  * nginx
-    * equal_shares - configuration for nginx
+* prod - files for production server
   * backend.env - environment variables for the backend service, will copy to /app/backend.env
-  * equal_shares.service - config for backend service
+  * db.env - environment variables for the database service, will copy to /app/db.env
   * frontend.env - environment variables for build the frontend, will copy to /app/frontend.env
 * res - resources
 * scripts - scripts for production
-  * config-gunicorn.sh - for update configuring of gunicorn service
-  * config-nginx.sh - for update configuring of nginx service
-  * pull.sh - for pulling the latest version of the code, build the application and restart the services
-  * restart.sh - for restarting the services
-* docker-compose.yml - for local development
+  * build.sh - building the services
+  * pull.sh - pulling the latest version of the code, build the services and restart the services
+  * rest-env-files.sh - copying the environment files to the /app directory
+  * restart.sh - restarting the services
+* dev.docker-compose.yml - for local development
 * environment.yml - conda environment
 * LICENSE - MIT license
 * Makefile - commands for development
+* prod.docker-compose.yml - for production
 * README.md - this file
 
 ### Production Files Structure
 
 * /app - the root directory of the project
-  * /backend.env - environment variables for the backend service
+  * /backend.env - environment variables for the backend service (container)
+  * /db.env - environment variables for the database service (container)
   * /equal-shares - the project directory
-  * /frontend.env - environment variables for build the frontend
+  * /frontend.env - environment variables for build the frontend image
   * /keys
     * equal-shares-api-private-key.pem - private RSA key for the API
     * equal-shares-api-public-key.pem - public RSA key for the API
-  * gunicorn.sock - socket for gunicorn
-  * static - static files for the frontend application
-  * access_log - log file for the access of the API
-  * error_log - log file for the errors of the API
 
 ## Environment Variables
 
@@ -137,14 +140,25 @@ Table of the optional environment variables for the backend:
 |----------|------------------|---------|
 | PG_PORT  | PostgresSQL port | 5432    |
 
-
 ### Frontend
 
-Table of the required environment variables for the frontend:
+Table of the required environment variables for the frontend, they used at build time:
 
 | Variable      | Description      |
 |---------------|------------------|
 | VITE_API_HOST | API backend host |
+
+### Database
+
+Table of the required environment variables for the database:
+
+| Variable          | Description              |
+| ----------------- | ------------------------ |
+| POSTGRES_PASSWORD | Password for PostgresSQL |
+
+## Database ERD
+
+![ERD](docs/database-erd.png)
 
 ## Requirements
 
@@ -193,7 +207,13 @@ npm ci
 For running the frontend, backend and the database run the following command:
 
 ```bash
-docker compose up
+make serve
+```
+
+Or
+
+```bash
+docker compose -f dev.docker-compose.yaml up --build
 ```
 
 The API will run on http://localhost:8000/
@@ -216,7 +236,7 @@ Creating the database tables: \
 In the API Dashbord run /admin/create-tables
 
 Change settings: \
-In the API Dashbord run /admin/set-settings \
+In the API Dashbord run /admin/set-settings
 * max_total_points - the maximum total points a voter can give to all the projects in total
 * points_step - a number that points in votes can be divided by.
   For example if `points_step` is 100, vouter cannot give 150 points to a project but can give 100 or 200 points.
@@ -224,11 +244,11 @@ In the API Dashbord run /admin/set-settings \
 Delete all the projects, votes and vouters: \
 In the API Dashbord run /admin/delete-projects-and-votes
 
-Delete votes and voters: \
+Delete votes and voters:
 In the API Dashbord run /admin/delete-votes
 
 Add new projects from XLSX file: \
-In the API Dashbord run /admin/add-projects \
+In the API Dashbord run /admin/add-projects
 * xlsx_file - the XLSX file with the projects. The columns should be:
   column 1: name of the project
   column 2: min points of the project
@@ -241,7 +261,7 @@ In the API Dashbord run /admin/projects
 
 ## Development
 
-For clean, safe and maintainable deployment exits number of Linters and Formatters. \
+For clean, safe and maintainable deployment exits number of Linters and Formatters.
 * Formaters - are tools that automatically format and fix the code.
   * Backend: isort, black
   * Frontend: Prettier, ESLint
@@ -268,24 +288,26 @@ For running only the linters run the following commands:
 make lint
 ```
 
+For running the services run the following command:
+
+```bash
+make serve
+```
+
 ## Production
 
-On the production server already installed Python 11, Poetry, Node 21.5.0 and PostgresSQL. \
-For managing the server you have scripts under /app/scripts
-
-The project will be saved in: /app/equal-shares
+The project will be saved in: /app
+For managing the server you have scripts under /app/equal-shares/scripts
 
 ### Production Scripts
 
-This following scripts will: \
+This following scripts will:
 * pull the latest version of the code from GitHub
-* update the dependencies of backend
-* update the dependencies of frontend
-* build the frontend
-* restart the API (gunicorn) service and nginx service
+* update backend and frontend images if needed
+* restart the services
 
 ```bash
-bash ./scripts/pull.sh
+bash /app/equal-shares/scripts/pull.sh
 ```
 
 For restarting the services run the following command:
@@ -294,27 +316,23 @@ For restarting the services run the following command:
 bash ./scripts/restart.sh
 ```
 
-For deleting the database run the following command:
+For reset the environment variables files by copying the files to the /app directory run the following command:
 
 ```bash
-psql -U postgres -c "DROP DATABASE equal_shares;"
+bash /app/equal-shares/scripts/rest-env-files.sh
 ```
 
-For configuring the nginx run the following command:
+For building the services run the following command:
 
 ```bash
-bash ./scripts/config-nginx.sh
-```
-
-For configuring the gunicorn run the following command:
-
-```bash
-bash ./scripts/config-gunicorn.sh
+bash /app/equal-shares/scripts/build.sh
 ```
 
 ### Production Requirements
 
-* Linux
+* Linux Server
+* SSH
+* RSA keys for the API (equal-shares-api-private-key.pem and equal-shares-api-public-key.pem)
 
 ### Production Installation
 
