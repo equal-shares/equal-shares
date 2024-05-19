@@ -22,6 +22,7 @@ COPY public /app/public
 COPY src /app/src
 
 RUN npm run build
+RUN LS -la /app
 
 COPY /app/dist /usr/share/nginx/html
 
