@@ -9,7 +9,6 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
-    env_file: /app/frontend.env
 
   backend:
     build:

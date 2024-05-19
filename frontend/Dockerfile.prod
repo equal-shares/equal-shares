@@ -1,5 +1,8 @@
 FROM nginx:1.25.5
 
+ARG VITE_API_HOST
+ENV VITE_API_HOST=$VITE_API_HOST
+
 RUN curl -sL https://deb.nodesource.com/setup_21.x | bash -
 RUN apt-get install -y nodejs
 
