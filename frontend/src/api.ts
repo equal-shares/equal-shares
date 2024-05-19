@@ -10,8 +10,8 @@ export async function postDataRequest(email: string, token: string): Promise<Dat
     method: 'POST',
     mode: 'cors',
     headers: {
-      'Content-Type': 'application/json'
-    }
+      'Content-Type': 'application/json',
+    },
   });
 
   if (!response.ok) {
@@ -27,7 +27,7 @@ export async function postDataRequest(email: string, token: string): Promise<Dat
 export async function postVoteRequest(
   email: string,
   token: string,
-  body: VoteRequestBody
+  body: VoteRequestBody,
 ): Promise<DataResponse> {
   const apiHost = getConfig().apiHost;
   const params = new URLSearchParams({ email, token });
@@ -35,9 +35,9 @@ export async function postVoteRequest(
     method: 'POST',
     mode: 'cors',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(body),
   });
 
   if (!response.ok) {

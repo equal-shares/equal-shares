@@ -6,7 +6,7 @@ import {
   Slider,
   Input,
   Checkbox,
-  FormControlLabel
+  FormControlLabel,
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 
@@ -29,7 +29,7 @@ export default function ProjectCard({
   pointsBoxOnChange,
   pointsBoxOnBlur,
   markedOnChange,
-  setDragDisabled
+  setDragDisabled,
 }: ProjectCardProps) {
   return (
     <Card className="my-[4px]" sx={{ boxShadow: 3 }}>
@@ -67,12 +67,12 @@ export default function ProjectCard({
                       marks={[
                         {
                           value: project.min_points,
-                          label: project.min_points.toString()
+                          label: project.min_points.toString(),
                         },
                         {
                           value: project.max_points,
-                          label: project.max_points.toString()
-                        }
+                          label: project.max_points.toString(),
+                        },
                       ]}
                       disabled={!project.marked}
                       onChange={(_, value) => pointsSliderOnChange(project, value)}
@@ -88,7 +88,7 @@ export default function ProjectCard({
                       step: pointsStep,
                       min: project.min_points,
                       max: project.max_points,
-                      type: 'number'
+                      type: 'number',
                     }}
                     disabled={!project.marked}
                     onChange={(event) => pointsBoxOnChange(project, event.target.value)}

@@ -8,7 +8,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Alert
+  Alert,
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { toast } from 'react-toastify';
@@ -75,7 +75,7 @@ export default function MainPage({ email, token }: Props) {
       value = project.points + availablePoints;
       toast('נגמר התקציב, כדי להוסיף הורד מפרוייקט אחר', {
         type: 'error',
-        toastId: TOAST_ID_MAX_POINTS
+        toastId: TOAST_ID_MAX_POINTS,
       });
     }
 
@@ -93,7 +93,7 @@ export default function MainPage({ email, token }: Props) {
       if (project.points + availablePoints < value) {
         toast('נגמר התקציב, כדי להוסיף הורד מפרוייקט אחר', {
           type: 'error',
-          toastId: TOAST_ID_MAX_POINTS
+          toastId: TOAST_ID_MAX_POINTS,
         });
       }
 
@@ -115,7 +115,7 @@ export default function MainPage({ email, token }: Props) {
       if (availablePoints - project.min_points < 0) {
         toast('אין מספיק יתרת תקציב להסיף את הפרוייקט הזה, הסר מפרוייקט אחר', {
           type: 'error',
-          toastId: TOAST_ID_MAX_POINTS
+          toastId: TOAST_ID_MAX_POINTS,
         });
         return;
       }
@@ -151,7 +151,7 @@ export default function MainPage({ email, token }: Props) {
         if (availablePoints - draggedProject.min_points < 0) {
           toast('אין מספיק יתרת תקציב להסיף את הפרוייקט הזה, הסר מפרוייקט אחר', {
             type: 'error',
-            toastId: TOAST_ID_MAX_POINTS
+            toastId: TOAST_ID_MAX_POINTS,
           });
           return;
         }
@@ -186,15 +186,15 @@ export default function MainPage({ email, token }: Props) {
         id: project.id,
         rank: project.rank,
         points: project.points,
-        marked: project.marked
-      }))
+        marked: project.marked,
+      })),
     }).then((data) => {
       toast.update(toastId, {
         render: 'הדירוג נשמר בהצלחה!',
         type: 'success',
         position: 'top-center',
         autoClose: 5000,
-        isLoading: false
+        isLoading: false,
       });
       setVoted(data.voted);
       setMaxTotalPoints(data.max_total_points);

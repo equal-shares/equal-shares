@@ -12,6 +12,6 @@ export function getConfig(): Config {
   }
 
   return {
-    apiHost
+    apiHost,
   };
 }
