@@ -13,6 +13,8 @@ def help_command() -> None:
 
 
 def check_database_command() -> None:
+    print("Version 1")
+
     print("Initializing configuration...")
     init_config()
     init_loggers()
@@ -45,7 +47,12 @@ def check_database_command() -> None:
             password=config.pg_password
     ))
     print("Database connection pool initialized")
-    g_pool.wait()
+    try:
+        g_pool.wait()
+    except Exception as e:
+        print(e)
+        print("Database connection failed")
+        raise e
     print("Database connection pool ready")
 
     g_pool.close()
