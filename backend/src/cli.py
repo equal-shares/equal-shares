@@ -37,7 +37,6 @@ def check_database_command() -> None:
     ):
         print("Connected to the database")
 
-
     print("Initializing database...")
     g_pool = psycopg_pool.ConnectionPool(
         make_conninfo(
