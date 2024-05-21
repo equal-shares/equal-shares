@@ -26,15 +26,16 @@ def check_database_command() -> None:
 
     print("Initializing database...")
     g_pool = psycopg_pool.ConnectionPool(
-        conninfo=make_conninfo(
+        make_conninfo(
             "",
             host=config.pg_host,
             port=config.pg_port,
             dbname=config.pg_database,
             user=config.pg_user,
-            password=config.pg_password
+            password=config.pg_password,
+            ssl="true",
+            sslmode="require"
         ),
-        # sslmode="require",
         min_size=1,
         max_size=2,
         timeout=30,
