@@ -44,6 +44,14 @@ def init_db() -> None:
             max_size=10,
             timeout=30,
         )
+        print(make_conninfo(
+                "",
+                host=config.pg_host,
+                port=config.pg_port,
+                dbname=config.pg_database,
+                user=config.pg_user,
+                password=config.pg_password
+        ))
         g_pool.wait()
     except psycopg.OperationalError as e:
         get_logger().exception(e)
