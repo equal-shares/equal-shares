@@ -2,7 +2,7 @@
 
 from src.config import init_config
 from src.logger import init_loggers
-from src.database import init_db, get_db
+from src.database import init_db, get_db, close_db
 
 
 def help_command() -> None:
@@ -25,3 +25,6 @@ def check_database_command() -> None:
         db.execute("SELECT 1;")
 
     print("The database connection is working.")
+
+    close_db()
+    print("Database connection closed.")

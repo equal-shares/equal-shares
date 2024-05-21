@@ -52,7 +52,9 @@ def init_db() -> None:
                 user=config.pg_user,
                 password=config.pg_password
         ))
+        print("Database connection pool initialized")
         g_pool.wait()
+        print("Database connection pool ready")
     except psycopg.DatabaseError as e:
         get_logger().exception(e)
         print(e)
