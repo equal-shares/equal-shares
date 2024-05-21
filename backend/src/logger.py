@@ -37,8 +37,8 @@ def init_loggers() -> None:
     dictConfig(logger_config)
 
     logging.getLogger("app").setLevel(config.logger_level)
-    logging.getLogger("psycopg").setLevel("ERROR")
-    logging.getLogger("psycopg.pool").setLevel("ERROR")
+    # logging.getLogger("psycopg").setLevel("ERROR")
+    # logging.getLogger("psycopg.pool").setLevel("ERROR")
 
 
 def get_logger() -> logging.Logger:
