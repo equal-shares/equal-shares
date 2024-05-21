@@ -9,6 +9,8 @@ services:
     restart: unless-stopped
     ports:
       - "80:80"
+    networks:
+      - external
 
   backend:
     build:
@@ -27,6 +29,9 @@ services:
     volumes:
       - /app/keys/equal-shares-api-public-key.pem:/app/equal-shares-api-public-key.pem
       - /app/keys/equal-shares-api-private-key.pem:/app/equal-shares-api-private-key.pem
+    networks:
+      - external
+      - internal
 
   db:
     image: postgres:16
@@ -43,6 +48,15 @@ services:
       - POSTGRES_PASSWORD=password
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - internal
 
 volumes:
   db_data:
+
+networks:
+  external:
+    driver: bridge
+  internal:
+    driver: overlay
+    internal: true
