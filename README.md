@@ -187,8 +187,9 @@ Table of the optional environment variables for the database:
 
 ```mermaid
 flowchart LR
-  website --> frontend
-  website --> backend
+  react(voting website) --> frontend
+  react(voting website) --> backend
+  admin(admin dashbord) --> backend
   subgraph Server
     frontend
     backend
