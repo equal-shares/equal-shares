@@ -15,7 +15,7 @@ class Config:
     pg_user: str = ""
     pg_password: str = ""
     pg_host: str = ""
-    pg_port: str = "5432"
+    pg_port: int = 5432
 
     admin_key: UUID = uuid4()
 
@@ -50,7 +50,7 @@ def init_config() -> None:
 
     pg_port = os.environ.get("PG_PORT")
     if pg_port is not None:
-        config.pg_port = pg_port
+        config.pg_port = int(pg_port)
 
     config.admin_key = UUID(_get_envioment_variable("ADMIN_KEY"))
     config.api_rsa_public_key = _get_envioment_variable("API_RSA_PUBLIC_KEY")

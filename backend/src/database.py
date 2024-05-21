@@ -5,6 +5,7 @@ from contextlib import contextmanager
 from typing import Any, Callable, Generator, TypeVar
 
 import psycopg
+from psycopg.conninfo import make_conninfo
 import psycopg_pool
 
 from src.config import config
@@ -29,20 +30,18 @@ def init_db() -> None:
         return
 
     try:
-        conninfo = f"""
-        dbname={config.pg_database}
-        user={config.pg_user}
-        password={config.pg_password}
-        host={config.pg_host}
-        port=5432
-        """
-
         g_pool = psycopg_pool.ConnectionPool(
-            conninfo=conninfo,
+            conninfo=make_conninfo(
+                "",
+                host=config.pg_host,
+                port=config.pg_port,
+                dbname=config.pg_database,
+                user=config.pg_user,
+                password=config.pg_password
+            ),
             # sslmode="require",
             min_size=1,
             max_size=10,
-            reconnect_failed=lambda conn: print("check", conn),
             timeout=30,
         )
         g_pool.wait()
