@@ -33,9 +33,7 @@ def check_database_command() -> None:
             dbname=config.pg_database,
             user=config.pg_user,
             password=config.pg_password,
-            sslmode="require",
         ),
-
         min_size=1,
         max_size=2,
         timeout=30,
