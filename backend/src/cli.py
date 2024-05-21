@@ -38,25 +38,12 @@ def check_database_command() -> None:
         max_size=2,
         timeout=30,
     )
-    print(make_conninfo(
-            "",
-            host=config.pg_host,
-            port=config.pg_port,
-            dbname=config.pg_database,
-            user=config.pg_user,
-            password=config.pg_password
-    ))
     print("Database connection pool initialized")
     try:
         g_pool.wait()
-    # except psycopg_pool.PoolTimeout:
-    #     print("psycopg_pool.PoolTimeout:")
     except psycopg.errors.Error:
         print("except psycopg.errors.Error:")
-    except Exception as e:
-        print(e)
-        print("Database connection failed")
-        raise e
+
     print("Database connection pool ready")
 
     g_pool.close()
