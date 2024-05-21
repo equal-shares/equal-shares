@@ -1,5 +1,7 @@
 # equal-shares
 
+[![Lint](https://github.com/equal-shares/equal-shares/actions/workflows/lint.yml/badge.svg)](https://github.com/equal-shares/equal-shares/actions/workflows/lint.yml)
+
 ## About
 
 This project is a voting application and algorithm based [Equal Shares](https://equalshares.net/) \
