@@ -33,7 +33,7 @@ def check_database_command() -> None:
         ),
         # sslmode="require",
         min_size=1,
-        max_size=10,
+        max_size=2,
         timeout=30,
     )
     print(make_conninfo(
