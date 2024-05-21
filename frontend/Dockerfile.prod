@@ -1,25 +1,29 @@
 FROM nginx:1.25.5
 
+# expose environment variables for build
 ARG VITE_API_HOST
 ENV VITE_API_HOST=$VITE_API_HOST
 
+# install nodejs
 RUN curl -sL https://deb.nodesource.com/setup_21.x | bash -
 RUN apt-get install -y nodejs
 
 WORKDIR /app
 
+# create SSL self-signed certificate
 RUN mkdir -p /etc/nginx/ssl
 RUN openssl req -x509 -nodes -days 365 \
         -newkey rsa:2048 \
         -subj "/AU=IL" \
         -keyout /etc/nginx/ssl/nginx-selfsigned.key \
         -out /etc/nginx/ssl/nginx-selfsigned.crt
-RUN ls /etc/nginx/ssl
 
+# install dependencies
 COPY package.json package-lock.json /app/
 
 RUN npm ci
 
+# copy files
 COPY .eslintrc.cjs /app/
 COPY index.html /app/
 COPY tsconfig.json /app/
@@ -32,6 +36,7 @@ COPY tailwind.config.js /app/
 COPY public /app/public
 COPY src /app/src
 
+# build
 RUN npm run build
 
 RUN cp -r /app/dist/* /usr/share/nginx/html

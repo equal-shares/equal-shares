@@ -2,10 +2,12 @@ FROM node:21
 
 WORKDIR /app
 
+# install dependencies
 COPY package.json package-lock.json /app/
 
 RUN npm ci
 
+# copy files
 COPY .eslintrc.cjs /app/
 COPY index.html /app/
 COPY tsconfig.json /app/

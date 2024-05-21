@@ -106,8 +106,11 @@ For Ariel University
   * package.json - dependencies and commands for development
 * prod - files for production server
   * db
-    * pg_hba-original.conf - original pg_hba.conf of the PostgresSQL
+    * pg_hba-original.conf - original pg_hba.conf of PostgresSQL
     * pg_hba.conf - configuration of the PostgresSQL
+  * frontend
+    * default-original.conf - original ` default.conf of Nginx
+    * default.conf - configuration of the Nginx
   * backend.env - environment variables for the backend service, will copy to /app/backend.env
   * db.env - environment variables for the database service, will copy to /app/db.env
   * frontend.env - environment variables for build the frontend, will copy to /app/frontend.env
@@ -502,13 +505,6 @@ scp equal-shares-api-public-key.pem root@<server-ip>:/app/keys/equal-shares-api-
 chmod 744 /app/**
 ```
 
-11. For open the ports run the following commands:
-
-```bash
-sudo ufw allow 80
-sudo ufw allow 8000
-```
-
 11. For build and start the services run the following commands:
 
 ```bash
@@ -542,8 +538,4 @@ And open the URL: http://<server-ip>/
 
 * Bar Nahmias
 * Didi Avidad
-* Omer Priel
-
-## License
-
-MIT
+* Omer Prielrequr  .txt

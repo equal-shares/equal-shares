@@ -1,14 +1,17 @@
 FROM python:3.12
 
+# install poetry
 RUN pip install -U pip poetry==1.7.1
 
 WORKDIR /app
 
+# install dependencies
 COPY pyproject.toml poetry.lock /app/
 
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
 
+# copy files
 COPY src /app/src
 
 COPY equal-shares-api-public-key.pem /app/
