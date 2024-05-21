@@ -39,7 +39,8 @@ services:
       retries: 120
     ports:
       - "5432:5432"
-    env_file: /app/db.env
+    environment:
+      - POSTGRES_PASSWORD=password
     volumes:
       - db_data:/var/lib/postgresql/data
 
