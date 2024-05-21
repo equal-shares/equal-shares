@@ -2,14 +2,14 @@
 
 [![Lint](https://github.com/equal-shares/equal-shares/actions/workflows/lint.yml/badge.svg)](https://github.com/equal-shares/equal-shares/actions/workflows/lint.yml)
 
-## About
+## Description
 
 This project is a voting application and algorithm based [Equal Shares](https://equalshares.net/) \
 For Ariel University
 
 ## Table of content
 
-* [About](#about)
+* [Description](#description)
 * [Technologies](#technologies)
   * [Versions](#versions)
 * [Files Structure](#files-structure)
