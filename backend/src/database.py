@@ -5,8 +5,8 @@ from contextlib import contextmanager
 from typing import Any, Callable, Generator, TypeVar
 
 import psycopg
-from psycopg.conninfo import make_conninfo
 import psycopg_pool
+from psycopg.conninfo import make_conninfo
 
 from src.config import config
 from src.exceptions import CriticalException, DBException
@@ -37,7 +37,7 @@ def init_db() -> None:
                 port=config.pg_port,
                 dbname=config.pg_database,
                 user=config.pg_user,
-                password=config.pg_password
+                password=config.pg_password,
             ),
             # sslmode="require",
             min_size=1,

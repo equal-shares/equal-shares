@@ -1,8 +1,8 @@
 # CLI for maintains
 
 from src.config import init_config
+from src.database import close_db, get_db, init_db
 from src.logger import init_loggers
-from src.database import init_db, get_db, close_db
 
 
 def help_command() -> None:
