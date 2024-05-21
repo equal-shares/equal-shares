@@ -164,6 +164,16 @@ Table of the required environment variables for the database:
 | ----------------- | ------------------------ |
 | POSTGRES_PASSWORD | Password for PostgresSQL |
 
+Table of the optional environment variables for the database:
+
+| Variable      | Description     | Default  |
+| ------------- | --------------- | -------- |
+| POSTGRES_USER | defualt user    | postgres |
+| POSTGRES_DB   | defualt databas | postgres |
+| 
+
+See: [docker jub - postgres](https://hub.docker.com/_/postgres)
+
 ## Database ERD
 
 ![ERD](docs/database-erd.png)
