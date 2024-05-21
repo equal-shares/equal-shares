@@ -17,14 +17,44 @@ def check_database_command() -> None:
     init_config()
     init_loggers()
 
+    from src.config import config
+    import psycopg_pool
+    from psycopg.conninfo import make_conninfo
+
     print("Initializing database...")
-    init_db()
+    g_pool = psycopg_pool.ConnectionPool(
+        conninfo=make_conninfo(
+            "",
+            host=config.pg_host,
+            port=config.pg_port,
+            dbname=config.pg_database,
+            user=config.pg_user,
+            password=config.pg_password
+        ),
+        # sslmode="require",
+        min_size=1,
+        max_size=10,
+        timeout=30,
+    )
+    print(make_conninfo(
+            "",
+            host=config.pg_host,
+            port=config.pg_port,
+            dbname=config.pg_database,
+            user=config.pg_user,
+            password=config.pg_password
+    ))
+    print("Database connection pool initialized")
+    g_pool.wait()
+    print("Database connection pool ready")
 
-    print("Checking the database connection...")
-    with get_db() as db:
-        db.execute("SELECT 1;")
+    g_pool.close()
 
-    print("The database connection is working.")
+    # print("Checking the database connection...")
+    # with get_db() as db:
+    #   db.execute("SELECT 1;")
 
-    close_db()
-    print("Database connection closed.")
+    # print("The database connection is working.")
+
+    # close_db()
+    # print("Database connection closed.")
