@@ -20,6 +20,7 @@ def check_database_command() -> None:
     init_loggers()
 
     from src.config import config
+    import psycopg
     import psycopg_pool
     from psycopg.conninfo import make_conninfo
 
@@ -49,7 +50,7 @@ def check_database_command() -> None:
     print("Database connection pool initialized")
     try:
         g_pool.wait()
-    except Exception as e:
+    except psycopg.Error as e:
         print(e)
         print("Database connection failed")
         raise e
