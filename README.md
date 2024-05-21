@@ -16,7 +16,9 @@ For Ariel University
   * [Backend](#backend)
   * [Frontend](#frontend)
   * [Database](#database)
-* [Database ERD](#database-erd)
+* [Diagrams](#diagrams)
+  * [Communication Diagram](#communication-diagram)
+  * [Database ERD](#database-erd)
 * [Requirements](#requirements)
   * [For Using Locally](#for-using-locally)
   * [For Development](#for-development)
@@ -68,7 +70,9 @@ For Ariel University
       * admin - routes for managmenet
       * form - routes for the frontend
       * report - routes for the reports of the votes and the algorithm
-    * app.py - the entry of the backend application
+    * `__main__` - the entry of the backend application using CLI
+    * app.py - the application of the backend that used by uvicorn
+    * cli - CLI commands for the backend
     * config.py - contains the configuration of the backend. uses environment variables
     * database.py - database connection
     * exceptions.py - custom exceptions
@@ -99,12 +103,16 @@ For Ariel University
   * package-lock.json - lock file of the dependencies, dont change manually
   * package.json - dependencies and commands for development
 * prod - files for production server
+  * db
+    * pg_hba-original.conf - original pg_hba.conf of the PostgresSQL
+    * pg_hba.conf - configuration of the PostgresSQL
   * backend.env - environment variables for the backend service, will copy to /app/backend.env
   * db.env - environment variables for the database service, will copy to /app/db.env
   * frontend.env - environment variables for build the frontend, will copy to /app/frontend.env
 * res - resources
 * scripts - scripts for production
   * build.sh - building the services
+  * check-database.sh - checking that the backend can connect to the database
   * pull.sh - pulling the latest version of the code, build the services and restart the services
   * rest-env-files.sh - copying the environment files to the /app directory
   * restart.sh - restarting the services
@@ -166,13 +174,25 @@ Table of the required environment variables for the database:
 
 Table of the optional environment variables for the database:
 
-| Variable      | Description     | Default  |
-| ------------- | --------------- | -------- |
-| POSTGRES_USER | defualt user    | postgres |
-| POSTGRES_DB   | defualt databas | postgres |
-| 
+| Variable      | Description           | Default  |
+| ------------- | --------------------- | -------- |
+| POSTGRES_USER | defualt user          | postgres |
+| POSTGRES_DB   | defualt database name | postgres |
 
-See: [docker jub - postgres](https://hub.docker.com/_/postgres)
+## Diagrams
+
+### Communication Diagram
+
+```mermaid
+flowchart LR
+  website --> frontend
+  website --> backend
+  subgraph Server
+    frontend
+    backend
+    backend --> PostgresSQL
+  end
+```
 
 ## Database ERD
 
@@ -344,6 +364,12 @@ For building the services run the following command:
 
 ```bash
 bash /app/equal-shares/scripts/build.sh
+```
+
+For checking manually that backend can connect to the database run the following command:
+
+```bash
+bash /app/equal-shares/scripts/check-database.sh
 ```
 
 ### Production Monitoring and Logs
