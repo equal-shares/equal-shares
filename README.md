@@ -344,22 +344,22 @@ For view all the services run the following command:
 docker ps
 ```
 
-For viewing the logs of the backend service run the following command:
+For viewing the logs (100 lines) of the backend service run the following command:
 
 ```bash
-docker logs equal-shares-backend-1
+docker logs equal-shares-backend-1 --tail 100
 ```
 
-For viewing the logs of the frontend service run the following command:
+For viewing the logs (100 lines) of the frontend service run the following command:
 
 ```bash
-docker logs equal-shares-frontend-1
+docker logs equal-shares-frontend-1 --tail 100
 ```
 
-For viewing the logs of the database service run the following command:
+For viewing the logs (100 lines) of the database service run the following command:
 
 ```bash
-docker logs equal-shares-db-1
+docker logs equal-shares-db-1 --tail 100
 ```
 
 ### Production Requirements
