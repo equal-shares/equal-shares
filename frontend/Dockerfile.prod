@@ -8,6 +8,8 @@ RUN apt-get install -y nodejs
 
 WORKDIR /app
 
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx-selfsigned.key -out /etc/nginx/ssl/nginx-selfsigned.crt
+
 COPY package.json package-lock.json /app/
 
 RUN npm ci
