@@ -55,7 +55,7 @@ def init_db() -> None:
         print("Database connection pool initialized")
         g_pool.wait()
         print("Database connection pool ready")
-    except psycopg.DatabaseError as e:
+    except psycopg.errors.Error as e:
         get_logger().exception(e)
         print(e)
         raise CriticalException("Database connection failed") from e
@@ -99,7 +99,7 @@ def db_named_query(func: Callable[..., ReturnT]) -> Callable[..., ReturnT]:
     def wrapper(*args: Any, **kwargs: Any) -> ReturnT:
         try:
             return func(*args, **kwargs)
-        except psycopg.errors.DatabaseError as e:
+        except psycopg.errors.Error as e:
             error_msg = str(e)
             get_logger().error(f"Database error: {error_msg}")
             get_logger().exception(e)

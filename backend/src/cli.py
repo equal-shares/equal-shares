@@ -19,40 +19,43 @@ def check_database_command() -> None:
     init_config()
     init_loggers()
 
-    from src.config import config
-    import psycopg
-    import psycopg_pool
-    from psycopg.conninfo import make_conninfo
+    # from src.config import config
+    # import psycopg
+    # import psycopg_pool
+    # from psycopg.conninfo import make_conninfo
+
+    # print("Initializing database...")
+    # g_pool = psycopg_pool.ConnectionPool(
+    #     make_conninfo(
+    #         "",
+    #         host=config.pg_host,
+    #         port=config.pg_port,
+    #         dbname=config.pg_database,
+    #         user=config.pg_user,
+    #         password=config.pg_password,
+    #     ),
+    #     min_size=1,
+    #     max_size=2,
+    #     timeout=30,
+    # )
+    # print("Database connection pool initialized")
+    # try:
+    #     g_pool.wait()
+    # except psycopg.errors.Error:
+    #     print("except psycopg.errors.Error:")
+
+    # print("Database connection pool ready")
+
+    # g_pool.close()
 
     print("Initializing database...")
-    g_pool = psycopg_pool.ConnectionPool(
-        make_conninfo(
-            "",
-            host=config.pg_host,
-            port=config.pg_port,
-            dbname=config.pg_database,
-            user=config.pg_user,
-            password=config.pg_password,
-        ),
-        min_size=1,
-        max_size=2,
-        timeout=30,
-    )
-    print("Database connection pool initialized")
-    try:
-        g_pool.wait()
-    except psycopg.errors.Error:
-        print("except psycopg.errors.Error:")
+    init_db()
 
-    print("Database connection pool ready")
+    print("Checking the database connection...")
+    with get_db() as db:
+        db.execute("SELECT 1;")
 
-    g_pool.close()
+    print("The database connection is working.")
 
-    # print("Checking the database connection...")
-    # with get_db() as db:
-    #   db.execute("SELECT 1;")
-
-    # print("The database connection is working.")
-
-    # close_db()
-    # print("Database connection closed.")
+    close_db()
+    print("Database connection closed.")
