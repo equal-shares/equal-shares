@@ -29,6 +29,8 @@ def init_loggers() -> None:
         },
         "loggers": {
             "app": {"handlers": ["default"], "level": "DEBUG"},
+            "psycopg": {"handlers": ["default"], "level": "ERROR"},
+            "psycopg.pool": {"handlers": ["default"], "level": "ERROR"},
         },
     }
 
