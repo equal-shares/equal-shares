@@ -44,17 +44,7 @@ def init_db() -> None:
             max_size=10,
             timeout=30,
         )
-        print(make_conninfo(
-                "",
-                host=config.pg_host,
-                port=config.pg_port,
-                dbname=config.pg_database,
-                user=config.pg_user,
-                password=config.pg_password
-        ))
-        print("Database connection pool initialized")
         g_pool.wait()
-        print("Database connection pool ready")
     except psycopg.errors.Error as e:
         get_logger().exception(e)
         print(e)
