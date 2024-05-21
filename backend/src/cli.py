@@ -13,7 +13,7 @@ def help_command() -> None:
 
 
 def check_database_command() -> None:
-    print("Version 1")
+    print("Version 2")
 
     print("Initializing configuration...")
     init_config()
@@ -50,10 +50,10 @@ def check_database_command() -> None:
     print("Database connection pool initialized")
     try:
         g_pool.wait()
-    except psycopg.errors.Error:
-        print("except psycopg.errors.Error:")
     except psycopg_pool.PoolTimeout:
         print("psycopg_pool.PoolTimeout:")
+    except psycopg.errors.Error:
+        print("except psycopg.errors.Error:")
     except Exception as e:
         print(e)
         print("Database connection failed")
