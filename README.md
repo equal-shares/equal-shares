@@ -230,14 +230,18 @@ Run the following commands to install:
 ```bash
 git clone git@github.com:equal-shares/equal-shares.git
 cd equal-shares
-
-docker compose -f dev.docker-compose.yaml build
 ```
 
 Create or Copy the RSA keys of the API to the backend directory.
 
 * ./backend/equal-shares-api-private-key.pem
 * ./backend/equal-shares-api-public-key.pem
+
+Then run the following commands to install:
+
+```bash
+docker compose -f dev.docker-compose.yaml up --build
+```
 
 ### For Development
 
