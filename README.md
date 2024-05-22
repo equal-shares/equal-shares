@@ -234,7 +234,13 @@ cd equal-shares
 docker compose -f dev.docker-compose.yaml build
 ```
 
+Create or Copy the RSA keys of the API to the backend directory.
+
+* ./backend/equal-shares-api-private-key.pem
+* ./backend/equal-shares-api-public-key.pem
+
 ### For Development
+
 
 Run the following commands to install for development:
 
