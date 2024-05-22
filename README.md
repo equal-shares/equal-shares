@@ -1,6 +1,6 @@
 # equal-shares
 
-[![Lint](https://github.com/equal-shares/equal-shares/actions/workflows/lint.yml/badge.svg)](https://github.com/equal-shares/equal-shares/actions/workflows/lint.yml)
+[![CI](https://github.com/equal-shares/equal-shares/actions/workflows/ci.yml/badge.svg)](https://github.com/equal-shares/equal-shares/actions/workflows/ci.yml)
 
 ## Description
 
@@ -29,6 +29,8 @@ For Ariel University
 * [Usage](#usage)
   * [Management](#management)
 * [Development](#Development)
+  * [Linters and Formatters](#linters-and-formatters)
+  * [Testing](#testing)
 * [Production](#production)
   * [Production Scripts](#production-scripts)
   * [Production Monitoring and Logs](#production-monitoring-and-logs)
@@ -53,7 +55,7 @@ For Ariel University
 * Vite - As build tool for the frontend
 * Tailwind CSS - For styling the frontend
 * MUI - As UI library for the frontend
-* GitHub Actions - For running the linters
+* GitHub Actions - For running the CI
 
 ### Versions
 
@@ -65,9 +67,10 @@ For Ariel University
 
 * .github
   * workflows
-    * lint.yml - Running the linters
+    * ci.yml - Running the CI
 * backend - The backend API
   * src
+    * algorithm - the algorithm of equal shares
     * routers
       * admin - routes for managmenet
       * form - routes for the frontend
@@ -82,6 +85,7 @@ For Ariel University
     * models.py - models and queries for comunicating with the database
     * schemas.py - schemas of the API
     * security.py - security functions
+  * tests - tests of the backend
   * Dockerfile.dev - for building the backend local development
   * Dockerfile.prod - for building the backend in production
   * equal-shares-api-private-key.pem - private RSA key for the API for local development, ignored in git
@@ -305,6 +309,14 @@ In the API Dashbord run /admin/projects
 
 ## Development
 
+For running the services run the following command:
+
+```bash
+make serve
+```
+
+### Linters and Formatters
+
 For clean, safe and maintainable deployment exits number of Linters and Formatters.
 * Formaters - are tools that automatically format and fix the code.
   * Backend: isort, black
@@ -332,10 +344,12 @@ For running only the linters run the following commands:
 make lint
 ```
 
-For running the services run the following command:
+### Testing
+
+For running the tests run the following command:
 
 ```bash
-make serve
+make test
 ```
 
 ## Production

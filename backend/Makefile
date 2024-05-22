@@ -10,25 +10,29 @@ clean:
 	find . -name '__pycache__' -exec rm -fr {} +
 
 isort:
-	python -m isort src
+	python -m isort src tests
 
 black:
-	 python -m black src
+	 python -m black .
 
 # Run the formatters for the backend
 fix: isort black
 
 flake8:
-	python -m flake8 src
+	python -m flake8 src tests
 
 black-check:
-	 python -m black --check --diff src
+	 python -m black --check --diff .
 
 mypy:
-	python -m mypy src
+	python -m mypy src tests
 
 # Run the linters for the backend
 lint: flake8 black-check mypy
+
+# Run the tests for the backend
+test:
+	python -m pytest -k tests
 
 # Run the formatters and linters for the backend
 fix-lint: fix lint
