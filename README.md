@@ -221,10 +221,6 @@ flowchart LR
 
 ## Installation - Local
 
-Create or Copy the RSA keys of the API to the backend directory.
-* ./backend/equal-shares-api-private-key.pem
-* ./backend/equal-shares-api-public-key.pem
-
 Run the following commands to install:
 
 ```bash
