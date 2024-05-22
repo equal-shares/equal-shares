@@ -231,7 +231,7 @@ Run the following commands to install:
 git clone git@github.com:omer-priel/equal-shares.git
 cd equal-shares
 
-docker compose build
+docker compose -f dev.docker-compose.yaml build
 ```
 
 ### For Development
