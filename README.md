@@ -115,7 +115,9 @@ For Ariel University
     * pg_hba.conf - configuration of the PostgresSQL
   * frontend
     * default-original.conf - original ` default.conf of Nginx
-    * default.conf - configuration of the Nginx
+    * default.conf - configuration of the Nginx for the frontend container
+  * nginx
+    * default - Nginx configuration for the server
   * backend.env - environment variables for the backend service, will copy to /app/backend.env
   * db.env - environment variables for the database service, will copy to /app/db.env
   * frontend.env - environment variables for build the frontend, will copy to /app/frontend.env
@@ -151,6 +153,11 @@ For Ariel University
         * chain.pem
         * fullchain.pem
         * privkey.pem
+  * nginx
+    * sites-available
+      * default - Nginx configuration
+    * sites-enabled
+      * default - Nginx configuration
 * /root - Home directory
   * certbot-creds.ini - credentials for the SSL Certificate
 
