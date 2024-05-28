@@ -49,8 +49,9 @@ For Ariel University
 * FastAPI - As framework for the backend
 * uvicorn - For running the backend usinn ASGI
 * PostgresSQL - As database
-* docker - For development in production of the backend
-* docker compose - For local development
+* docker - For running the services
+* docker compose - For running the services
+* Nginx - For handling SSL and routing different domains to thier services
 * React - As framework for the frontend
 * TypeScript - As programming language for the frontend
 * Vite - As build tool for the frontend
@@ -126,6 +127,7 @@ For Ariel University
   * build.sh - building the services
   * check-database.sh - checking that the backend can connect to the database
   * pull.sh - pulling the latest version of the code, build the services and restart the services
+  * renew-ssl.sh - renewing the SSL Certificate
   * rest-env-files.sh - copying the environment files to the /app directory
   * restart.sh - restarting the services
 * dev.docker-compose.yml - for local development
@@ -212,13 +214,17 @@ Table of the optional environment variables for the database:
 
 ```mermaid
 flowchart LR
-  react(voting website) --> frontend
-  react(voting website) --> backend
-  admin(admin dashbord) --> backend
+  react(voting website) --> main-domain
+  react(voting website) --> api-sub-domain
+  admin(admin dashbord) --> api-sub-domain
   subgraph Server
-    frontend
-    backend
-    backend --> PostgresSQL
+    subgraph docker-containers
+      frontend
+      backend --> PostgresSQL
+    end
+
+    main-domain -->|Nginx| frontend
+    api-sub-domain -->|Nginx| backend
   end
 ```
 
@@ -416,6 +422,12 @@ For checking manually that backend can connect to the database run the following
 bash /app/equal-shares/scripts/check-database.sh
 ```
 
+For renewing the SSL Certificate run the following command:
+
+```bash
+bash /app/equal-shares/scripts/renew-ssl.sh
+```
+
 ### Production Monitoring and Logs
 
 For view all the services run the following command:
@@ -583,6 +595,7 @@ And save the file
 sudo certbot certonly \
   --dns-digitalocean \
   --dns-digitalocean-credentials ~/certbot-creds.ini \
+  -d '<server-domain>' \
   -d '*.<server-domain>'
 ```
 

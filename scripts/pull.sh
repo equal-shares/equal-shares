@@ -12,3 +12,6 @@ source /app/frontend.env
 docker compose -f prod.docker-compose.yaml stop
 docker compose -f prod.docker-compose.yaml build --build-arg VITE_API_HOST=$VITE_API_HOST
 docker compose -f prod.docker-compose.yaml up --detach
+
+# restart the nginx server
+systemctl restart nginx
