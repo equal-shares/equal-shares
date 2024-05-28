@@ -1,0 +1,35 @@
+# Redirect all HTTP traffic to HTTPS of Frontend to the container
+server {
+    listen       80;
+    server_name  <server-domain>;
+
+    proxy_pass  http://127.0.0.1:8080/;
+}
+
+server {
+    listen       443 ssl;
+    server_name  <server-domain>;
+
+    ssl_certificate /etc/letsencrypt/live/<server-domain>/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/<server-domain>/privkey.pem;
+
+    proxy_pass  http://127.0.0.1:8080/;
+}
+
+# Redirect all HTTP traffic to HTTPS of API to the container
+server {
+    listen       80;
+    server_name  <sub-server-domain>;
+
+    proxy_pass  http://127.0.0.1:8000/;
+}
+
+server {
+    listen       443 ssl;
+    server_name  <sub-server-domain>;
+
+    ssl_certificate /etc/letsencrypt/live/<server-domain>/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/<server-domain>/privkey.pem;
+
+    proxy_pass  http://127.0.0.1:8000/;
+}

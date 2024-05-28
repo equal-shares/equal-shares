@@ -136,14 +136,23 @@ For Ariel University
 ### Production Files Structure
 
 * /app - the root directory of the project
-  * /backend.env - environment variables for the backend service (container)
-  * /certbot-creds.ini - credentials for the SSL Certificate
-  * /db.env - environment variables for the database service (container)
-  * /equal-shares - the project directory
-  * /frontend.env - environment variables for build the frontend image
-  * /keys
+  * backend.env - environment variables for the backend service (container)
+  * db.env - environment variables for the database service (container)
+  * equal-shares - the project directory
+  * frontend.env - environment variables for build the frontend image
+  * keys
     * equal-shares-api-private-key.pem - private RSA key for the API
     * equal-shares-api-public-key.pem - public RSA key for the API
+* /etc
+  * letsencrypt
+    * live
+      * `<server-domain>`
+        * cert.pem
+        * chain.pem
+        * fullchain.pem
+        * privkey.pem
+* /root - Home directory
+  * certbot-creds.ini - credentials for the SSL Certificate
 
 ## Environment Variables
 
@@ -542,26 +551,14 @@ scp equal-shares-api-public-key.pem root@<server-domain>:/app/keys/equal-shares-
 
 10. Connect to the server using SSH
 
-11.  Update the permissions of the directories:
-
-```bash
-chmod 744 /app/**
-```
-
-12. For build and start the services run the following commands:
-
-```bash
-bash /app/equal-shares/scripts/build.sh
-```
-
-13.  The next steps will be for the SSL Certificate (13 - )
+11.  The next steps will be for the SSL Certificate (11 - 12)
 
 You can see the [Lets Encrypt Tutorial - DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-create-let-s-encrypt-wildcard-certificates-with-certbot) for more information
 
 Run the following command:
 
 ```bash
-nano /app/certbot-creds.ini
+nano /root/certbot-creds.ini
 ```
 
 And add the following lines to the file:
@@ -570,9 +567,10 @@ And add the following lines to the file:
 dns_digitalocean_token = <dns-digitalocean-token>
 ```
 
-Note: replace `<dns-digitalocean-token>` with the DNS API Token for the SSL Certificate certbot
+Replace `<dns-digitalocean-token>` with the DNS API Token for the SSL Certificate certbot
+And save the file
 
-14. For retrieving the SSL Certificate. Run the following command:
+12. For retrieving the SSL Certificate. Run the following command:
 
 ```bash
 sudo certbot certonly \
@@ -582,6 +580,70 @@ sudo certbot certonly \
 ```
 
 Note: replace `<server-domain>` with the domain of the server
+
+After the command you will have to write email. \
+Then press `Y`, then press `N`.
+
+14. Install Nejinx for the server:
+
+```bash
+sudo apt install -y nginx
+```
+
+15. For configuring the Nginx stop the Nginx service and remove the default configuration:
+
+```bash
+systemctl stop nginx
+```
+
+For removing the default configuration run the following commands:
+
+```bash
+rm /etc/nginx/sites-enabled/*
+rm /etc/nginx/sites-available/*
+```
+
+Then copy the configuration of the Nginx from the project to the server:
+
+```bash
+cp /app/equal-shares/prod/nginx/default /etc/nginx/sites-available/default
+```
+
+Then use nano for editing the configuration:
+
+```bash
+nano /etc/nginx/sites-available/default
+```
+
+And replace `<server-domain>` with the domain of the server for the website
+
+And replace `<sub-server-domain>` with the sub domain of the server for the API / Admin Dashbord
+
+Note: exists 6 places to replace the domain and 2 places to replace the sub domain
+
+Then save the file and run the following commands:
+
+```bash
+cp /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+```
+
+And start the Nginx service:
+
+```bash
+systemctl start nginx
+```
+
+13.  Update the permissions of the directories:
+
+```bash
+chmod 744 /app/**
+```
+
+14. For build and start the services run the following commands:
+
+```bash
+bash /app/equal-shares/scripts/build.sh
+```
 
 15. For start the services run the following commands:
 
