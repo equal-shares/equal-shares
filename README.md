@@ -137,6 +137,7 @@ For Ariel University
 
 * /app - the root directory of the project
   * /backend.env - environment variables for the backend service (container)
+  * /certbot-creds.ini - credentials for the SSL Certificate
   * /db.env - environment variables for the database service (container)
   * /equal-shares - the project directory
   * /frontend.env - environment variables for build the frontend image
@@ -553,7 +554,11 @@ chmod 744 /app/**
 bash /app/equal-shares/scripts/build.sh
 ```
 
-13.  The next steps will be for the SSL Certificate, run the following command:
+13.  The next steps will be for the SSL Certificate (13 - )
+
+You can see the [Lets Encrypt Tutorial - DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-create-let-s-encrypt-wildcard-certificates-with-certbot) for more information
+
+Run the following command:
 
 ```bash
 nano /app/certbot-creds.ini
@@ -567,7 +572,18 @@ dns_digitalocean_token = <dns-digitalocean-token>
 
 Note: replace `<dns-digitalocean-token>` with the DNS API Token for the SSL Certificate certbot
 
-14. For start the services run the following commands:
+14. For retrieving the SSL Certificate. Run the following command:
+
+```bash
+sudo certbot certonly \
+  --dns-digitalocean \
+  --dns-digitalocean-credentials ~/certbot-creds.ini \
+  -d '*.<server-domain>'
+```
+
+Note: replace `<server-domain>` with the domain of the server
+
+15. For start the services run the following commands:
 
 ```bash
 bash /app/equal-shares/scripts/pull.sh
@@ -575,7 +591,7 @@ bash /app/equal-shares/scripts/pull.sh
 
 For checking the services open in Browser (like Google Chrome) the domain of the server for the website and the sub domain for the Admin / API Dashbord.
 
-13. For creating the database tables open the sub domain of the server for the Admin / API Dashbord \
+16. For creating the database tables open the sub domain of the server for the Admin / API Dashbord \
     And run the route `/admin/create-tables`
 
 ## Links
@@ -589,7 +605,7 @@ For checking the services open in Browser (like Google Chrome) the domain of the
 * [Final-Project](https://github.com/ElhaiMansbach/Final-Project)
   For the algorithm of equal shares - Flask and React
 
-* [Lets Encrypt Tutorial](https://www.digitalocean.com/community/tutorials/how-to-create-let-s-encrypt-wildcard-certificates-with-certbot)
+* [Lets Encrypt Tutorial - DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-create-let-s-encrypt-wildcard-certificates-with-certbot)
 
 # Authors
 
