@@ -9,36 +9,37 @@ For Ariel University
 
 ## Table of content
 
-* [Description](#description)
-* [Technologies](#technologies)
-  * [Versions](#versions)
-* [Files Structure](#files-structure)
-  * [Production Files Structure](#production-files-structure)
-* [Environment Variables](#environment-variables)
-  * [Backend](#backend)
-  * [Frontend](#frontend)
-  * [Database](#database)
-* [Diagrams](#diagrams)
-  * [Communication Diagram](#communication-diagram)
-  * [Database ERD](#database-erd)
-* [Requirements](#requirements)
-  * [For Using Locally](#for-using-locally)
-  * [For Development](#for-development)
-* [Installation - Local](#installation---local)
-  * [For Development](#for-development)
-* [Usage](#usage)
-  * [Management](#management)
-* [Development](#Development)
-  * [Linters and Formatters](#linters-and-formatters)
-  * [Testing](#testing)
-* [Production](#production)
-  * [Production Scripts](#production-scripts)
-  * [Production Monitoring and Logs](#production-monitoring-and-logs)
-  * [Production Requirements](#production-requirements)
-  * [Production Installation](#production-installation)
-* [Links](#links)
-* [Authors](#authors)
-* [License](#license)
+- [equal-shares](#equal-shares)
+  - [Description](#description)
+  - [Table of content](#table-of-content)
+  - [Technologies](#technologies)
+    - [Versions](#versions)
+  - [Files Structure](#files-structure)
+    - [Production Files Structure](#production-files-structure)
+  - [Environment Variables](#environment-variables)
+    - [Backend](#backend)
+    - [Frontend](#frontend)
+    - [Database](#database)
+  - [Diagrams](#diagrams)
+    - [Communication Diagram](#communication-diagram)
+  - [Database ERD](#database-erd)
+  - [Requirements](#requirements)
+    - [For Using Locally](#for-using-locally)
+    - [For Development](#for-development)
+  - [Installation - Local](#installation---local)
+    - [For Development](#for-development-1)
+  - [Usage](#usage)
+    - [Management](#management)
+  - [Development](#development)
+    - [Linters and Formatters](#linters-and-formatters)
+    - [Testing](#testing)
+  - [Production](#production)
+    - [Production Scripts](#production-scripts)
+    - [Production Monitoring and Logs](#production-monitoring-and-logs)
+    - [Production Requirements](#production-requirements)
+    - [Production Installation](#production-installation)
+  - [Links](#links)
+- [Authors](#authors)
 
 ## Technologies
 
@@ -426,9 +427,13 @@ docker logs equal-shares-db-1 --tail 100
 
 ### Production Requirements
 
-* Linux Server
+* Linux Server with:
+  * Domain and Sub-Domain - for the Frontend and the API
+  * DNS API Token for the SSL Certificate certbot (for example DigitalOcean: dns_digitalocean_token)
 * SSH
 * RSA keys for the API (equal-shares-api-private-key.pem and equal-shares-api-public-key.pem)
+
+The main domain will be for the websites and the sub-domain will be for the API and the admin dashbord.
 
 ### Production Installation
 
@@ -467,7 +472,24 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plug
 sudo docker run hello-world
 ```
 
-5. For installing the project run the following commands:
+5. For installing the dependencies for SSL Certificate:
+
+Note: this example is for DigitalOcean, you can use other providers. \
+You can see other providers in the [Certbot Documentation](https://eff-certbot.readthedocs.io/en/latest/using.html#dns-plugins)
+
+```bash
+sudo apt install -y python3-certbot-dns-digitalocean
+```
+
+For checking the installation of certbot run the following command:
+
+```bash
+certbot --version
+certbot plugins
+```
+
+
+6. For installing the project run the following commands:
 
 ```bash
 mkdir /app
@@ -475,7 +497,7 @@ cd /app
 git clone https://github.com/equal-shares/equal-shares.git
 ```
 
-6. For configuring the environment variables run the following commands:
+7. For configuring the environment variables run the following commands:
 
 ```bash
 ash /app/equal-shares/scripts/rest-env-files.sh
@@ -495,52 +517,65 @@ nano /app/backend.env
 ```
 
 Use nano for editing VITE_API_HOST in /app/frontend.env \
-Replace the value of VITE_API_HOST with `http://<server-ip>:8000` the `server-ip` is the IP of the server
+Set the value of VITE_API_HOST to URL of the sub domain of for the API / Admin Dashbord. For example url like: `https://api.equal-shares.net`
 
 ```bash
 nano /app/frontend.env
 ```
 
-7. Run the folowing commands for create directory for the Keys:
+1. Run the folowing commands for create directory for the Keys:
   
 ```bash
 mkdir -p /app/keys
 ```
 
-8. For adding the api RSA keys disconnect the SSH \
+9. For adding the api RSA keys disconnect the SSH \
     Copy the RSA keys of the API to production server using the following commands:
 
-Note: replace <server-ip> with the IP of the server and you should have the keys in your current directory
+Note: replace `<server-domain>` with the domain or IP of the server, and you should have the keys in your current directory
 
 ```bash
-scp equal-shares-api-private-key.pem root@<server-ip>:/app/keys/equal-shares-api-private-key.pem
-scp equal-shares-api-public-key.pem root@<server-ip>:/app/keys/equal-shares-api-public-key.pem
+scp equal-shares-api-private-key.pem root@<server-domain>:/app/keys/equal-shares-api-private-key.pem
+scp equal-shares-api-public-key.pem root@<server-domain>:/app/keys/equal-shares-api-public-key.pem
 ```
 
-9. Connect to the server using SSH
+10. Connect to the server using SSH
 
-10. Update the permissions of the directories:
+11.  Update the permissions of the directories:
 
 ```bash
 chmod 744 /app/**
 ```
 
-11. For build and start the services run the following commands:
+12. For build and start the services run the following commands:
 
 ```bash
 bash /app/equal-shares/scripts/build.sh
 ```
 
-12. For start the services run the following commands:
+13.  The next steps will be for the SSL Certificate, run the following command:
+
+```bash
+nano /app/certbot-creds.ini
+```
+
+And add the following lines to the file:
+
+```bash
+dns_digitalocean_token = <dns-digitalocean-token>
+```
+
+Note: replace `<dns-digitalocean-token>` with the DNS API Token for the SSL Certificate certbot
+
+14. For start the services run the following commands:
 
 ```bash
 bash /app/equal-shares/scripts/pull.sh
 ```
 
-For checking the services open in Browser (like Google Chrome) the URL: http://<server-ip>:8000/ \
-And open the URL: http://<server-ip>/
+For checking the services open in Browser (like Google Chrome) the domain of the server for the website and the sub domain for the Admin / API Dashbord.
 
-13. For creating the database tables open the URL: http://<server-ip>:8000/ \
+13. For creating the database tables open the sub domain of the server for the Admin / API Dashbord \
     And run the route `/admin/create-tables`
 
 ## Links
@@ -553,6 +588,8 @@ And open the URL: http://<server-ip>/
 * [equalshares.net](https://equalshares.net/)
 * [Final-Project](https://github.com/ElhaiMansbach/Final-Project)
   For the algorithm of equal shares - Flask and React
+
+* [Lets Encrypt Tutorial](https://www.digitalocean.com/community/tutorials/how-to-create-let-s-encrypt-wildcard-certificates-with-certbot)
 
 # Authors
 
