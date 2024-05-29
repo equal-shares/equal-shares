@@ -13,6 +13,7 @@ RUN poetry install --no-root
 
 # copy files
 COPY src /app/src
+COPY tests /app/tests
 
 EXPOSE 8000
 
