@@ -90,6 +90,7 @@ For Ariel University
   * tests - tests of the backend
   * Dockerfile.dev - for building the backend local development
   * Dockerfile.prod - for building the backend in production
+  * Dockerfile.test - for building the backend for local testing
   * equal-shares-api-private-key.pem - private RSA key for the API for local development, ignored in git
   * equal-shares-api-public-key.pem - public RSA key for the API for local development, ignored in git
   * Makefile - commands for development
@@ -136,6 +137,9 @@ For Ariel University
 * Makefile - commands for development
 * prod.docker-compose.yml - for production
 * README.md - this file
+* test.docker-compose.yml - for local testing
+* windows-serve.bat - script for running the services locally in Windows
+* windows-test.bat - script for running the tests locally in Windows
 
 ### Production Files Structure
 
@@ -257,14 +261,21 @@ Create or Copy the RSA keys of the API to the backend directory.
 * ./backend/equal-shares-api-private-key.pem
 * ./backend/equal-shares-api-public-key.pem
 
-Then run the following commands to install:
+Then run the following commands to install and run the services:
 
 ```bash
 docker compose -f dev.docker-compose.yaml up --build
 ```
 
-### For Development
+or For Linux \ MacOS:
 
+```bash
+make serve
+```
+
+For Windows run the script file `windows-serve.bat`
+
+### For Development
 
 Run the following commands to install for development:
 
@@ -293,6 +304,8 @@ Or
 ```bash
 docker compose -f dev.docker-compose.yaml up --build
 ```
+
+or For Windows run the script file `windows-serve.bat`
 
 The API will run on http://localhost:8000/
 
@@ -345,6 +358,8 @@ For running the services run the following command:
 make serve
 ```
 
+or for windows run the script file `windows-serve.bat`
+
 ### Linters and Formatters
 
 For clean, safe and maintainable deployment exits number of Linters and Formatters.
@@ -381,6 +396,8 @@ For running the tests run the following command:
 ```bash
 make test
 ```
+
+Or for windows run the script file `windows-test.bat`
 
 ## Production
 
