@@ -58,6 +58,9 @@ For Ariel University
 * Tailwind CSS - For styling the frontend
 * MUI - As UI library for the frontend
 * GitHub Actions - For running the CI
+* eslint, prettier - For linting and formatting the frontend
+* isort, black, flake8, mypy - For linting and formatting the backend
+* pytest, doctest - For testing the backend
 
 ### Versions
 
