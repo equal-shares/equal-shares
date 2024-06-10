@@ -18,9 +18,6 @@ COPY tests /app/tests
 # install the project as a package
 RUN poetry install
 
-COPY equal-shares-api-public-key.pem /app/
-COPY equal-shares-api-private-key.pem /app/
-
 EXPOSE 8000
 
 ENTRYPOINT ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "--reload", "src.app:app"]

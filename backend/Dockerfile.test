@@ -21,7 +21,4 @@ COPY . /app/
 # install the project as a package
 RUN poetry install
 
-COPY equal-shares-api-public-key.pem /app/
-COPY equal-shares-api-private-key.pem /app/
-
 ENTRYPOINT ["make", "test"]
