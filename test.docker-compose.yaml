@@ -4,7 +4,7 @@ services:
   backend-test:
     build:
       context: ./backend
-      dockerfile: Dockerfile.test
+      target: test
     environment:
       - ADMIN_KEY=7fbae5db-37bb-4dc5-a9f5-115878c6bcb0
       - API_RSA_PUBLIC_KEY=/app/equal-shares-api-public-key.pem

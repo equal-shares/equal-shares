@@ -4,7 +4,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod
+      target: prod
     restart: unless-stopped
     ports:
       - "8080:80"
@@ -14,7 +14,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.prod
+      target: prod
     restart: unless-stopped
     depends_on:
       - db
