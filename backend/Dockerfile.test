@@ -1,5 +1,9 @@
 FROM python:3.12
 
+# install apt dependencies
+RUN apt-get update && \
+    apt-get install -y make
+
 # install poetry
 RUN pip install -U pip poetry==1.7.1
 
@@ -12,8 +16,7 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
 
 # copy files
-COPY src /app/src
-COPY tests /app/tests
+COPY . /app/
 
 # install the project as a package
 RUN poetry install
@@ -21,4 +24,4 @@ RUN poetry install
 COPY equal-shares-api-public-key.pem /app/
 COPY equal-shares-api-private-key.pem /app/
 
-ENTRYPOINT ["python", "-m", "pytest", "-k", "tests"]
+ENTRYPOINT ["make", "test"]
