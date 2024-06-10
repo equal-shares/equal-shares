@@ -31,8 +31,13 @@ mypy:
 lint: flake8 black-check mypy
 
 # Run the tests for the backend
-test:
+doctest:
+	python -m doctest src/**/*.py
+
+pytest:
 	python -m pytest -k tests
+
+test: doctest pytest
 
 # Run the formatters and linters for the backend
 fix-lint: fix lint
