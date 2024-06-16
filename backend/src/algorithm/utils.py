@@ -27,10 +27,12 @@ def find_max(bids: dict[int, dict[int, int]]) -> dict[int, int]:
 
 
 def filter_bids(
-    update_bids, update_approvers, curr_project_id, curr_project_cost, budget_increment_per_project, update_cost
+    update_bids, update_approvers, curr_project_id, 
+    curr_project_cost, budget_increment_per_project, update_cost
 ):
     """
-    
+    Updates the variables `update_bids`, `update_approvers` and `update_cost` 
+            after adding funding to a project.
     """
     max_payment = curr_project_cost + budget_increment_per_project
     filtered_approvers = {voter: bid for voter, bid in update_bids[curr_project_id].items() if bid <= max_payment}
