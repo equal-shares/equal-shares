@@ -111,15 +111,17 @@ def equal_shares_fixed_budget(
     projects: list[int],
     cost: dict[int, int],
     approvers: dict[int, list[int]],
-    budget,
+    budget:int,
     bids,
     budget_increment_per_project,
     max_cost_for_project,
 ):
     """
+    Runs the equal-shares algorithm with a fixed budget.
+
     # T.0
-    >>> voters = [1, 2, 3, 4, 5]  # Voters
-    >>> projects = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # Project IDs
+    >>> voters = [1, 2, 3, 4, 5] 
+    >>> projects = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] 
     >>> cost = {1: 100, 2: 150, 3: 200, 4: 250, 5: 300, 6: 350, 7: 400, 8: 450, 9: 500, 10: 550}
     >>> approvers = {
     ...     1: [1, 2, 4], 2: [2, 5], 3: [1, 5], 4: [3, 4], 5: [2, 3, 5],
