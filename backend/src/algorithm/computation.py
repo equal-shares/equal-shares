@@ -1,6 +1,6 @@
 import logging
 
-from src.algorithm.equal_shares import equal_shares
+from equal_shares import equal_shares
 
 logger = logging.getLogger("equal_shares_logger")
 
@@ -91,3 +91,7 @@ def min_max_equal_shares(voters, projects, cost_min_max, bids, budget, budget_in
         approvers[project_id] = list(value.keys())
 
     return equal_shares(voters, projects, cost, approvers, budget, bids, budget_increment_per_project)
+
+if __name__=="__main__":
+    import doctest
+    print(doctest.testmod())

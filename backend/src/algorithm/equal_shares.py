@@ -1,7 +1,7 @@
 import copy
 import logging
 
-from src.algorithm.utils import filter_bids, find_max
+from utils import filter_bids, find_max
 
 logger = logging.getLogger("equal_shares_logger")
 
@@ -230,3 +230,8 @@ def equal_shares_fixed_budget(
             del remaining[curr_project_id]
 
     return winners, winners_total_cost, update_cost, budget_per_voter
+
+
+if __name__=="__main__":
+    import doctest
+    print(doctest.testmod())
