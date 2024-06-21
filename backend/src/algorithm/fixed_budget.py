@@ -10,7 +10,8 @@ from utils import find_max, filter_bids
 logger = logging.getLogger("equal_shares_logger")
 
 
-def equal_shares(voters: list, projects: list, cost: dict, approvers: dict, budget: int, bids: dict, budget_increment_per_project: int):
+
+def equal_shares_fixed_budget(voters: list, projects: list, cost: dict, approvers: dict, budget: int, bids: dict, budget_increment_per_project:int,max_cost_for_project:dict):
 
 
     '''
@@ -22,85 +23,9 @@ def equal_shares(voters: list, projects: list, cost: dict, approvers: dict, budg
     >>> bids = { 1: {1: 100, 2: 100, 4: 100},2: {2: 150, 5: 150},3: {1: 200, 5: 200}, 4: {3: 250, 4: 250, },5: {2: 300, 3: 300, 5: 300},6: {2: 350, 5: 350}, 7: {1: 400, 4: 400, },8: {2: 450, 5: 450},9: {1: 500, 3: 500,5: 500},10:{2: 550, 3: 550}}
     >>> budget = 900  # Total budget
     >>> budget_increment_per_project = 10
-    >>> equal_shares(voters, projects, cost, approvers,budget, bids,budget_increment_per_project)
-    ([1, 3, 4, 5], {1: 100, 2: 0, 3: 200, 4: 250, 5: 300, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}, {1: {1: 70.0, 2: 70.0, 4: 70.0}, 2: {2: 0, 5: 0}, 3: {1: 100.0, 5: 100.0}, 4: {3: 0, 4: 134.33333333333331}, 5: {2: 203.33333333333331, 3: 203.33333333333331, 5: 203.33333333333331}, 6: {2: 0, 5: 0}, 7: {1: 0, 4: 0}, 8: {2: 0, 5: 0}, 9: {1: 0, 3: 0, 5: 0}, 10: {2: 0, 3: 0}})
-
-    
-
-
-
-    '''
-
-    max_cost_for_project = find_max(bids)
-    chosen_project, chosen_project_cost, update_cost,budget_per_voter = equal_shares_fixed_budget(voters, projects, cost, approvers, budget, bids, budget_increment_per_project,max_cost_for_project)
-
-    # add 1 completion
-    # start with integral per-voter voters_budget
-    voters_budget = int(budget / len(voters)) * len(voters)
-    total_chosen_project_cost = sum(chosen_project_cost[c] for c in chosen_project_cost)
-
-    while True:
-        # is current outcome exhaustive?
-        is_exhaustive = True
-        for project in projects:
-            max_value_project = max_cost_for_project[project]
-            project_cost = update_cost[project]
-
-
-
-            # chack if total cost of chosen project + current project  <= budget, if true have more project to chack
-            # check if total cost of chosen project + project_cost   <= budget
-            # and total project_cost + curr project_cost <= max value for curr project, if true thr price of the project can be increased
-
-            if (project not in chosen_project and total_chosen_project_cost + cost[project] <= budget) or \
-                    (project in chosen_project and total_chosen_project_cost + project_cost <= budget and
-                     chosen_project_cost[project] + project_cost <= max_value_project):
-                is_exhaustive = False
-
-                break
-        # if so, stop
-        if is_exhaustive:
-            break
-        # would the next highest voters_budget work?
-        update_voters_budget = voters_budget + len(voters)  # Add 1 to each voter's voters_budget
-        logger.info("  call fix voters_budget   = %s B= %s, %s", total_chosen_project_cost, budget, update_voters_budget)
-        update_chosen_project, update_chosen_project_cost, update_cost, update_budget_per_voter = equal_shares_fixed_budget(voters, projects, cost, approvers, update_voters_budget, bids, budget_increment_per_project,max_cost_for_project)
-        total_chosen_project_cost = sum(update_chosen_project_cost[c] for c in update_chosen_project_cost)
-
-        if total_chosen_project_cost <= budget:
-            # yes, so continue with that voters_budget
-            voters_budget = update_voters_budget
-            chosen_project = update_chosen_project
-            chosen_project_cost = update_chosen_project_cost
-            budget_per_voter = update_budget_per_voter
-        else:
-            # logger.info("  break total_chosen_project_cost  = %s B= %s", total_chosen_project_cost, B)
-            # no, so stop
-            break
-
-    return chosen_project, chosen_project_cost,budget_per_voter
-
-
-
-'''
-break ties
-first the min cost project
-second the max voter for project
-Ensure there is only one remaining project, third the min index project
-'''
-def break_ties(cost: dict, approvers: dict, bids: list):
-    remaining = bids.copy()
-    best_cost = min(cost[c] for c in remaining)  # first the min cost project
-    remaining = [c for c in remaining if cost[c] == best_cost]
-    best_count = max(len(approvers[c]) for c in remaining)  # second the max voter for project
-    remaining = [c for c in remaining if len(approvers[c]) == best_count]
-    remaining = [min(remaining)]  # Ensure there is only one remaining project, third the min index project
-    return remaining
-
-
-
-def equal_shares_fixed_budget(voters: list, projects: list, cost: dict, approvers: dict, budget: int, bids: dict, budget_increment_per_project:int,max_cost_for_project:dict):
-
+    >>> max_cost_for_project = {1: 100, 2: 150, 3: 200, 4: 250, 5: 300, 6: 350, 7: 400, 8: 450, 9: 500, 10: 550}
+    >>> equal_shares_fixed_budget(voters, projects, cost, approvers,budget, bids,budget_increment_per_project,max_cost_for_project)
+    ([1, 3, 5], {1: 100, 2: 0, 3: 200, 4: 0, 5: 300, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}, {1: 10, 2: 150, 3: 10, 4: 250, 5: 10, 6: 350, 7: 400, 8: 450, 9: 500, 10: 550}, {1: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336}, 2: {2: 0, 5: 0}, 3: {1: 120.0, 5: 0}, 4: {3: 0, 4: 0}, 5: {2: 100.0, 3: 100.0, 5: 100.0}, 6: {2: 0, 5: 0}, 7: {1: 0, 4: 0}, 8: {2: 0, 5: 0}, 9: {1: 0, 3: 0, 5: 0}, 10: {2: 0, 3: 0}})''' 
     voters_budget = {i: budget / len(voters) for i in voters}
 
     remaining = {}  # remaining candidate -> previous effective vote count
@@ -235,6 +160,14 @@ def equal_shares_fixed_budget(voters: list, projects: list, cost: dict, approver
     # logger.info("winners return  = %s", winners)
     return winners, winners_total_cost, update_cost,budget_per_voter
 
+def break_ties(cost: dict, approvers: dict, bids: list):
+    remaining = bids.copy()
+    best_cost = min(cost[c] for c in remaining)  # first the min cost project
+    remaining = [c for c in remaining if cost[c] == best_cost]
+    best_count = max(len(approvers[c]) for c in remaining)  # second the max voter for project
+    remaining = [c for c in remaining if len(approvers[c]) == best_count]
+    remaining = [min(remaining)]  # Ensure there is only one remaining project, third the min index project
+    return remaining
 
 
 if __name__ == "__main__":
