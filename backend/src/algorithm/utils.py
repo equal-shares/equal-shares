@@ -5,7 +5,7 @@ import doctest
 logger = logging.getLogger("equal_shares_logger")
 
 
-def find_max(bids):
+def find_max(bids: dict):
     '''
     #T.0
     >>> bids = { 1: {1: 100, 2: 100, 4: 100},2: {2: 150, 5: 150},3: {1: 200, 5: 200}, 4: {3: 250, 4: 250, },5: {2: 300, 3: 300, 5: 300},6: {2: 350, 5: 350}, 7: {1: 400, 4: 400, },8: {2: 450, 5: 450},9: {1: 500, 3: 500,5: 500},10:{2: 550, 3: 550}}
@@ -13,17 +13,54 @@ def find_max(bids):
     {1: 100, 2: 150, 3: 200, 4: 250, 5: 300, 6: 350, 7: 400, 8: 450, 9: 500, 10: 550}
     '''
 
-    max_cost_for_project = {}
-    for project_id, voter_bids in bids.items():
-        max_cost_for_project[project_id] = max(voter_bids.values())
-    return max_cost_for_project
+    max_result = {key: 0 for key in bids}
 
-def filter_bids(update_bids, update_approvers, curr_project_id, curr_project_cost, budget_increment_per_project, update_cost):
-    max_payment = curr_project_cost + budget_increment_per_project
-    filtered_approvers = {voter: bid for voter, bid in update_bids[curr_project_id].items() if bid <= max_payment}
-    update_bids[curr_project_id] = filtered_approvers
-    update_approvers[curr_project_id] = list(filtered_approvers.keys())
-    update_cost[curr_project_id] = max_payment
+    for project_id in bids:
+        max_result[project_id] = max(bids[project_id].values(), default=0)  # Find the maximum value in the list
+
+    return max_result
+
+
+
+
+'''
+This function accepts update_bids,update_approvers,curr_project_id,
+budget_increment_per_project and curr_project_cost and returns all values ​​in update_bids,update_approvers
+that are greater or equal than curr_project_cost.
+In addition, filter_bids update update_cost to be at budget_increment_per_project price
+
+example: 
+
+input:                                  -->  output/ update this value after call filter bids
+
+update_bids: {1: {2: 99}, 2: {1: 98}}   --> {1: {2: 99}, 2: {}}
+update_approvers: {1: [2], 2: [1]}      --> {1: [2], 2: []}
+curr_project_id: 2                      --> 2
+curr_project_cost: 98                   --> 98
+budget_increment_per_project: 10        --> 10
+update_cost: {1: 99, 2: 98}             --> {1: 99, 2: 10}
+
+
+'''
+def filter_bids(update_bids: dict, update_approvers: dict, curr_project_id: int, curr_project_cost: int, budget_increment_per_project: int,
+                update_cost: dict):
+
+
+    if curr_project_id in update_bids:
+        voters_to_remove = []
+        for voter_id, price in update_bids[curr_project_id].items():
+            update_project_price = price - (curr_project_cost + budget_increment_per_project)  # for the next iteration
+            if update_project_price < 0:
+                voters_to_remove.append(voter_id)
+                update_cost[curr_project_id] = budget_increment_per_project
+            else:
+                update_bids[curr_project_id][voter_id] = update_project_price + budget_increment_per_project
+                update_cost[curr_project_id] = budget_increment_per_project
+
+        for voter_id in voters_to_remove:
+            update_bids[curr_project_id].pop(voter_id)
+
+    update_approvers[curr_project_id] = list(update_bids[curr_project_id].keys())
 
 
 
