@@ -24,8 +24,16 @@ def find_max(bids: dict):
 
 
 '''
-This function accepts update_bids,update_approvers,curr_project_id,
-budget_increment_per_project and curr_project_cost and returns all voters ​​in curr_project_id from update_bids,update_approvers
+
+   Args:
+        update_bids (dict): A dictionary mapping project IDs to the list of voters who approve them and the cost the voters chose.
+        update_approvers (list): A list of project IDs.
+        curr_project_id (int): The id number of current project
+        curr_project_cost (int): The cost of current project
+        budget_increment_per_project (int) : A const number marking the steps between the maximum and minimum price
+        update_cost (dict): A dictionary mapping project IDs to their current costs.
+
+This void function accepts this Args and returns all voters ​​in curr_project_id from update_bids,update_approvers
 that their budget vote are greater or equal than curr_project_cost.
 In addition, filter_bids update update_cost to be at budget_increment_per_project price
 

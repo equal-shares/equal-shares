@@ -3,7 +3,6 @@ import copy
 import logging
 import doctest
 
-# Your test code here
 
 from utils import find_max, filter_bids
 
