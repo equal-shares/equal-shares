@@ -23,13 +23,8 @@ def equal_shares(voters: list, projects: list, cost: dict, approvers: dict, budg
     >>> budget = 900  # Total budget
     >>> budget_increment_per_project = 10
     >>> equal_shares(voters, projects, cost, approvers,budget, bids,budget_increment_per_project)
-    ([1, 3, 4, 5], {1: 100, 2: 0, 3: 200, 4: 250, 5: 300, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}, {1: {1: 70.0, 2: 70.0, 4: 70.0}, 2: {2: 0, 5: 0}, 3: {1: 100.0, 5: 100.0}, 4: {3: 0, 4: 134.33333333333331}, 5: {2: 203.33333333333331, 3: 203.33333333333331, 5: 203.33333333333331}, 6: {2: 0, 5: 0}, 7: {1: 0, 4: 0}, 8: {2: 0, 5: 0}, 9: {1: 0, 3: 0, 5: 0}, 10: {2: 0, 3: 0}})
-
-    
-
-
-
-    '''
+    ([1, 3, 4, 5], {1: 100, 2: 0, 3: 200, 4: 250, 5: 300, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}, {1: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336}, 2: {2: 0, 5: 0}, 3: {1: 108.0, 5: 0}, 4: {3: 0, 4: 158.0}, 5: {2: 100.0, 3: 100.0, 5: 100.0}, 6: {2: 0, 5: 0}, 7: {1: 0, 4: 0}, 8: {2: 0, 5: 0}, 9: {1: 0, 3: 0, 5: 0}, 10: {2: 0, 3: 0}})'''
+  
 
     max_cost_for_project = find_max(bids)
     chosen_project, chosen_project_cost, update_cost,budget_per_voter = equal_shares_fixed_budget(voters, projects, cost, approvers, budget, bids, budget_increment_per_project,max_cost_for_project)
