@@ -4,7 +4,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      target: dev
     ports:
       - "5173:5173"
     environment:
@@ -13,7 +13,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.dev
+      target: dev
     depends_on:
       - db
     ports:
@@ -27,6 +27,9 @@ services:
       - ADMIN_KEY=7fbae5db-37bb-4dc5-a9f5-115878c6bcb0
       - API_RSA_PUBLIC_KEY=/app/equal-shares-api-public-key.pem
       - API_RSA_PRIVATE_KEY=/app/equal-shares-api-private-key.pem
+    volumes:
+      - ./backend/equal-shares-api-private-key.pem:/app/equal-shares-api-private-key.pem
+      - ./backend/equal-shares-api-public-key.pem:/app/equal-shares-api-public-key.pem
 
   db:
     image: postgres:16

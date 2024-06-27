@@ -4,3 +4,4 @@ exclude =
     __pycache__,
 
 max-line-length = 120
+doctests = 0

@@ -58,6 +58,9 @@ For Ariel University
 * Tailwind CSS - For styling the frontend
 * MUI - As UI library for the frontend
 * GitHub Actions - For running the CI
+* eslint, prettier - For linting and formatting the frontend
+* isort, black, flake8, mypy - For linting and formatting the backend
+* pytest, doctest - For testing the backend
 
 ### Versions
 
@@ -88,9 +91,7 @@ For Ariel University
     * schemas.py - schemas of the API
     * security.py - security functions
   * tests - tests of the backend
-  * Dockerfile.dev - for building the backend local development
-  * Dockerfile.prod - for building the backend in production
-  * Dockerfile.test - for building the backend for local testing
+  * Dockerfile - for building the images of the backend
   * equal-shares-api-private-key.pem - private RSA key for the API for local development, ignored in git
   * equal-shares-api-public-key.pem - public RSA key for the API for local development, ignored in git
   * Makefile - commands for development
@@ -107,8 +108,7 @@ For Ariel University
     * config.ts - configuration of the frontend at build time
     * main.tsx - the entry of the frontend application
     * schema.ts - schemas of the API
-  * Dockerfile.dev - for building the frontend local development
-  * Dockerfile.prod - for building the frontend in production
+  * Dockerfile - for building the images of the frontend
   * package-lock.json - lock file of the dependencies, dont change manually
   * package.json - dependencies and commands for development
 * prod - files for production server
@@ -388,6 +388,9 @@ For running only the linters run the following commands:
 ```bash
 make lint
 ```
+
+or for windows run the script file `windows-lint.bat` \
+Note: In windows we do not support formatters
 
 ### Testing
 
