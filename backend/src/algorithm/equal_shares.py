@@ -42,7 +42,7 @@ def equal_shares(voters: list, projects: list, cost: dict, approvers: dict, budg
 
 
 
-            # chack if total cost of chosen project + current project  <= budget, if true have more project to chack
+            # check if total cost of chosen project + current project  <= budget, if true have more project to chack
             # check if total cost of chosen project + project_cost   <= budget
             # and total project_cost + curr project_cost <= max value for curr project, if true thr price of the project can be increased
 
