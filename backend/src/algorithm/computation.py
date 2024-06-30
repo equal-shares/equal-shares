@@ -157,3 +157,8 @@ def min_max_equal_shares(
         approvers[project_id] = list(value.keys())
 
     return equal_shares(voters, projects, cost, approvers, budget, bids, budget_increment_per_project)
+
+
+if __name__=="__main__":
+    import doctest
+    print(doctest.testmod())

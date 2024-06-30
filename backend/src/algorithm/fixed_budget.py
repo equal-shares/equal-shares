@@ -214,3 +214,9 @@ def break_ties(cost: dict, approvers: dict, bids: list):
     remaining = [c for c in remaining if len(approvers[c]) == best_count]
     remaining = [min(remaining)]  # Ensure there is only one remaining project, third the min index project
     return remaining
+
+
+
+if __name__=="__main__":
+    import doctest
+    print(doctest.testmod())
