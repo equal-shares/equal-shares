@@ -6,7 +6,6 @@ from src.algorithm.utils import filter_bids
 logger = logging.getLogger("equal_shares_logger")
 
 
-
 def equal_shares_fixed_budget(
     voters: list[int],
     projects: list[int],
@@ -16,8 +15,7 @@ def equal_shares_fixed_budget(
     bids: dict[int, dict[int, int]],
     budget_increment_per_project: int,
     max_cost_for_project: dict,
-) -> tuple[list[int], dict[int, int], dict[int, int], dict[int, dict[int,int]]]:
-    
+) -> tuple[list[int], dict[int, int], dict[int, int], dict[int, dict[int, int]]]:
     """
     # T.0
     >>> voters = [1, 2, 3, 4, 5]
