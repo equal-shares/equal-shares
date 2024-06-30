@@ -59,14 +59,14 @@ def equal_shares(
     >>> chosen_project
     [11, 13, 14, 15]
     >>> chosen_project_cost
-    {11: 100, 12: 0, 13: 200, 14: 250, 15: 300, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
+    {11: 100.0, 12: 0, 13: 200.0, 14: 250.0, 15: 300.0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
     >>> budget_per_voter
     {11: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336}, 12: {2: 0, 5: 0}, 13: {1: 108.0, 5: 0}, 14: {3: 0, 4: 158.0}, 15: {2: 100.0, 3: 100.0, 5: 100.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}})
     """
 
-    max_cost_for_project = find_max(bids)
-    chosen_project, chosen_project_cost, update_cost, budget_per_voter = equal_shares_fixed_budget(
-        voters, projects, cost, approvers, budget, bids, budget_increment_per_project, max_cost_for_project
+    max_bid_for_project = find_max(bids)
+    chosen_project, chosen_project_cost, updated_cost, budget_per_voter = equal_shares_fixed_budget(
+        voters, projects, cost, approvers, budget, bids, budget_increment_per_project, max_bid_for_project
     )
 
     # add 1 completion
@@ -77,32 +77,31 @@ def equal_shares(
     while True:
         # is current outcome exhaustive?
         is_exhaustive = True
-        for project in projects:
-            max_value_project = max_cost_for_project[project]
-            project_cost = update_cost[project]
+        for candidate in projects:
+            candidate_cost = updated_cost[candidate]
+            candidate_max_bid = max_bid_for_project[candidate]
 
             # check if total cost of chosen project + current project  <= budget, if true have more project to chack
             # check if total cost of chosen project + project_cost   <= budget
             # and total project_cost + curr project_cost <= max value for curr project,
-            # if true thr price of the project can be increased
+            # if true the price of the project can be increased
 
-            if (project not in chosen_project and total_chosen_project_cost + cost[project] <= budget) or (
-                project in chosen_project
-                and total_chosen_project_cost + project_cost <= budget
-                and chosen_project_cost[project] + project_cost <= max_value_project
+            if (candidate not in chosen_project and total_chosen_project_cost + cost[candidate] <= budget) or (
+                candidate in chosen_project
+                and total_chosen_project_cost + candidate_cost <= budget
+                and chosen_project_cost[candidate] + candidate_cost <= candidate_max_bid
             ):
                 is_exhaustive = False
-
                 break
         # if so, stop
         if is_exhaustive:
             break
         # would the next highest voters_budget work?
         update_voters_budget = voters_budget + len(voters)  # Add 1 to each voter's voters_budget
-        logger.info(
+        logger.debug(
             "  Call fix voters_budget   = %s B= %s, %s", total_chosen_project_cost, budget, update_voters_budget
         )
-        update_chosen_project, update_chosen_project_cost, update_cost, update_budget_per_voter = (
+        update_chosen_project, update_chosen_project_cost, updated_cost, update_budget_per_voter = (
             equal_shares_fixed_budget(
                 voters,
                 projects,
@@ -111,10 +110,12 @@ def equal_shares(
                 update_voters_budget,
                 bids,
                 budget_increment_per_project,
-                max_cost_for_project,
+                max_bid_for_project,
             )
         )
         total_chosen_project_cost = sum(update_chosen_project_cost[c] for c in update_chosen_project_cost)
+        logger.info("update_chosen_project=%s, update_chosen_project_cost=%s, update_cost=%s, total_chosen_project_cost=%s", update_chosen_project, update_chosen_project_cost, updated_cost, total_chosen_project_cost)
+
 
         if total_chosen_project_cost <= budget:
             # yes, so continue with that voters_budget
@@ -158,42 +159,42 @@ def equal_shares_fixed_budget(
     budget: int,
     bids: dict[int, dict[int, int]],
     budget_increment_per_project: int,
-    max_cost_for_project: dict,
+    max_bid_for_project: dict,
 ) -> tuple[list[int], dict[int, int], dict[int, int], dict[int, dict[int, int]]]:
     """
     # T.0
     >>> voters = [1, 2, 3, 4, 5]
-    >>> projects = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    >>> cost = {1: 100, 2: 150, 3: 200, 4: 250, 5: 300, 6: 350, 7: 400, 8: 450, 9: 500, 10: 550}
+    >>> projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    >>> cost = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
     >>> approvers = {
-    ...     1: [1, 2, 4],
-    ...     2: [2, 5],
-    ...     3: [1, 5],
-    ...     4: [3, 4],
-    ...     5: [2, 3, 5],
-    ...     6: [2, 5],
-    ...     7: [1, 4],
-    ...     8: [2, 5],
-    ...     9: [1, 3, 5],
-    ...     10: [2, 3]
+    ...     11: [1, 2, 4],
+    ...     12: [2, 5],
+    ...     13: [1, 5],
+    ...     14: [3, 4],
+    ...     15: [2, 3, 5],
+    ...     16: [2, 5],
+    ...     17: [1, 4],
+    ...     18: [2, 5],
+    ...     19: [1, 3, 5],
+    ...     20: [2, 3]
     ... }
     >>> bids = {
-    ...     1: {1: 100, 2: 100, 4: 100},
-    ...     2: {2: 150, 5: 150},
-    ...     3: {1: 200, 5: 200},
-    ...     4: {3: 250, 4: 250, },
-    ...     5: {2: 300, 3: 300, 5: 300},
-    ...     6: {2: 350, 5: 350},
-    ...     7: {1: 400, 4: 400, },
-    ...     8: {2: 450, 5: 450},
-    ...     9: {1: 500, 3: 500,5: 500},
-    ...     10:{2: 550, 3: 550}
+    ...     11: {1: 100, 2: 100, 4: 100},
+    ...     12: {2: 150, 5: 150},
+    ...     13: {1: 200, 5: 200},
+    ...     14: {3: 250, 4: 250, },
+    ...     15: {2: 300, 3: 300, 5: 300},
+    ...     16: {2: 350, 5: 350},
+    ...     17: {1: 400, 4: 400, },
+    ...     18: {2: 450, 5: 450},
+    ...     19: {1: 500, 3: 500,5: 500},
+    ...     20:{2: 550, 3: 550}
     ... }
-    >>> budget = 900  # Total budget
+    >>> budget = 900
     >>> budget_increment_per_project = 10
-    >>> max_cost_for_project = {
-    ...     1: 100, 2: 150, 3: 200, 4: 250, 5: 300,
-    ...     6: 350, 7: 400, 8: 450, 9: 500, 10: 550
+    >>> max_bid_for_project = {
+    ...     11: 100, 12: 150, 13: 200, 14: 250, 15: 300,
+    ...     16: 350, 17: 400, 18: 450, 19: 500, 20: 550
     ... }
     >>> winners, winners_allocation, updated_cost, candidates_investments_per_voter = equal_shares_fixed_budget(
     ...     voters,
@@ -203,16 +204,16 @@ def equal_shares_fixed_budget(
     ...     budget,
     ...     bids,
     ...     budget_increment_per_project,
-    ...     max_cost_for_project
+    ...     max_bid_for_project
     ... )
     >>> winners
-    [1, 3, 5]
+    [11, 13, 15]
     >>> winners_allocation
-    {1: 100, 2: 0, 3: 200, 4: 0, 5: 300, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0}
+    {11: 100.0, 12: 0, 13: 200.0, 14: 0, 15: 300.0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
     >>> updated_cost
-    {1: 10, 2: 150, 3: 10, 4: 250, 5: 10, 6: 350, 7: 400, 8: 450, 9: 500, 10: 550}
+    {11: 10, 12: 150, 13: 10, 14: 250, 15: 10, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
     >>> candidates_investments_per_voter
-    {1: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336}, 2: {2: 0, 5: 0}, 3: {1: 120.0, 5: 80.0}, 4: {3: 0, 4: 0}, 5: {2: 100.0, 3: 100.0, 5: 100.0}, 6: {2: 0, 5: 0}, 7: {1: 0, 4: 0}, 8: {2: 0, 5: 0}, 9: {1: 0, 3: 0, 5: 0}, 10: {2: 0, 3: 0}}
+    {11: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336}, 12: {2: 0, 5: 0}, 13: {1: 120.0, 5: 80.0}, 14: {3: 0, 4: 0}, 15: {2: 100.0, 3: 100.0, 5: 100.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}}
     """
 
     logger.info("\nRunning equal_shares_fixed_budget: budget=%s, bids:\n   %s", budget,bids)
@@ -285,10 +286,9 @@ def equal_shares_fixed_budget(
                 f"Tie-breaking failed: tie between projects {best_found} "
                 + "could not be resolved. Another tie-breaking needs to be added."
             )
-        best_candidate = best_found[0]
-        winners.append(best_candidate)
+        chosen_candidate = best_found[0]
+        winners.append(chosen_candidate)
         winners = list(set(winners))
-        logger.info("Updated set of winners: %s", winners)
 
         """
         After receiving the selected project, we reduce the cost of the selected project from the Update_bids list
@@ -299,60 +299,66 @@ def equal_shares_fixed_budget(
         """
 
         # the project curr id number and  cost
-        curr_project_id = best_candidate
-        curr_project_cost = updated_cost[best_candidate]
+        chosen_candidate_cost = updated_cost[chosen_candidate]
 
         # Find the highest choice for the current project
-        max_value_project = max_cost_for_project[curr_project_id]
-        logger.info("Chosen project = %s, current cost = %s, max value = %s", curr_project_id, curr_project_cost, max_value_project)
+        chosen_candidate_max_bid = max_bid_for_project[chosen_candidate]
+        logger.debug("Chosen project: %s, current cost: %s, max bid: %s", chosen_candidate, chosen_candidate_cost, chosen_candidate_max_bid)
 
         # Deducts from the voters_budget of each voter who chose the current
         # project the relative part for the current project
-        best_max_payment = curr_project_cost / best_effective_vote_count
-        for i in updated_bids[curr_project_id].keys():
+        best_max_payment = chosen_candidate_cost / best_effective_vote_count
+        for i in updated_bids[chosen_candidate].keys():
             if voters_budgets[i] > best_max_payment:
                 voter_payment = best_max_payment
             else:
                 voter_payment = voters_budgets[i]
             voters_budgets[i] -= voter_payment
-            candidates_investments_per_voter[curr_project_id][i] += voter_payment
-            logger.debug("Candidate %s: voter %s pays %s", curr_project_id, i, voter_payment)
+            winners_allocation[chosen_candidate] += voter_payment
+            candidates_investments_per_voter[chosen_candidate][i] += voter_payment
+            logger.debug("   Voter %s pays %s", i, voter_payment)
 
         # check if the curr cost + total update codt <= max value for this projec
-        # logger.info(" total project price   = %s", winners_total_cost[curr_project_id])
+        # logger.info(" total project price   = %s", winners_total_cost[chosen_candidate])
 
-        if winners_allocation[curr_project_id] + curr_project_cost <= max_value_project:
+        if winners_allocation[chosen_candidate] + chosen_candidate_cost < chosen_candidate_max_bid:
             filter_bids(
                 updated_bids,
                 updated_approvers,
-                curr_project_id,
-                curr_project_cost,
+                chosen_candidate,
+                chosen_candidate_cost,
                 budget_increment_per_project,
                 updated_cost,
             )
-
-            winners_allocation[curr_project_id] = winners_allocation[curr_project_id] + curr_project_cost
-
+            winners_allocation[chosen_candidate] += chosen_candidate_cost
             # Updates the remaining list in the number of voters after updating the price of the project
-            remaining_candidates[curr_project_id] = len(updated_bids[curr_project_id].keys())
-
+            remaining_candidates[chosen_candidate] = len(updated_bids[chosen_candidate].keys())
+            logger.debug("Candidate %s now has allocation %s. Setting new cost to %s, new effective vote count = %s",
+                          chosen_candidate, winners_allocation[chosen_candidate], updated_cost[chosen_candidate], remaining_candidates[chosen_candidate])
         else:
-            updated_cost[curr_project_id] = 0
-            del remaining_candidates[curr_project_id]
+            updated_cost[chosen_candidate] = 0
+            del remaining_candidates[chosen_candidate]
+            logger.debug("Candidate %s now has the maximum possible allocation: %s. Setting new cost to %s",
+                          chosen_candidate, winners_allocation[chosen_candidate], updated_cost[chosen_candidate])
 
     # logger.info("winners return  = %s", winners)
     return winners, winners_allocation, updated_cost, candidates_investments_per_voter
 
 
 if __name__=="__main__":
-    import doctest
-    print("\n",doctest.testmod(),"\n")
+    import doctest, sys
 
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
+    logger.addHandler(logging.StreamHandler(sys.stderr))
 
-    voters = [1, 2, 3, 4, 5] 
-    projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] 
+    # print("\n",doctest.testmod(),"\n")
+    # doctest.run_docstring_examples(equal_shares, globals())    # currently endless loop
+    doctest.run_docstring_examples(equal_shares_fixed_budget, globals())
+
+    print("\n\nExample 1\n\n")
+
+    voters = [1, 2, 3, 4, 5]
+    projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     cost = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
     approvers = {
         11: [1, 2, 4],
@@ -380,7 +386,7 @@ if __name__=="__main__":
     }
     budget = 900  # Total budget
     budget_increment_per_project = 10
-    print(equal_shares_fixed_budget(
+    (equal_shares_fixed_budget(
         voters,
         projects,
         cost,
@@ -388,5 +394,5 @@ if __name__=="__main__":
         budget,
         bids,
         budget_increment_per_project,
-        max_cost_for_project = find_max(bids)
+        max_bid_for_project = find_max(bids)
     ))
