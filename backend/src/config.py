@@ -22,6 +22,8 @@ class Config:
     api_rsa_public_key: str = ""
     api_rsa_private_key: str = ""
 
+    without_auth_mode: bool = False
+
     logger_level: str = "DEBUG"  # Level for logging
 
 
@@ -55,3 +57,9 @@ def init_config() -> None:
     config.admin_key = UUID(_get_envioment_variable("ADMIN_KEY"))
     config.api_rsa_public_key = _get_envioment_variable("API_RSA_PUBLIC_KEY")
     config.api_rsa_private_key = _get_envioment_variable("API_RSA_PRIVATE_KEY")
+
+    without_auth_mode = os.environ.get("WITHOUT_AUTH_MODE")
+    if without_auth_mode is not None:
+        config.without_auth_mode = without_auth_mode.lower() == "true"
+
+    print("config.without_auth_mode", config.without_auth_mode)

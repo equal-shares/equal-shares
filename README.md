@@ -185,17 +185,19 @@ Table of the required environment variables for the backend:
 
 Table of the optional environment variables for the backend:
 
-| Variable | Description      | Default |
-|----------|------------------|---------|
-| PG_PORT  | PostgresSQL port | 5432    |
+| Variable          | Description                      | Default |
+|-------------------|----------------------------------|---------|
+| PG_PORT           | PostgresSQL port                 | 5432    |
+| WITHOUT_AUTH_MODE | for using without authentication | false   |
 
 ### Frontend
 
 Table of the required environment variables for the frontend, they used at build time:
 
-| Variable      | Description      |
-|---------------|------------------|
-| VITE_API_HOST | API backend host |
+| Variable               | Description                      |
+|------------------------|----------------------------------|
+| VITE_API_HOST          | API backend host                 |
+| VITE_WITHOUT_AUTH_MODE | for using without authentication |
 
 ### Database
 
@@ -207,10 +209,10 @@ Table of the required environment variables for the database:
 
 Table of the optional environment variables for the database:
 
-| Variable      | Description           | Default  |
-| ------------- | --------------------- | -------- |
-| POSTGRES_USER | defualt user          | postgres |
-| POSTGRES_DB   | defualt database name | postgres |
+| Variable          | Description           | Default  |
+| ----------------- | --------------------- | -------- |
+| POSTGRES_USER     | defualt user          | postgres |
+| POSTGRES_DB       | defualt database name | postgres |
 
 ## Diagrams
 

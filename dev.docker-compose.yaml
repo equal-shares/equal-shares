@@ -9,6 +9,7 @@ services:
       - "5173:5173"
     environment:
       - VITE_API_HOST=http://localhost:8000
+      - VITE_WITHOUT_AUTH_MODE=true
 
   backend:
     build:
@@ -27,6 +28,7 @@ services:
       - ADMIN_KEY=7fbae5db-37bb-4dc5-a9f5-115878c6bcb0
       - API_RSA_PUBLIC_KEY=/app/equal-shares-api-public-key.pem
       - API_RSA_PRIVATE_KEY=/app/equal-shares-api-private-key.pem
+      - WITHOUT_AUTH_MODE=true
     volumes:
       - ./backend/equal-shares-api-private-key.pem:/app/equal-shares-api-private-key.pem
       - ./backend/equal-shares-api-public-key.pem:/app/equal-shares-api-public-key.pem

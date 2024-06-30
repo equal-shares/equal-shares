@@ -26,6 +26,9 @@ def verify_valid_email(email: str) -> bool:
 
 
 def verify_valid_token(email: str, token: str) -> bool:
+    if config.without_auth_mode:
+        return True
+
     with open(config.api_rsa_private_key, "r") as private_key_file:
         private_key = RSA.importKey(private_key_file.read())
     decryptor = PKCS1_OAEP.new(private_key)
