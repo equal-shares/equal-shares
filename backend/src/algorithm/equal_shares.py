@@ -10,7 +10,7 @@ logger = logging.getLogger("equal_shares_logger")
 def equal_shares(
     voters: list[int],
     projects: list[int],
-    cost: dict[int, int],
+    cost: dict[int, int],              # min cost per project
     approvers: dict[int, int],
     budget: int,
     bids: dict[int, dict[int, int]],
@@ -95,7 +95,7 @@ def equal_shares(
         # would the next highest voters_budget work?
         update_voters_budget = voters_budget + len(voters)  # Add 1 to each voter's voters_budget
         logger.info(
-            "  call fix voters_budget   = %s B= %s, %s", total_chosen_project_cost, budget, update_voters_budget
+            "  Call fix voters_budget   = %s B= %s, %s", total_chosen_project_cost, budget, update_voters_budget
         )
         update_chosen_project, update_chosen_project_cost, update_cost, update_budget_per_voter = (
             equal_shares_fixed_budget(
@@ -155,77 +155,72 @@ def equal_shares_fixed_budget(
     budget_increment_per_project: int,
     max_cost_for_project: dict,
 ) -> tuple[list[int], dict[int, int], dict[int, int], dict[int, dict[int, int]]]:
+    logger.info("\nRunning equal_shares_fixed_budget: budget=%s, bids=%s", budget,bids)
 
-    voters_budget = {i: budget / len(voters) for i in voters}
+    voters_budgets = {i: budget / len(voters) for i in voters}
+    logger.debug("Initial voters_budgets=%s", voters_budgets)
 
-    remaining = {}  # remaining candidate -> previous effective vote count
+    budget_per_voter = {candidate: {voter: 0 for voter in inner_dict.keys()} for candidate, inner_dict in bids.items()}
+    logger.debug("Initial budget_per_voter=%s", budget_per_voter)
 
-    budget_per_voter = {}
-    for outer_key, inner_dict in bids.items():
-        # Initialize the inner dictionary with values set to 0
-        budget_per_voter[outer_key] = {inner_key: 0 for inner_key in inner_dict.keys()}
+    remaining = {candidate: len(approvers[candidate]) for candidate in projects if cost[candidate] > 0 and len(approvers[candidate]) > 0}  # remaining candidate -> previous effective vote count
+    logger.debug("remaining=%s", remaining)
 
-    for c in projects:
-        if cost[c] > 0 and len(approvers[c]) > 0:
-            remaining[c] = len(approvers[c])
+    winners = []  # Initialize list of winning projects
+    winners_allocation = {candidate: 0 for candidate in projects}  # Initialize amount invested in each winning projects
 
-    # logger.info("Remaining --> the number of relevant vote for any project remaining=%s", remaining)
-
-    winners = []
-
-    update_bids = copy.deepcopy(bids)
-    update_approvers = copy.deepcopy(approvers)
-    update_cost = copy.deepcopy(cost)
-    winners_total_cost = {key: 0 for key in projects}
+    updated_bids = copy.deepcopy(bids)
+    updated_approvers = copy.deepcopy(approvers)
+    updated_cost = copy.deepcopy(cost)
 
     while True:
-
-        best = []
-        best_eff_vote_count = 0
+        best_candidates = []
+        best_effective_vote_count = 0
 
         # go through remaining candidates in order of decreasing previous effective vote count
-        remaining_sorted = sorted(remaining, key=lambda c: remaining[c], reverse=True)
+        remaining_candidates_sorted = sorted(remaining.keys(), key=lambda candidate: remaining[candidate], reverse=True)
+        logger.debug("Remaining candidates sorted by decreasing effective vote count: x%s", remaining_candidates_sorted)
 
-        for c in remaining_sorted:
-            previous_eff_vote_count = remaining[c]
-            if previous_eff_vote_count < best_eff_vote_count:
+        for candidate in remaining_candidates_sorted:
+            previous_eff_vote_count = remaining[candidate]
+            if previous_eff_vote_count < best_effective_vote_count:
                 # c cannot be better than the best so far
                 # logger.info("c cannot be better than the best so far c=%s", c)
 
                 break
-            money_behind_now = sum(voters_budget[i] for i in update_approvers[c])
-            if money_behind_now < update_cost[c]:
+            money_behind_now = sum(voters_budgets[i] for i in updated_approvers[candidate])
+            if money_behind_now < updated_cost[candidate]:
                 # c is not affordable
-                del remaining[c]
+                del remaining[candidate]
                 # logger.info("c is not affordable c=%s, update_cost for c=%s ", update_cost[c])
                 continue
             # calculate the effective vote count of c
-            update_approvers[c].sort(key=lambda i: voters_budget[i])
+            updated_approvers[candidate].sort(key=lambda i: voters_budgets[i])
             paid_so_far = 0
-            denominator = len(update_approvers[c])
-            for i in update_approvers[c]:
+            denominator = len(updated_approvers[candidate])
+            for i in updated_approvers[candidate]:
                 # compute payment if remaining approvers pay equally
-                max_payment = (update_cost[c] - paid_so_far) / denominator
-                eff_vote_count = update_cost[c] / max_payment
-                if max_payment > voters_budget[i]:
+                max_payment = (updated_cost[candidate] - paid_so_far) / denominator
+                eff_vote_count = updated_cost[candidate] / max_payment
+                if max_payment > voters_budgets[i]:
                     # i cannot afford the payment, so pays entire remaining voters_budget
-                    paid_so_far += voters_budget[i]
+                    paid_so_far += voters_budgets[i]
                     denominator -= 1
                 else:
                     # i (and all later approvers) can afford the payment; stop here
-                    remaining[c] = int(eff_vote_count)
-                    if eff_vote_count > best_eff_vote_count:
-                        best_eff_vote_count = eff_vote_count
-                        best = [c]
-                    elif eff_vote_count == best_eff_vote_count:
-                        best.append(c)
+                    remaining[candidate] = int(eff_vote_count)
+                    if eff_vote_count > best_effective_vote_count:
+                        best_effective_vote_count = eff_vote_count
+                        best_candidates = [candidate]
+                    elif eff_vote_count == best_effective_vote_count:
+                        best_candidates.append(candidate)
 
                     break
-        if not best:
+        if not best_candidates:
             # logger.info(" no remaining candidates are affordable ,best = %s", best)
 
             break
-        best_found = break_ties(update_cost, update_approvers, best)
+        best_found = break_ties(updated_cost, updated_approvers, best_candidates)
         # logger.info(" after vreak ties ,best  = %s", best)
 
         if len(best_found) > 1:
@@ -233,8 +228,8 @@ def equal_shares_fixed_budget(
                 f"Tie-breaking failed: tie between projects {best_found} "
                 + "could not be resolved. Another tie-breaking needs to be added."
             )
-        best = best_found[0]
-        winners.append(best)
+        best_candidates = best_found[0]
+        winners.append(best_candidates)
         winners = list(set(winners))
 
         logger.info("  ,winners  = %s", winners)
@@ -251,8 +246,8 @@ def equal_shares_fixed_budget(
 
         # the project curr id number and  cost
 
-        curr_project_id = best
-        curr_project_cost = update_cost[best]
+        curr_project_id = best_candidates
+        curr_project_cost = updated_cost[best_candidates]
 
         logger.info(" id and cost for the chosen project   = %s, %s", curr_project_id, curr_project_cost)
 
@@ -261,44 +256,86 @@ def equal_shares_fixed_budget(
         # Deducts from the voters_budget of each voter who chose the current
         # project the relative part for the current project
 
-        best_max_payment = curr_project_cost / best_eff_vote_count
+        best_max_payment = curr_project_cost / best_effective_vote_count
 
-        for i in update_bids[curr_project_id].keys():
-            if voters_budget[i] > best_max_payment:
-                voters_budget[i] -= best_max_payment
+        for i in updated_bids[curr_project_id].keys():
+            if voters_budgets[i] > best_max_payment:
+                voters_budgets[i] -= best_max_payment
                 budget_per_voter[curr_project_id][i] = budget_per_voter[curr_project_id][i] + best_max_payment
             else:
-                voters_budget[i] = 0
+                voters_budgets[i] = 0
 
         # check if the curr cost + total update codt <= max value for this projec
         # logger.info(" total project price   = %s", winners_total_cost[curr_project_id])
 
-        if winners_total_cost[curr_project_id] + curr_project_cost <= max_value_project:
+        if winners_allocation[curr_project_id] + curr_project_cost <= max_value_project:
 
             filter_bids(
-                update_bids,
-                update_approvers,
+                updated_bids,
+                updated_approvers,
                 curr_project_id,
                 curr_project_cost,
                 budget_increment_per_project,
-                update_cost,
+                updated_cost,
             )
 
-            winners_total_cost[curr_project_id] = winners_total_cost[curr_project_id] + curr_project_cost
+            winners_allocation[curr_project_id] = winners_allocation[curr_project_id] + curr_project_cost
 
             # Updates the remaining list in the number of voters after updating the price of the project
-            remaining[curr_project_id] = len(update_bids[curr_project_id].keys())
+            remaining[curr_project_id] = len(updated_bids[curr_project_id].keys())
 
         else:
 
-            update_cost[curr_project_id] = 0
+            updated_cost[curr_project_id] = 0
             del remaining[curr_project_id]
 
     # logger.info("winners return  = %s", winners)
-    return winners, winners_total_cost, update_cost, budget_per_voter
+    return winners, winners_allocation, updated_cost, budget_per_voter
 
 
 if __name__=="__main__":
     import doctest
-    print(doctest.testmod())
+    print("\n",doctest.testmod(),"\n")
 
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler())
+
+    voters = [1, 2, 3, 4, 5] 
+    projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] 
+    cost = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
+    approvers = {
+        11: [1, 2, 4],
+        12: [2, 5],
+        13: [1, 5],
+        14: [3, 4],
+        15: [2, 3, 5],
+        16: [2, 5],
+        17: [1, 4],
+        18: [2, 5],
+        19: [1, 3, 5],
+        20: [2, 3]
+    }
+    bids = {
+        11: {1: 100, 2: 100, 4: 100},
+        12: {2: 150, 5: 150},
+        13: {1: 200, 5: 200},
+        14: {3: 250, 4: 250, },
+        15: {2: 300, 3: 300, 5: 300},
+        16: {2: 350, 5: 350},
+        17: {1: 400, 4: 400},
+        18: {2: 450, 5: 450},
+        19: {1: 500, 3: 500,5: 500},
+        20:{2: 550, 3: 550}
+    }
+    budget = 900  # Total budget
+    budget_increment_per_project = 10
+    print(equal_shares_fixed_budget(
+        voters,
+        projects,
+        cost,
+        approvers,
+        budget,
+        bids,
+        budget_increment_per_project,
+        max_cost_for_project = find_max(bids)
+    ))
