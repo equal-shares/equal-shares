@@ -193,11 +193,11 @@ def equal_shares_fixed_budget(
     ...     max_bid_for_project
     ... )
     >>> {c:int(x) for c,x in winners_allocations.items()}
-    {11: 200, 12: 0, 13: 200, 14: 0, 15: 350, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
+    {11: 200, 12: 0, 13: 0, 14: 0, 15: 400, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
     >>> updated_cost
-    {11: 0, 12: 150, 13: 1, 14: 250, 15: 1, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
+    {11: 0, 12: 150, 13: 200, 14: 250, 15: 0, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
     >>> candidates_payments_per_voter
-    {11: {1: 33.333333333333336, 2: 58.333333333333336, 4: 108.33333333333334}, 12: {2: 0, 5: 0}, 13: {1: 145.0, 5: 55.0}, 14: {3: 0, 4: 0}, 15: {2: 100.0, 3: 125.0, 5: 125.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}}
+    {11: {1: 33.333333333333336, 2: 80.0, 4: 86.66666666666669}, 12: {2: 0, 5: 0}, 13: {1: 0, 5: 0}, 14: {3: 0, 4: 0}, 15: {2: 100.0, 3: 150.0, 5: 150.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}}
 
     # T.3:    ensure that increment is fairly allocated.
     >>> voters = [1, 2]
@@ -236,6 +236,7 @@ def equal_shares_fixed_budget(
         # go through remaining candidates in order of decreasing previous effective vote count
         remaining_candidates_sorted = {candidate: effective_vote_count for candidate,effective_vote_count in sorted(remaining_candidates.items(), key=lambda item:item[1], reverse=True)}
         logger.debug("\nRemaining candidates sorted by decreasing previous effective vote count:\n   %s", remaining_candidates_sorted)
+        logger.debug("Voters' budgets:\n   %s", voters_budgets)
         for candidate, previous_effective_vote_count in remaining_candidates_sorted.items():
             if previous_effective_vote_count < best_effective_vote_count:
                 logger.debug("Candidate %s: Previous effective vote count (%s) < best_effective_vote_count (%s): breaking", candidate, previous_effective_vote_count, best_effective_vote_count)
@@ -268,7 +269,7 @@ def equal_shares_fixed_budget(
                     elif effective_vote_count == best_effective_vote_count:
                         best_candidates.append(candidate)
                     break
-            logger.debug("Candidate %s: Approvers and budgets=%s; effective_vote_count=%s", candidate, sorted_approvers, effective_vote_count)
+            logger.debug("Candidate %s: cost %s; approvers and budgets=%s; effective_vote_count=%s", candidate, updated_cost[candidate], sorted_approvers, effective_vote_count)
         logger.debug("best_candidates: %s", best_candidates)
         if not best_candidates:
             logger.debug("No remaining candidates are affordable.")
@@ -298,9 +299,10 @@ def equal_shares_fixed_budget(
         logger.debug("Chosen project: %s, current cost: %s, max bid: %s, updated bids: %s", chosen_candidate, chosen_candidate_cost, chosen_candidate_max_bid, chosen_candidate_bids)
 
         if chosen_candidate_cost==CONTINUOUS_COST:
+            positive_bids = {voter:bid for voter,bid in chosen_candidate_bids.items() if bid>0}
             chosen_candidate_cost = min(
                 chosen_candidate_max_bid - winners_allocations[chosen_candidate],
-                min([min(bid,voters_budgets[voter]) for voter,bid in chosen_candidate_bids.items() if bid>0]),
+                len(positive_bids)*min([min(bid,voters_budgets[voter]) for voter,bid in positive_bids.items()]),
                 )
             logger.debug("   Chosen project is now in the continuous phase - changing the cost to %s", chosen_candidate_cost)
 
@@ -423,12 +425,12 @@ def example3():
 def example4():
     print("\n\nExample 4\n")
 
-    voters = [1, 2]
+    voters = [1, 2, 3]
     projects_costs = {11: 100, 12: 100}
     # No increments
     bids = {
-        11: {1: 200},
-        12: {2: 200},
+        11: {1: 200, 2:200},
+        12: {2: 200, 3:200},
     }
     budget = 300
 
@@ -452,4 +454,4 @@ if __name__=="__main__":
 
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stderr))
-    # example4()
+    # example1()
