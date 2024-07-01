@@ -22,7 +22,7 @@ def equal_shares(
     ...     11: {1: 100, 2: 100, 4: 100},
     ...     12: {2: 150, 5: 150},
     ...     13: {1: 200, 5: 200},
-    ...     14: {3: 250, 4: 250, },
+    ...     14: {3: 250, 4: 250},
     ...     15: {2: 300, 3: 300, 5: 300},
     ...     16: {2: 350, 5: 350},
     ...     17: {1: 400, 4: 400},
@@ -40,7 +40,7 @@ def equal_shares(
     >>> {c:int(x) for c,x in winners_allocations.items()}
     {11: 100, 12: 0, 13: 200, 14: 250, 15: 300, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
     >>> budget_per_voter
-    {11: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336}, 12: {2: 0, 5: 0}, 13: {1: 100.0, 5: 100.0}, 14: {3: 108.0, 4: 142.0}, 15: {2: 100.0, 3: 100.0, 5: 100.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}}
+    {11: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336}, 12: {2: 0, 5: 0}, 13: {1: 108.0, 5: 92.0}, 14: {3: 92.0, 4: 158.0}, 15: {2: 100.0, 3: 100.0, 5: 100.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}}
     """
     projects = projects_costs.keys()
     max_bid_for_project = find_max(bids)
@@ -56,7 +56,6 @@ def equal_shares(
     while True:
         # Check if current outcome is exhaustive
         is_exhaustive = True
-        winners = [candidate for candidate,allocation in winners_allocations.items() if allocation>0]
         for candidate in projects:
             candidate_cost_of_next_increase = projects_costs_of_next_increase[candidate]
             # check if total cost of chosen project + current project  <= budget, if true have more project to chack
@@ -71,7 +70,8 @@ def equal_shares(
             #     and total_chosen_project_cost + candidate_cost_of_next_increase <= budget
             #     and winners_allocations[candidate] + candidate_cost_of_next_increase <= max_bid_for_project[candidate])
             # if (condition1 or condition2):
-            if (total_chosen_project_cost + candidate_cost_of_next_increase <= budget) or (winners_allocations[candidate] + candidate_cost_of_next_increase <= max_bid_for_project[candidate]):
+            if (total_chosen_project_cost + candidate_cost_of_next_increase <= budget) and (winners_allocations[candidate] + candidate_cost_of_next_increase <= max_bid_for_project[candidate]) and (candidate_cost_of_next_increase > 0):
+                logger.debug("Candidate %s ", candidate)
                 is_exhaustive = False
                 break
         if is_exhaustive:
@@ -79,9 +79,6 @@ def equal_shares(
 
         # would the next highest voters_budget work?
         updated_rounded_budget = rounded_budget + len(voters)  # Add 1 to each voter's voters_budget
-        logger.debug(
-            "  Call fix voters_budget   = %s B= %s, %s", total_chosen_project_cost, budget, updated_rounded_budget
-        )
         updated_winners_allocations, projects_costs_of_next_increase, updated_budget_per_voter = (
             equal_shares_fixed_budget(
                 voters,
@@ -394,6 +391,22 @@ def example2():
     print(winners_allocation, candidates_investments_per_voter)
 
 
+def example3():
+    print("\n\nExample 3\n")
+    voters = [1, 2]
+    projects_costs = {11: 200, 12: 300, 13: 100}
+    bids = {11: {1: 500, 2:200}, 12: {1: 300, 2: 300}, 13:{2:100}}
+    budget = 900.0
+    winners_allocation, candidates_investments_per_voter = equal_shares(
+        voters,
+        projects_costs,
+        budget,
+        bids,
+    )
+    print(winners_allocation, candidates_investments_per_voter)
+
+
+
 if __name__=="__main__":
     import doctest, sys
 
@@ -404,4 +417,4 @@ if __name__=="__main__":
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stderr))
 
-    example1()
+    # example2()
