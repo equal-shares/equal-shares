@@ -11,7 +11,6 @@ def equal_shares(
     voters: list[int],
     projects: list[int],
     cost: dict[int, int],              # min cost per project
-    approvers: dict[int, int],
     budget: int,
     bids: dict[int, dict[int, int]],
     budget_increment_per_project: int,
@@ -21,18 +20,6 @@ def equal_shares(
     >>> voters = [1, 2, 3, 4, 5]  # Voters
     >>> projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  # Project IDs
     >>> cost = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
-    >>> approvers = {
-    ...     11: [1, 2, 4],
-    ...     12: [2, 5],
-    ...     13: [1, 5],
-    ...     14: [3, 4],
-    ...     15: [2, 3, 5],
-    ...     16: [2, 5],
-    ...     17: [1, 4],
-    ...     18: [2, 5],
-    ...     19: [1, 3, 5],
-    ...     20: [2, 3]
-    ... }
     >>> bids = {
     ...     11: {1: 100, 2: 100, 4: 100},
     ...     12: {2: 150, 5: 150},
@@ -51,7 +38,6 @@ def equal_shares(
     ...     voters,
     ...     projects,
     ...     cost,
-    ...     approvers,
     ...     budget,
     ...     bids,
     ...     budget_increment_per_project
@@ -64,7 +50,7 @@ def equal_shares(
 
     max_bid_for_project = find_max(bids)
     winners_allocations, updated_cost, budget_per_voter = equal_shares_fixed_budget(
-        voters, projects, cost, approvers, budget, bids, budget_increment_per_project, max_bid_for_project
+        voters, projects, cost, budget, bids, budget_increment_per_project, max_bid_for_project
     )
 
     # add 1 completion
@@ -106,7 +92,6 @@ def equal_shares(
                 voters,
                 projects,
                 cost,
-                approvers,
                 updated_rounded_budget,
                 bids,
                 budget_increment_per_project,
@@ -139,13 +124,13 @@ Ensure there is only one remaining project, third the min index project
 
 
 def break_ties(
-    cost: dict[int, int], approvers: dict[int, dict[int, int]], bids: list[int, dict[int, int]]
+    cost: dict[int, int], bids:dict[int, dict[int, int]], candidates: list[int]
 ) -> list[int]:
-    remaining = bids.copy()
+    remaining = candidates
     best_cost = min(cost[c] for c in remaining)  # first the min cost project
     remaining = [c for c in remaining if cost[c] == best_cost]
-    best_count = max(len(approvers[c]) for c in remaining)  # second the max voter for project
-    remaining = [c for c in remaining if len(approvers[c]) == best_count]
+    best_count = max(len(bids[c]) for c in remaining)  # second the max voter for project
+    remaining = [c for c in remaining if len(bids[c]) == best_count]
     remaining = [min(remaining)]  # Ensure there is only one remaining project, third the min index project
     return remaining
 
@@ -154,7 +139,6 @@ def equal_shares_fixed_budget(
     voters: list[int],
     projects: list[int],
     cost: dict[int, int],
-    approvers: dict[int],
     budget: int,
     bids: dict[int, dict[int, int]],
     budget_increment_per_project: int,
@@ -165,18 +149,6 @@ def equal_shares_fixed_budget(
     >>> voters = [1, 2, 3, 4, 5]
     >>> projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     >>> cost = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
-    >>> approvers = {
-    ...     11: [1, 2, 4],
-    ...     12: [2, 5],
-    ...     13: [1, 5],
-    ...     14: [3, 4],
-    ...     15: [2, 3, 5],
-    ...     16: [2, 5],
-    ...     17: [1, 4],
-    ...     18: [2, 5],
-    ...     19: [1, 3, 5],
-    ...     20: [2, 3]
-    ... }
     >>> bids = {
     ...     11: {1: 100, 2: 100, 4: 100},
     ...     12: {2: 150, 5: 150},
@@ -199,7 +171,6 @@ def equal_shares_fixed_budget(
     ...     voters,
     ...     projects,
     ...     cost,
-    ...     approvers,
     ...     budget,
     ...     bids,
     ...     budget_increment_per_project,
@@ -221,11 +192,10 @@ def equal_shares_fixed_budget(
     candidates_investments_per_voter = {candidate: {voter: 0 for voter in inner_dict.keys()} for candidate, inner_dict in bids.items()}
     # logger.debug("Initial candidates_investments_per_voter:\n   %s", candidates_investments_per_voter)
 
-    remaining_candidates = {candidate: len(approvers[candidate]) for candidate in projects if cost[candidate] > 0 and len(approvers[candidate]) > 0}  # remaining candidate -> previous effective vote count
+    remaining_candidates = {candidate: len(bids[candidate]) for candidate in projects if cost[candidate] > 0 and len(bids[candidate]) > 0}  # remaining candidate -> previous effective vote count
     winners_allocations = {candidate: 0 for candidate in projects}  # Initialize amount invested in each winning projects
 
     updated_bids = copy.deepcopy(bids)
-    updated_approvers = copy.deepcopy(approvers)
     updated_cost = copy.deepcopy(cost)
 
     while True:
@@ -239,7 +209,7 @@ def equal_shares_fixed_budget(
             if previous_effective_vote_count < best_effective_vote_count:
                 logger.debug("Candidate %s: Previous effective vote count (%s) < best_effective_vote_count (%s): breaking", candidate, previous_effective_vote_count, best_effective_vote_count)
                 break
-            money_behind_candidate = sum(voters_budgets[i] for i in updated_approvers[candidate])
+            money_behind_candidate = sum(voters_budgets[i] for i in updated_bids[candidate].keys() if updated_bids[candidate][i]>0)
             if money_behind_candidate < updated_cost[candidate]:
                 # candidate is not affordable
                 logger.debug("Candidate %s not affordable: supporters have %s but updated_cost = %s", candidate, money_behind_candidate, updated_cost[candidate])
@@ -247,7 +217,7 @@ def equal_shares_fixed_budget(
                 continue
 
             # Calculate the effective vote count of candidate:
-            sorted_approvers = {voter:voters_budgets[voter] for voter in sorted(updated_approvers[candidate], key=lambda i: voters_budgets[i])}
+            sorted_approvers = {voter:voters_budgets[voter] for voter in sorted(updated_bids[candidate].keys(), key=lambda i: voters_budgets[i])}
             denominator = len(sorted_approvers)
             paid_so_far = 0
             for i, budget_of_i in sorted_approvers.items():
@@ -273,7 +243,7 @@ def equal_shares_fixed_budget(
             logger.debug("No remaining candidates are affordable.")
             break   # Break out of the outer "while True" loop
 
-        best_found = break_ties(updated_cost, updated_approvers, best_candidates)
+        best_found = break_ties(updated_cost, updated_bids, best_candidates)
         logger.debug("best_found after tie-breaking: %s", best_found)
 
         if len(best_found) > 1:
