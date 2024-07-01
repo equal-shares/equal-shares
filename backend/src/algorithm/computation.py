@@ -61,17 +61,17 @@ def min_max_equal_shares(
     >>> budget = 900
     >>> budget_increment_per_project = 10
     >>> min_max_equal_shares(voters, projects, cost, bids, budget,budget_increment_per_project)
-    ([11, 13, 14, 15], {11: 130, 12: 0, 13: 200, 14: 250, 15: 320, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}, {11: {1: 33.333333333333336, 2: 48.333333333333336, 4: 48.333333333333336}, 12: {2: 0, 5: 0}, 13: {1: 104.33333333333333, 5: 0}, 14: {3: 0, 4: 154.33333333333331}, 15: {2: 103.33333333333333, 3: 108.33333333333333, 5: 108.33333333333333}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}})
+    ({11: 130, 12: 0, 13: 200, 14: 250, 15: 320, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}, {11: {1: 33.333333333333336, 2: 48.333333333333336, 4: 48.333333333333336}, 12: {2: 0, 5: 0}, 13: {1: 104.33333333333333, 5: 0}, 14: {3: 0, 4: 154.33333333333331}, 15: {2: 103.33333333333333, 3: 108.33333333333333, 5: 108.33333333333333}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}})
 
     #T.1 Three projects with different prices
     >>> voters = [1, 2]
     >>> projects = [11, 12, 13]
     >>> cost = [{11: (200, 700)}, {12: (300, 900)}, {13:(100,100)}]
     >>> bids = {11: {1: 500, 2:200}, 12: {1: 300, 2: 300}, 13:{2:100}}
-    >>> budget = 900
+    >>> budget = 900.0
     >>> budget_increment_per_project = 10
     >>> min_max_equal_shares(voters, projects, cost, bids, budget, budget_increment_per_project)
-    ([11, 12, 13], {11: 500, 12: 300, 13: 100}, {11: {1: 390.0, 2: 100.0}, 12: {1: 150.0, 2: 150.0}, 13: {2: 100.0}})
+    ({11: 500.0, 12: 300.0, 13: 100.0}, {11: {1: 390.0, 2: 100.0}, 12: {1: 150.0, 2: 150.0}, 13: {2: 100.0}})
 
     #T.2 Two projects with the same amount of voters and the price difference between them is 1
     >>> voters = [1, 2]
@@ -81,7 +81,7 @@ def min_max_equal_shares(
     >>> budget = 100
     >>> budget_increment_per_project = 10
     >>> min_max_equal_shares(voters, projects, cost, bids, budget, budget_increment_per_project)
-    ([12], {11: 0, 12: 98}, {11: {2: 0}, 12: {1: 0}})
+    ({11: 0, 12: 98.0}, {11: {2: 0}, 12: {1: 0}})
 
 
     # T.3 For 4 projects with same cost and same voters,
@@ -98,7 +98,7 @@ def min_max_equal_shares(
     >>> budget = 500
     >>> budget_increment_per_project = 10
     >>> min_max_equal_shares(voters, projects, cost, bids, budget, budget_increment_per_project)
-    ([11], {11: 500, 12: 0, 13: 0, 14: 0}, {11: {1: 0, 2: 0, 3: 0, 4: 0}, 12: {1: 0, 2: 0, 3: 0, 4: 0}, 13: {1: 0, 2: 0, 3: 0, 4: 0}, 14: {1: 0, 2: 0, 3: 0, 4: 0}})
+    ({11: 500.0, 12: 0, 13: 0, 14: 0}, {11: {1: 0, 2: 0, 3: 0, 4: 0}, 12: {1: 0, 2: 0, 3: 0, 4: 0}, 13: {1: 0, 2: 0, 3: 0, 4: 0}, 14: {1: 0, 2: 0, 3: 0, 4: 0}})
 
 
     # T.4 For one projects with one voter. the budget > project cost.
@@ -109,7 +109,7 @@ def min_max_equal_shares(
     >>> budget = 1000  # Budget
     >>> budget_increment_per_project = 10
     >>> min_max_equal_shares(voters, projects, cost, bids, budget,budget_increment_per_project)
-    ([11], {11: 600}, {11: {1: 600.0}})
+    ([11], {11: 600.0}, {11: {1: 600.0}})
 
 
     # T.5 For one projects with one voter. the budget <= project min cost.
@@ -144,19 +144,14 @@ def min_max_equal_shares(
     >>> budget = 1500
     >>> budget_increment_per_project = 10
     >>> min_max_equal_shares(voters, projects,cost,bids,budget,budget_increment_per_project)
-    ([11, 12, 13], {11: 500, 12: 500, 13: 500}, {11: {1: 166.66666666666666, 2: 166.66666666666666, 3: 166.66666666666666}, 12: {1: 166.66666666666666, 2: 166.66666666666666, 3: 166.66666666666666}, 13: {1: 166.66666666666666, 2: 166.66666666666666, 3: 166.66666666666666}})
+    ({11: 500, 12: 500, 13: 500}, {11: {1: 166.66666666666666, 2: 166.66666666666666, 3: 166.66666666666666}, 12: {1: 166.66666666666666, 2: 166.66666666666666, 3: 166.66666666666666}, 13: {1: 166.66666666666666, 2: 166.66666666666666, 3: 166.66666666666666}})
     """
 
-    cost = {}
+    projects_costs = {}
     for item in cost_min_max:
         project_id, (min_value, _) = item.popitem()
-        cost[project_id] = min_value
-
-    approvers = {}
-    for project_id, value in bids.items():
-        approvers[project_id] = list(value.keys())
-
-    return equal_shares(voters, projects, cost, approvers, budget, bids, budget_increment_per_project)
+        projects_costs[project_id] = min_value
+    return equal_shares(voters, projects_costs, budget, bids, budget_increment_per_project)
 
 
 if __name__=="__main__":
