@@ -282,7 +282,6 @@ def equal_shares_fixed_budget(
         if winners_allocations[chosen_candidate] + chosen_candidate_cost < chosen_candidate_max_bid:
             filter_bids(
                 updated_bids,
-                updated_approvers,
                 chosen_candidate,
                 chosen_candidate_cost,
                 budget_increment_per_project,
@@ -305,18 +304,6 @@ def example1():
 
     voters = [1, 2, 3, 4, 5]
     projects_costs = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
-    approvers = {
-        11: [1, 2, 4],
-        12: [2, 5],
-        13: [1, 5],
-        14: [3, 4],
-        15: [2, 3, 5],
-        16: [2, 5],
-        17: [1, 4],
-        18: [2, 5],
-        19: [1, 3, 5],
-        20: [2, 3]
-    }
     bids = {
        11: {1: 100, 2: 100, 4: 100},
         12: {2: 150, 5: 150},
@@ -338,7 +325,6 @@ def example1():
     winners_allocation, updated_cost, candidates_investments_per_voter = equal_shares_fixed_budget(
         voters,
         projects_costs,
-        approvers,
         budget,
         bids,
         budget_increment_per_project,
@@ -355,4 +341,4 @@ if __name__=="__main__":
     # print("\n",doctest.testmod(),"\n")
     doctest.run_docstring_examples(equal_shares, globals())    # currently endless loop
 
-    # example1()
+    example1()

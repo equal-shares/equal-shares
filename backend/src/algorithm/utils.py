@@ -95,7 +95,6 @@ update_cost:
 
 def filter_bids(
     update_bids: dict[int, int],
-    update_approvers: dict[int, int],
     curr_project_id: int,
     curr_project_cost: int,
     budget_increment_per_project: int,
@@ -115,5 +114,3 @@ def filter_bids(
 
         for voter_id in voters_to_remove:
             update_bids[curr_project_id].pop(voter_id)
-
-    update_approvers[curr_project_id] = list(update_bids[curr_project_id].keys())
