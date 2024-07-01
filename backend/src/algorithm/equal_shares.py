@@ -9,17 +9,15 @@ logger = logging.getLogger("equal_shares_logger")
 
 def equal_shares(
     voters: list[int],
-    projects: list[int],
-    cost: dict[int, int],              # min cost per project
+    projects_costs: dict[int, int],              # min cost per project
     budget: int,
     bids: dict[int, dict[int, int]],
     budget_increment_per_project: int,
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """
     # T.0
-    >>> voters = [1, 2, 3, 4, 5]  # Voters
-    >>> projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]  # Project IDs
-    >>> cost = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
+    >>> voters = [1, 2, 3, 4, 5] 
+    >>> projects_costs = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
     >>> bids = {
     ...     11: {1: 100, 2: 100, 4: 100},
     ...     12: {2: 150, 5: 150},
@@ -36,8 +34,7 @@ def equal_shares(
     >>> budget_increment_per_project = 10
     >>> winners_allocations, budget_per_voter = equal_shares(
     ...     voters,
-    ...     projects,
-    ...     cost,
+    ...     projects_costs,
     ...     budget,
     ...     bids,
     ...     budget_increment_per_project
@@ -47,10 +44,10 @@ def equal_shares(
     >>> budget_per_voter
     {11: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336}, 12: {2: 0, 5: 0}, 13: {1: 108.0, 5: 0}, 14: {3: 0, 4: 158.0}, 15: {2: 100.0, 3: 100.0, 5: 100.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}})
     """
-
+    projects = projects_costs.keys()
     max_bid_for_project = find_max(bids)
     winners_allocations, updated_cost, budget_per_voter = equal_shares_fixed_budget(
-        voters, projects, cost, budget, bids, budget_increment_per_project, max_bid_for_project
+        voters, projects_costs, budget, bids, budget_increment_per_project, max_bid_for_project
     )
 
     # add 1 completion
@@ -71,7 +68,7 @@ def equal_shares(
             # and total project_cost + curr project_cost <= max value for curr project,
             # if true the price of the project can be increased
 
-            if (candidate not in winners and total_chosen_project_cost + cost[candidate] <= budget) or (
+            if (candidate not in winners and total_chosen_project_cost + projects_costs[candidate] <= budget) or (
                 candidate in winners
                 and total_chosen_project_cost + candidate_cost <= budget
                 and winners_allocations[candidate] + candidate_cost <= candidate_max_bid
@@ -90,8 +87,7 @@ def equal_shares(
         update_chosen_project_cost, updated_cost, update_budget_per_voter = (
             equal_shares_fixed_budget(
                 voters,
-                projects,
-                cost,
+                projects_costs,
                 updated_rounded_budget,
                 bids,
                 budget_increment_per_project,
@@ -137,8 +133,7 @@ def break_ties(
 
 def equal_shares_fixed_budget(
     voters: list[int],
-    projects: list[int],
-    cost: dict[int, int],
+    projects_costs: dict[int, int],
     budget: int,
     bids: dict[int, dict[int, int]],
     budget_increment_per_project: int,
@@ -147,8 +142,7 @@ def equal_shares_fixed_budget(
     """
     # T.0
     >>> voters = [1, 2, 3, 4, 5]
-    >>> projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-    >>> cost = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
+    >>> projects_costs = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
     >>> bids = {
     ...     11: {1: 100, 2: 100, 4: 100},
     ...     12: {2: 150, 5: 150},
@@ -169,8 +163,7 @@ def equal_shares_fixed_budget(
     ... }
     >>> winners_allocation, updated_cost, candidates_investments_per_voter = equal_shares_fixed_budget(
     ...     voters,
-    ...     projects,
-    ...     cost,
+    ...     projects_costs,
     ...     budget,
     ...     bids,
     ...     budget_increment_per_project,
@@ -185,6 +178,7 @@ def equal_shares_fixed_budget(
     """
 
     logger.info("\nRunning equal_shares_fixed_budget: budget=%s", budget)
+    projects = projects_costs.keys()
 
     voters_budgets = {i: budget / len(voters) for i in voters}
     # logger.debug("Initial voters_budgets: %s", voters_budgets)
@@ -192,11 +186,11 @@ def equal_shares_fixed_budget(
     candidates_investments_per_voter = {candidate: {voter: 0 for voter in inner_dict.keys()} for candidate, inner_dict in bids.items()}
     # logger.debug("Initial candidates_investments_per_voter:\n   %s", candidates_investments_per_voter)
 
-    remaining_candidates = {candidate: len(bids[candidate]) for candidate in projects if cost[candidate] > 0 and len(bids[candidate]) > 0}  # remaining candidate -> previous effective vote count
+    remaining_candidates = {candidate: len(bids[candidate]) for candidate in projects if projects_costs[candidate] > 0 and len(bids[candidate]) > 0}  # remaining candidate -> previous effective vote count
     winners_allocations = {candidate: 0 for candidate in projects}  # Initialize amount invested in each winning projects
 
     updated_bids = copy.deepcopy(bids)
-    updated_cost = copy.deepcopy(cost)
+    updated_cost = copy.deepcopy(projects_costs)
 
     while True:
         best_candidates = []
@@ -310,8 +304,7 @@ def example1():
     print("\n\nExample 1\n")
 
     voters = [1, 2, 3, 4, 5]
-    projects = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
-    cost = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
+    projects_costs = {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
     approvers = {
         11: [1, 2, 4],
         12: [2, 5],
@@ -344,8 +337,7 @@ def example1():
     }
     winners_allocation, updated_cost, candidates_investments_per_voter = equal_shares_fixed_budget(
         voters,
-        projects,
-        cost,
+        projects_costs,
         approvers,
         budget,
         bids,
@@ -356,11 +348,11 @@ def example1():
 
 if __name__=="__main__":
     import doctest, sys
+    doctest.run_docstring_examples(equal_shares_fixed_budget, globals())
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stderr))
 
     # print("\n",doctest.testmod(),"\n")
     doctest.run_docstring_examples(equal_shares, globals())    # currently endless loop
-    # doctest.run_docstring_examples(equal_shares_fixed_budget, globals())
 
     # example1()
