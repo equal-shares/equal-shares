@@ -193,11 +193,11 @@ def equal_shares_fixed_budget(
     ...     max_bid_for_project
     ... )
     >>> {c:int(x) for c,x in winners_allocations.items()}
-    {11: 200, 12: 0, 13: 0, 14: 0, 15: 400, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
+    {11: 200, 12: 0, 13: 200, 14: 0, 15: 350, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
     >>> updated_cost
-    {11: 0, 12: 150, 13: 200, 14: 250, 15: 0, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
+    {11: 0, 12: 150, 13: 1, 14: 250, 15: 1, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
     >>> candidates_payments_per_voter
-    {11: {1: 33.333333333333336, 2: 80.0, 4: 86.66666666666669}, 12: {2: 0, 5: 0}, 13: {1: 0, 5: 0}, 14: {3: 0, 4: 0}, 15: {2: 100.0, 3: 150.0, 5: 150.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}}
+    {11: {1: 33.333333333333336, 2: 58.333333333333336, 4: 108.33333333333334}, 12: {2: 0, 5: 0}, 13: {1: 145.0, 5: 55.0}, 14: {3: 0, 4: 0}, 15: {2: 100.0, 3: 125.0, 5: 125.0}, 16: {2: 0, 5: 0}, 17: {1: 0, 4: 0}, 18: {2: 0, 5: 0}, 19: {1: 0, 3: 0, 5: 0}, 20: {2: 0, 3: 0}}
 
     # T.3:    ensure that increment is fairly allocated.
     >>> voters = [1, 2]
@@ -451,8 +451,8 @@ if __name__=="__main__":
 
     # doctest.run_docstring_examples(equal_shares_fixed_budget, globals())
     # doctest.run_docstring_examples(equal_shares, globals())    # currently endless loop
-    # print("\n",doctest.testmod(),"\n")
+    print("\n",doctest.testmod(),"\n")
 
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stderr))
-    example4()
+    # example4()

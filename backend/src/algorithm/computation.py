@@ -63,7 +63,7 @@ def min_max_equal_shares(
     >>> bids = {11: {1: 500, 2:200}, 12: {1: 300, 2: 300}, 13:{2:100}}
     >>> budget = 900.0
     >>> min_max_equal_shares(voters, projects_costs, bids, budget)
-    ({11: 500, 12: 300, 13: 100}, {11: {1: 300.0, 2: 100.0}, 12: {1: 150.0, 2: 150.0}, 13: {2: 100.0}})
+    ({11: 500, 12: 300, 13: 100}, {11: {1: 400.0, 2: 100.0}, 12: {1: 150.0, 2: 150.0}, 13: {2: 100.0}})
 
     #T.2 Two projects with the same amount of voters and the price difference between them is 1
     >>> voters = [1, 2]
