@@ -299,10 +299,11 @@ def equal_shares_fixed_budget(
         logger.debug("Chosen project: %s, current cost: %s, max bid: %s, updated bids: %s", chosen_candidate, chosen_candidate_cost, chosen_candidate_max_bid, chosen_candidate_bids)
 
         if chosen_candidate_cost==CONTINUOUS_COST:
-            positive_bids = {voter:bid for voter,bid in chosen_candidate_bids.items() if bid>0}
+            positive_bids = {voter:bid for voter,bid in chosen_candidate_bids.items() if bid>0 and voters_budgets[voter]>0}
             chosen_candidate_cost = min(
                 chosen_candidate_max_bid - winners_allocations[chosen_candidate],
-                len(positive_bids)*min([min(bid,voters_budgets[voter]) for voter,bid in positive_bids.items()]),
+                min(bid for voter,bid in positive_bids.items()),
+                sum(voters_budgets[voter] for voter,bid in positive_bids.items())
                 )
             logger.debug("   Chosen project is now in the continuous phase - changing the cost to %s", chosen_candidate_cost)
 
@@ -429,8 +430,8 @@ def example4():
     projects_costs = {11: 100, 12: 100}
     # No increments
     bids = {
-        11: {1: 200, 2:200},
-        12: {2: 200, 3:200},
+        11: {1: 300, 2:150},
+        12: {2: 150, 3:300},
     }
     budget = 300
 
@@ -450,8 +451,8 @@ if __name__=="__main__":
 
     # doctest.run_docstring_examples(equal_shares_fixed_budget, globals())
     # doctest.run_docstring_examples(equal_shares, globals())    # currently endless loop
-    print("\n",doctest.testmod(),"\n")
+    # print("\n",doctest.testmod(),"\n")
 
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler(sys.stderr))
-    # example1()
+    example4()
