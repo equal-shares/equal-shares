@@ -420,7 +420,10 @@ For running examples of the algorithm of equal shares run the following command:
 make examples-run-algorithm
 ```
 
-## Productionu
+## Production
+
+### Production Scripts
+
 ```bash
 bash ./scripts/restart.sh
 ```
