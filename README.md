@@ -425,7 +425,7 @@ make examples-run-algorithm
 ### Production Scripts
 
 ```bash
-bash ./scripts/restart.sh
+bash /app/equal-shares/scripts/restart.sh
 ```
 
 For reset the environment variables files by copying the files to the /app directory run the following command:
