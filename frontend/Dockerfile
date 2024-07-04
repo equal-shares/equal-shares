@@ -5,6 +5,9 @@ WORKDIR /app
 ARG VITE_API_HOST
 ENV VITE_API_HOST=$VITE_API_HOST
 
+ARG VITE_WITHOUT_AUTH_MODE=false
+ENV VITE_WITHOUT_AUTH_MODE=$VITE_WITHOUT_AUTH_MODE
+
 # install dependencies
 COPY package.json package-lock.json /app/
 
