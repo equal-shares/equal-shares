@@ -428,6 +428,16 @@ make examples-run-algorithm
 bash /app/equal-shares/scripts/restart.sh
 ```
 
+For updating the services the following command will:
+* pull the last version of the repository
+* update files permissions
+* build the services
+* restart the services
+
+```bash
+bash /app/equal-shares/scripts/pull.sh
+```
+
 For reset the environment variables files by copying the files to the /app directory run the following command:
 
 ```bash
