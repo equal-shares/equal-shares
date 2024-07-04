@@ -1,10 +1,3 @@
-# this file only for test fixed_budget func
-
-import logging
-
-logger = logging.getLogger("equal_shares_logger")
-
-
 def find_max(bids: dict[int, dict[int, int]]) -> dict[int, int]:
     max_result = {key: 0 for key in bids}
 

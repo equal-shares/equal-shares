@@ -1,9 +1,10 @@
 import copy
-import logging
 
 from src.algorithm.utils import filter_bids, find_max
+from src.logger import LoggerName, get_logger
 
-logger = logging.getLogger("equal_shares_logger")
+logger = get_logger(LoggerName.ALGORITHM)
+
 
 CONTINUOUS_COST = 1  # A cost that signals that the given project is in its continuous increment phase.
 

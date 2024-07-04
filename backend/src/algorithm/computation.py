@@ -1,9 +1,4 @@
-import logging
-
 from src.algorithm.equal_shares import equal_shares
-
-logger = logging.getLogger("equal_shares_logger")
-
 
 """
 The purpose of min_max_equal_shares function is to convert the input in the received format

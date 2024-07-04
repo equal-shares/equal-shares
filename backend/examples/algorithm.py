@@ -1,5 +1,9 @@
+import logging
+import sys
+
 from src.algorithm.equal_shares import equal_shares, equal_shares_fixed_budget
 from src.algorithm.utils import find_max
+from src.logger import LoggerName, get_logger
 
 
 def example1() -> None:
@@ -113,6 +117,9 @@ def example4() -> None:
 
 
 def main() -> None:
+    get_logger(LoggerName.ALGORITHM).setLevel(logging.DEBUG)
+    get_logger(LoggerName.ALGORITHM).addHandler(logging.StreamHandler(sys.stderr))
+
     example1()
 
 

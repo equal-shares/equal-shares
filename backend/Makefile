@@ -36,3 +36,7 @@ fix-lint: fix lint
 # Run the tests for the backend
 test:
 	python -m pytest
+
+# Run examples
+examples-run-algorithm:
+	python examples/algorithm.py
