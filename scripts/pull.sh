@@ -7,6 +7,8 @@ git pull
 chmod 744 /app/**
 
 # restart and update the services
+VITE_WITHOUT_AUTH_MODE=false
+
 source /app/frontend.env
 
 docker compose -f prod.docker-compose.yaml stop
