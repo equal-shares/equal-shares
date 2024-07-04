@@ -33,6 +33,7 @@ For Ariel University
   - [Development](#development)
     - [Linters and Formatters](#linters-and-formatters)
     - [Testing](#testing)
+    - [Examples](#examples)
   - [Production](#production)
     - [Production Scripts](#production-scripts)
     - [Production Monitoring and Logs](#production-monitoring-and-logs)
@@ -419,24 +420,7 @@ For running examples of the algorithm of equal shares run the following command:
 make examples-run-algorithm
 ```
 
-## Production
-
-The project will be saved in: /app
-For managing the server you have scripts under /app/equal-shares/scripts
-
-### Production Scripts
-
-This following scripts will:
-* pull the latest version of the code from GitHub
-* update backend and frontend images if needed
-* restart the services
-
-```bash
-bash /app/equal-shares/scripts/pull.sh
-```
-
-For restarting the services run the following command:
-
+## Productionu
 ```bash
 bash ./scripts/restart.sh
 ```
