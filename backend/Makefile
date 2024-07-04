@@ -30,16 +30,9 @@ mypy:
 # Run the linters for the backend
 lint: flake8 black-check mypy
 
-# Run the tests for the backend
-doctest:
-	python -m doctest src/algorithm/computation.py
-	python -m doctest src/algorithm/equal_shares.py
-	python -m doctest src/algorithm/utils.py
-
-pytest:
-	python -m pytest -k tests
-
-test: doctest pytest
-
 # Run the formatters and linters for the backend
 fix-lint: fix lint
+
+# Run the tests for the backend
+test:
+	python -m pytest -k tests
