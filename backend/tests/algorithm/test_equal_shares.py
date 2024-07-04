@@ -329,7 +329,7 @@ def test_equal_shares_passed_example_2() -> None:
     voters = [1, 2]
     projects_costs = {11: 200, 12: 300, 13: 100}
     bids = {11: {1: 500, 2: 200}, 12: {1: 300, 2: 300}, 13: {2: 100}}
-    budget = 900.0
+    budget = 900
     winners_allocation, candidates_payments_per_voter = equal_shares(
         voters,
         projects_costs,

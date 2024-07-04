@@ -94,7 +94,7 @@ def equal_shares_fixed_budget(
     budget: int,
     bids: dict[int, dict[int, int]],
     max_bid_for_project: dict,
-) -> tuple[dict[int, int], dict[int, int], dict[int, dict[int, int]]]:
+) -> tuple[dict[int, int], dict[int, int], dict[int, dict[int, float]]]:
     logger.info("\nRunning equal_shares_fixed_budget: budget=%s", budget)
     projects = projects_costs.keys()
 
@@ -102,7 +102,7 @@ def equal_shares_fixed_budget(
     # logger.debug("Initial voters_budgets: %s", voters_budgets)
 
     candidates_payments_per_voter = {
-        candidate: {voter: 0 for voter in inner_dict.keys()} for candidate, inner_dict in bids.items()
+        candidate: {voter: 0.0 for voter in inner_dict.keys()} for candidate, inner_dict in bids.items()
     }
     # logger.debug("Initial candidates_payments_per_voter:\n   %s", candidates_payments_per_voter)
 
@@ -120,7 +120,7 @@ def equal_shares_fixed_budget(
 
     while True:
         best_candidates = []
-        best_effective_vote_count = 0
+        best_effective_vote_count = 0.0
 
         # go through remaining candidates in order of decreasing previous effective vote count
         remaining_candidates_sorted = {
@@ -163,7 +163,7 @@ def equal_shares_fixed_budget(
                 for voter in sorted(updated_bids[candidate].keys(), key=lambda i: voters_budgets[i])
             }
             denominator = len(sorted_approvers)
-            paid_so_far = 0
+            paid_so_far = 0.0
             for i, budget_of_i in sorted_approvers.items():
                 # compute payment if remaining approvers pay equally
                 equal_payment = (updated_cost[candidate] - paid_so_far) / denominator

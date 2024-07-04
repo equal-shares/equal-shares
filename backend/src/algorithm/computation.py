@@ -22,10 +22,10 @@ to a format suitable for the equal_shares function (Selects the minimum value)
 
 def min_max_equal_shares(
     voters: list[int],
-    cost_min_max: dict[int, tuple[int, int]],
+    cost_min_max: list[dict[int, tuple[int, int]]],
     bids: dict[int, dict[int, int]],
     budget: int,
-) -> tuple[list[int], dict[int, int], dict[int, dict[int, float]]]:
+) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     projects_costs = {}
     for item in cost_min_max:
         project_id, (min_value, _) = item.popitem()

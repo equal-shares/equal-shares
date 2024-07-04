@@ -76,7 +76,7 @@ update_cost:
 
 
 def filter_bids(
-    update_bids: dict[int, int],
+    update_bids: dict[int, dict[int, int]],
     curr_project_id: int,
     curr_project_cost: int,
     budget_increment_per_project: int,
