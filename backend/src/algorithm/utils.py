@@ -1,29 +1,4 @@
-# this file only for test fixed_budget func
-
-import logging
-
-logger = logging.getLogger("equal_shares_logger")
-
-
 def find_max(bids: dict[int, dict[int, int]]) -> dict[int, int]:
-    """
-    #T.0
-    >>> bids = {
-    ...     11: {1: 100, 2: 100, 4: 100},
-    ...     12: {2: 150, 5: 150},
-    ...     13: {1: 200, 5: 200},
-    ...     14: {3: 250, 4: 250, },
-    ...     15: {2: 300, 3: 300, 5: 300},
-    ...     16: {2: 350, 5: 350},
-    ...     17: {1: 400, 4: 400, },
-    ...     18: {2: 450, 5: 450},
-    ...     19: {1: 500, 3: 500,5: 500},
-    ...     20:{2: 550, 3: 550}
-    ... }
-    >>> find_max(bids)
-    {11: 100, 12: 150, 13: 200, 14: 250, 15: 300, 16: 350, 17: 400, 18: 450, 19: 500, 20: 550}
-    """
-
     max_result = {key: 0 for key in bids}
 
     for project_id in bids:
@@ -94,13 +69,12 @@ update_cost:
 
 
 def filter_bids(
-    update_bids: dict[int, int],
+    update_bids: dict[int, dict[int, int]],
     curr_project_id: int,
     curr_project_cost: int,
     budget_increment_per_project: int,
     update_cost: dict[int, int],
 ) -> None:
-
     if curr_project_id in update_bids:
         voters_to_remove = []
         for voter_id, price in update_bids[curr_project_id].items():

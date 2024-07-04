@@ -74,6 +74,9 @@ For Ariel University
   * workflows
     * ci.yml - Running the CI
 * backend - The backend API
+  * examples - examples of usage of the algorithm
+    * algorithm - examples of the algorithm of equal shares running with logs. \
+      For debugging and understanding the core algorithm
   * src
     * algorithm - the algorithm of equal shares
     * routers
@@ -90,7 +93,7 @@ For Ariel University
     * models.py - models and queries for comunicating with the database
     * schemas.py - schemas of the API
     * security.py - security functions
-  * tests - tests of the backend
+  * tests - tests of the backend, same structure as `src`
   * Dockerfile - for building the images of the backend
   * equal-shares-api-private-key.pem - private RSA key for the API for local development, ignored in git
   * equal-shares-api-public-key.pem - public RSA key for the API for local development, ignored in git
@@ -403,6 +406,18 @@ make test
 ```
 
 Or for windows run the script file `windows-test.bat`
+
+### Examples
+
+In `backend/examples` directory you can find examples of how \
+to run the algorithm for reasearch and debugging. \
+In the API call `public.py` that is Facade for the algorithm module and not directly the algorithm.
+
+For running examples of the algorithm of equal shares run the following command:
+
+```bash
+make examples-run-algorithm
+```
 
 ## Production
 

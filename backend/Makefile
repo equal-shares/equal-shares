@@ -10,7 +10,7 @@ clean:
 	find . -name '__pycache__' -exec rm -fr {} +
 
 isort:
-	python -m isort src tests
+	python -m isort .
 
 black:
 	 python -m black .
@@ -19,27 +19,24 @@ black:
 fix: isort black
 
 flake8:
-	python -m flake8 src tests
+	python -m flake8 .
 
 black-check:
 	 python -m black --check --diff .
 
 mypy:
-	python -m mypy src tests
+	python -m mypy .
 
 # Run the linters for the backend
 lint: flake8 black-check mypy
 
-# Run the tests for the backend
-doctest:
-	python -m doctest src/algorithm/computation.py
-	python -m doctest src/algorithm/equal_shares.py
-	python -m doctest src/algorithm/utils.py
-
-pytest:
-	python -m pytest -k tests
-
-test: doctest pytest
-
 # Run the formatters and linters for the backend
 fix-lint: fix lint
+
+# Run the tests for the backend
+test:
+	python -m pytest
+
+# Run examples
+examples-run-algorithm:
+	python examples/algorithm.py

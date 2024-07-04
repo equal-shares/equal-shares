@@ -2,9 +2,15 @@
 
 import logging
 import logging.config
+from enum import Enum
 from logging.config import dictConfig
 
 from src.config import config
+
+
+class LoggerName(Enum):
+    APP = "app"
+    ALGORITHM = "app.algorithm"
 
 
 def init_loggers() -> None:
@@ -29,6 +35,7 @@ def init_loggers() -> None:
         },
         "loggers": {
             "app": {"handlers": ["default"], "level": "DEBUG"},
+            "app.algorithm": {"handlers": ["default"], "level": "ERROR"},
             "psycopg": {"handlers": ["default"], "level": "INFO"},
             "psycopg.pool": {"handlers": ["default"], "level": "INFO"},
         },
@@ -37,10 +44,8 @@ def init_loggers() -> None:
     dictConfig(logger_config)
 
     logging.getLogger("app").setLevel(config.logger_level)
-    # logging.getLogger("psycopg").setLevel("ERROR")
-    # logging.getLogger("psycopg.pool").setLevel("ERROR")
 
 
-def get_logger() -> logging.Logger:
+def get_logger(name: LoggerName = LoggerName.APP) -> logging.Logger:
     """Get the logger for the application"""
-    return logging.getLogger("app")
+    return logging.getLogger(name.value)

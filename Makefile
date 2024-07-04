@@ -24,6 +24,10 @@ test:
 docker-test:
 	docker compose -f test.docker-compose.yaml up --build
 
+# Run the examples
+examples-run-algorithm:
+	make -C backend examples-run-algorithm
+
 # development
 serv:
 	docker compose -f dev.docker-compose.yaml up --build
