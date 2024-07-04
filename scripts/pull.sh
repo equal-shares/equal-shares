@@ -10,7 +10,9 @@ chmod 744 /app/**
 source /app/frontend.env
 
 docker compose -f prod.docker-compose.yaml stop
-docker compose -f prod.docker-compose.yaml build --build-arg VITE_API_HOST=$VITE_API_HOST
+docker compose -f prod.docker-compose.yaml build \
+    --build-arg VITE_API_HOST=$VITE_API_HOST \
+    --build-arg VITE_WITHOUT_AUTH_MODE=$VITE_WITHOUT_AUTH_MODE
 docker compose -f prod.docker-compose.yaml up --detach
 
 # restart the nginx server
