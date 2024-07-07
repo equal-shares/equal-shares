@@ -22,7 +22,6 @@ def get_tables_exists(db: psycopg.Connection) -> dict[str, bool]:
             FROM information_schema.tables
             WHERE table_schema = 'public';
             """,
-            (_TABLES_NAMES,),
         )
 
         rows = cursor.fetchall()
