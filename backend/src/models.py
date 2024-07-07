@@ -9,11 +9,36 @@ from pydantic import BaseModel
 
 from src.database import db_named_query
 
+_TABLES_NAMES = ["settings", "projects", "voters", "projects_votes"]
+
+
+@db_named_query
+def get_tables_exists(db: psycopg.Connection) -> dict[str, bool]:
+    """Check if the tables exist in the database."""
+    with db.cursor() as cursor:
+        cursor.execute(
+            """
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public';
+            """,
+            (_TABLES_NAMES,),
+        )
+
+        rows = cursor.fetchall()
+
+    tables_exists = {table_name: False for table_name in _TABLES_NAMES}
+
+    for row in rows:
+        if row[0] in tables_exists:
+            tables_exists[row[0]] = True
+
+    return tables_exists
+
 
 @db_named_query
 def create_tables(db: psycopg.Connection) -> None:
     """Create the tables in the database."""
-
     with db.cursor() as cursor:
         cursor.execute(
             """

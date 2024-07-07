@@ -19,6 +19,7 @@ from src.models import (
     delete_votes,
     get_projects,
     get_settings,
+    get_tables_exists,
     update_settings,
 )
 from src.security import create_token, verify_valid_email, verify_valid_token
@@ -35,6 +36,16 @@ def route_create_tables(
 
     if config.admin_key != admin_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    tables_exists = get_tables_exists(db)
+
+    if any(tables_exists.values()):
+        return {
+            "status": "error",
+            "message": "Tables already exist",
+            "tables_exists": [table_name for table_name, table_exists in tables_exists.items() if table_exists],
+            "tables_not_exists": [table_name for table_name, table_exists in tables_exists.items() if not table_exists],
+        }
 
     create_tables(db)
 
