@@ -34,10 +34,10 @@ def verify_valid_token(email: str, token: str) -> bool:
     decryptor = PKCS1_OAEP.new(private_key)
 
     print('-------------------')
-    print(email)
+    print(email, type(email))
     print('-------------------')
     print(token)
-    print(len(token))
+    print(len(token), type(token))
     print('-------------------')
 
     try:
@@ -47,13 +47,17 @@ def verify_valid_token(email: str, token: str) -> bool:
         print('-------------------')
         return False
 
+    while len(decrypted_data) % 128 != 0:
+        decrypted_data += b'\x00'
+
     print(decrypted_data)
-    print(len(decrypted_data))
+    print(len(decrypted_data), type(decrypted_data))
     print('-------------------')
 
     decrypted_data = decryptor.decrypt(decrypted_data)
 
     print(decrypted_data)
+    print(len(decrypted_data), type(decrypted_data))
     print('-------------------')
 
     decrypted_email = decrypted_data.decode("utf-8")
