@@ -65,7 +65,7 @@ For Ariel University
 
 ### Versions
 
-* python 3.12
+* python 3.12 (with poetry 1.7.1)
 * node 21
 * PostgresSQL 16
 
