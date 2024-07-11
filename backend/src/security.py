@@ -39,6 +39,9 @@ def verify_valid_token(email: str, token: str) -> bool:
         return False
 
     print('-------------------')
+    print(email)
+
+    print('-------------------')
 
     print(token)
     print(token.encode("utf-8"))
