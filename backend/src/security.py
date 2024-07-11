@@ -33,29 +33,15 @@ def verify_valid_token(email: str, token: str) -> bool:
         private_key = RSA.importKey(private_key_file.read())
     decryptor = PKCS1_OAEP.new(private_key)
 
-    print('-------------------')
-    print(email, type(email))
-    print('-------------------')
-    print(token)
-    print(len(token), type(token))
-    print('-------------------')
-
     try:
         decrypted_data = b64decode(token)
-    except binascii.Error as ex:
-        print(ex)
-        print('-------------------')
+    except binascii.Error:
         return False
 
-    print(decrypted_data)
-    print(len(decrypted_data), type(decrypted_data))
-    print('-------------------')
-
-    decrypted_data = decryptor.decrypt(decrypted_data)
-
-    print(decrypted_data)
-    print(len(decrypted_data), type(decrypted_data))
-    print('-------------------')
+    try:
+        decrypted_data = decryptor.decrypt(decrypted_data)
+    except ValueError:
+        return False
 
     decrypted_email = decrypted_data.decode("utf-8")
 

@@ -15,6 +15,8 @@ function getDocumentHeight() {
 }
 
 function onReceiveMessage(event: MessageEvent) {
+  console.log('onReceiveMessage', event, getDocumentHeight());
+
   const payload = JSON.parse(event.data);
 
   if (event.source !== window.parent) {
@@ -44,6 +46,8 @@ function onReceiveMessage(event: MessageEvent) {
 }
 
 function onDocumentResize() {
+  console.log('onDocumentResize', getDocumentHeight());
+
   window.parent.postMessage(
     JSON.stringify({
       type: MESSAGE_TYPE.resised,
@@ -54,6 +58,8 @@ function onDocumentResize() {
 }
 
 export function registerPostMessage() {
+  console.log('registerPostMessage');
+
   window.addEventListener('message', onReceiveMessage);
   window.addEventListener('resize', onDocumentResize);
 
