@@ -5,6 +5,8 @@ import { getConfig } from './config';
 
 import 'react-toastify/dist/ReactToastify.css';
 import WithoutAuthPage from './components/WithoutAuthPage';
+import { registerPostMessage } from './postMessage';
+import { useEffect } from 'react';
 
 export default function App() {
   const searchParams = new URLSearchParams(window.location.search);
@@ -13,6 +15,8 @@ export default function App() {
 
   const email = searchParams.get('email');
   const token = searchParams.get('token');
+
+  useEffect(registerPostMessage, []);
 
   // load config for checking that all the environment variables are set
   try {
