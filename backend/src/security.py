@@ -38,7 +38,20 @@ def verify_valid_token(email: str, token: str) -> bool:
     except binascii.Error:
         return False
 
+    print('-------------------')
+
+    print(token)
+    print(token.encode("utf-8"))
+    print(decrypted_data)
+
+    print('-------------------')
+
+    print(b64encode(decrypted_data).decode("utf-8"))
+
+    print('-------------------')
+
     decrypted_data = decryptor.decrypt(decrypted_data)
+
     decrypted_email = decrypted_data.decode("utf-8")
 
     return email == decrypted_email
