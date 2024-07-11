@@ -34,26 +34,22 @@ def verify_valid_token(email: str, token: str) -> bool:
     decryptor = PKCS1_OAEP.new(private_key)
 
     try:
-        decrypted_data = b64decode(token.encode("utf-8"))
+        decrypted_data = b64decode(token)
     except binascii.Error:
         return False
 
     print('-------------------')
     print(email)
-
     print('-------------------')
-
     print(token)
-    print(token.encode("utf-8"))
-    print(decrypted_data)
-
     print('-------------------')
-
-    print(b64encode(decrypted_data).decode("utf-8"))
-
+    print(decrypted_data)
     print('-------------------')
 
     decrypted_data = decryptor.decrypt(decrypted_data)
+
+    print(decrypted_data)
+    print('-------------------')
 
     decrypted_email = decrypted_data.decode("utf-8")
 
