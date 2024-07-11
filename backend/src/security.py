@@ -41,7 +41,9 @@ def verify_valid_token(email: str, token: str) -> bool:
 
     try:
         decrypted_data = b64decode(token)
-    except binascii.Error:
+    except binascii.Error as ex:
+        print(ex)
+        print('-------------------')
         return False
 
     print(decrypted_data)
