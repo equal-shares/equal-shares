@@ -47,9 +47,6 @@ def verify_valid_token(email: str, token: str) -> bool:
         print('-------------------')
         return False
 
-    while len(decrypted_data) % 128 != 0:
-        decrypted_data += b'\x00'
-
     print(decrypted_data)
     print(len(decrypted_data), type(decrypted_data))
     print('-------------------')
