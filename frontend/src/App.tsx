@@ -40,7 +40,7 @@ export default function App() {
 
   return (
     <div dir="rtl">
-      <div className="min-h-[85dvh]">
+      <div className="h-fit">
         <div className="w-fit mx-auto py-[10px]">
           {config.withoutAuthMode ? (
             <WithoutAuthPage />
@@ -49,7 +49,7 @@ export default function App() {
           )}
         </div>
       </div>
-      <div className="w-full min-h-[15dvh] p-[10px] border border-[#DEE2E6] border-t-1">
+      <div className="w-full min-h-[50px] p-[10px] border border-[#DEE2E6] border-t-1">
         <div className="w-fit mx-auto">© 2023 המעבדה לאלגוריתמים כלכליים</div>
       </div>
       <ToastContainer position="top-left" newestOnTop={false} rtl />
