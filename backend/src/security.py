@@ -37,6 +37,7 @@ def verify_valid_token(email: str, token: str) -> bool:
     print(email)
     print('-------------------')
     print(token)
+    print(len(token))
     print('-------------------')
 
     try:
@@ -47,6 +48,7 @@ def verify_valid_token(email: str, token: str) -> bool:
         return False
 
     print(decrypted_data)
+    print(len(decrypted_data))
     print('-------------------')
 
     decrypted_data = decryptor.decrypt(decrypted_data)
