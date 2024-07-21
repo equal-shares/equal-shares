@@ -3,7 +3,9 @@
 export type Project = {
   id: number;
   name: string;
-  description: string;
+  description_1: string;
+  description_2: string;
+  fixed: boolean;
   min_points: number;
   max_points: number;
   rank: number;

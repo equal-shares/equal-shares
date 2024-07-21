@@ -9,7 +9,9 @@ class ProjectSchema(BaseModel):
 
     id: int
     name: str
-    description: str
+    description_1: str
+    description_2: str
+    fixed: bool
     min_points: int
     max_points: int
     rank: int

@@ -64,6 +64,10 @@ export default function MainPage({ email, token }: Props) {
   }, [email, token]);
 
   const pointsSliderOnChange = (project: Project, value: number | number[]) => {
+    if (project.fixed) {
+      return;
+    }
+
     if (typeof value !== 'number') {
       return;
     }
@@ -85,6 +89,10 @@ export default function MainPage({ email, token }: Props) {
   };
 
   const pointsBoxOnChange = (project: Project, textValue: string) => {
+    if (project.fixed) {
+      return;
+    }
+
     project.points_text = textValue;
 
     const value = parseInt(project.points_text, 10);
@@ -105,12 +113,20 @@ export default function MainPage({ email, token }: Props) {
   };
 
   const pointsBoxOnBlur = (project: Project) => {
+    if (project.fixed) {
+      return;
+    }
+
     project.points = Math.round(project.points / pointsStep) * pointsStep;
     project.points_text = project.points.toString();
     setProjects(sortedProjects([...projects]));
   };
 
   const markedOnChange = (project: Project) => {
+    if (project.fixed) {
+      return;
+    }
+
     if (!project.marked) {
       if (availablePoints - project.min_points < 0) {
         toast('אין מספיק יתרת תקציב להסיף את הפרוייקט הזה, הסר מפרוייקט אחר', {
@@ -145,6 +161,10 @@ export default function MainPage({ email, token }: Props) {
 
     const draggedProject = projects[result.source.index - 1];
     const destinationProject = projects[result.destination.index - 1];
+
+    if (draggedProject.fixed || destinationProject.fixed) {
+      return;
+    }
 
     if (draggedProject.marked !== destinationProject.marked) {
       if (destinationProject.marked) {

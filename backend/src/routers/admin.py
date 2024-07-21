@@ -117,8 +117,9 @@ async def route_add_projects(
     - Project name
     - Min points
     - Max points
-    - unused column - can be anything
-    - Description
+    - Description 2
+    - Description 1
+    - Is fixed project - if this column is 'v' then the project cannot be selected.
     """
 
     if config.admin_key != admin_key:
@@ -130,25 +131,27 @@ async def route_add_projects(
     df = pd.read_excel(file)
 
     # Validate the File
-    if len(df.columns) < 5:
+    if len(df.columns) < 6:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Missing columns")
 
     projects_data: list[dict] = []
 
     for i in range(len(df)):
         row = list(df.iloc[i])
-        project_name, min_points, max_points, _, description = list(row)
+        project_name, min_points, max_points, description_1, description_2, fixed = list(row)
 
-        if not project_name or not min_points or not max_points or not description:
+        if not project_name or not min_points or not max_points or not description_1 or not description_2:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Row {i + 1}: Missing data")
 
         project_name = str(project_name).strip()
         min_points = str(min_points).split(".", 2)[0].strip()
         max_points = str(max_points).split(".", 2)[0].strip()
-        description = str(description).strip()
+        description_1 = str(description_1).strip()
+        description_2 = str(description_2).strip()
+        fixed = str(fixed).strip().lower() == "v"
 
         if not min_points.isdigit() or not max_points.isdigit():
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Row {i + 1}: Points must be numbers")
+            continue
 
         min_points = int(min_points)
         max_points = int(max_points)
@@ -169,7 +172,9 @@ async def route_add_projects(
                 "name": project_name,
                 "min_points": min_points,
                 "max_points": max_points,
-                "description": description,
+                "description_1": description_1,
+                "description_2": description_2,
+                "fixed": fixed,
                 "order_number": len(projects_data) + 1,
             }
         )

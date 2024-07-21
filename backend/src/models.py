@@ -63,7 +63,9 @@ def create_tables(db: psycopg.Connection) -> None:
                 name TEXT NOT NULL UNIQUE,
                 min_points INTEGER NOT NULL,
                 max_points INTEGER NOT NULL,
-                description TEXT NOT NULL,
+                description_1 TEXT NOT NULL,
+                description_2 TEXT NOT NULL,
+                fixed BOOLEAN NOT NULL,
                 order_number INTEGER NOT NULL,
                 created_at TIMESTAMP NOT NULL
             );
@@ -155,20 +157,31 @@ class Project(BaseModel):
     name: str
     min_points: int
     max_points: int
-    description: str
+    description_1: str
+    description_2: str
+    fixed: bool
     order_number: int
     created_at: datetime
 
 
 @db_named_query
 def create_project(
-    db: psycopg.Connection, name: str, min_points: int, max_points: int, description: str, order_number: int
+    db: psycopg.Connection,
+    name: str,
+    min_points: int,
+    max_points: int,
+    description_1: str,
+    description_2: str,
+    fixed: bool,
+    order_number: int,
 ) -> Project:
     project = Project(
         name=name,
         min_points=min_points,
         max_points=max_points,
-        description=description,
+        description_1=description_1,
+        description_2=description_2,
+        fixed=fixed,
         order_number=order_number,
         created_at=datetime.now(),
     )
@@ -176,15 +189,19 @@ def create_project(
     with db.cursor() as cursor:
         cursor.execute(
             """
-            INSERT INTO public.projects (name, min_points, max_points, description, order_number, created_at)
-            VALUES (%s, %s, %s, %s, %s, %s)
+            INSERT INTO public.projects
+            (name, min_points, max_points, description_1, description_2, fixed, order_number, created_at)
+            VALUES
+            (%s, %s, %s, %s, %s, %s, %s, %s)
             RETURNING id;
             """,
             (
                 project.name,
                 project.min_points,
                 project.max_points,
-                project.description,
+                project.description_1,
+                project.description_2,
+                project.fixed,
                 project.order_number,
                 project.created_at,
             ),
@@ -220,7 +237,7 @@ def get_projects(db: psycopg.Connection) -> list[Project]:
     with db.cursor() as cursor:
         cursor.execute(
             """
-            SELECT id, name, min_points, max_points, description, order_number, created_at
+            SELECT id, name, min_points, max_points, description_1, description_2, fixed, order_number, created_at
             FROM public.projects
             ORDER BY order_number, created_at;
             """
@@ -233,9 +250,11 @@ def get_projects(db: psycopg.Connection) -> list[Project]:
             name=row[1],
             min_points=row[2],
             max_points=row[3],
-            description=row[4],
-            order_number=row[5],
-            created_at=row[6],
+            description_1=row[4],
+            description_2=row[5],
+            fixed=bool(row[6]),
+            order_number=row[7],
+            created_at=row[8],
         )
         for row in rows
     ]

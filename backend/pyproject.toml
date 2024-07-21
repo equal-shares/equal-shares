@@ -1,8 +1,8 @@
 [tool.poetry]
 name = "backend"
 version = "0.1.0"
-description = "SoluTrain API"
-authors = ["Dor", "Omer Priel <omer.priel2@gmail.com>", "Ori Sharaby", "Ori Sharaby", "Stav Sharon"]
+description = "Equal Shares API"
+authors = ["Dor", "Omer Priel <omer.priel2@gmail.com>", "Bar Nahmias", "Erel Segal-Halevi <erelsgl@gmail.com>"]
 license = "MIT"
 packages = [{include = "src"}]
 

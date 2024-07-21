@@ -28,7 +28,9 @@ def _create_data_response_schema(
         projects_data[project.project_id] = ProjectSchema(
             id=project.project_id,
             name=project.name,
-            description=project.description,
+            description_1=project.description_1,
+            description_2=project.description_2,
+            fixed=project.fixed,
             min_points=project.min_points,
             max_points=project.max_points,
             rank=project.order_number,
@@ -44,9 +46,12 @@ def _create_data_response_schema(
 
     projects_order = sorted(projects_data.values(), key=lambda x: x.rank)
 
+    max_total_points = settings.max_total_points
+    max_total_points -= sum([project.min_points for project in projects if project.fixed])
+
     return DataResponseSchema(
         voted=len(voter_votes) > 0,
-        max_total_points=settings.max_total_points,
+        max_total_points=max_total_points,
         points_step=settings.points_step,
         projects=projects_order,
     )
@@ -91,6 +96,9 @@ def route_vote(
     settings = get_settings(db)
     projects = get_projects(db)
 
+    max_total_points = settings.max_total_points
+    max_total_points -= sum([project.min_points for project in projects if project.fixed])
+
     projects_dict = {project.project_id: project for project in projects}
 
     # validate vote
@@ -109,7 +117,7 @@ def route_vote(
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid points")
 
     total_points = sum(vote.points for vote in projects_votes.values())
-    if total_points > settings.max_total_points:
+    if total_points > max_total_points:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Total points exceed the limit")
 
     ranks = {vote.rank for vote in projects_votes.values()}

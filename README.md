@@ -350,8 +350,8 @@ In the API Dashbord run /admin/add-projects
   column 1: name of the project
   column 2: min points of the project
   column 3: max points of the project
-  column 4: this column is not in use
-  column 5: description of the project,
+  column 4: "description 2" is not in use
+  column 5: "description 1" of the project,
 
 Get the Projects and Settings as JSON format: \
 In the API Dashbord run /admin/projects

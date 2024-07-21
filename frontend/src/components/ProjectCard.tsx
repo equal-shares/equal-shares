@@ -36,11 +36,13 @@ export default function ProjectCard({
       <CardContent>
         <Grid container spacing={2}>
           <Grid item xs={1}>
-            <div className="h-full flex justify-content">
-              <div className="h-fit my-auto">
-                <MenuIcon />
+            {!project.fixed && (
+              <div className="h-full flex justify-content">
+                <div className="h-fit my-auto">
+                  <MenuIcon />
+                </div>
               </div>
-            </div>
+            )}
           </Grid>
           <Grid item xs={6}>
             <div>
@@ -48,7 +50,13 @@ export default function ProjectCard({
                 {project.rank}. {project.name}
               </Typography>
               <Typography variant="body1" component="p">
-                {project.description}
+                {project.description_1}
+              </Typography>
+              <Typography variant="body1" component="p">
+                {project.description_2}
+              </Typography>
+              <Typography variant="body1" component="p">
+                {project.fixed ? 'fixed' : 'not fixed'}
               </Typography>
             </div>
           </Grid>
@@ -74,7 +82,7 @@ export default function ProjectCard({
                           label: project.max_points.toString(),
                         },
                       ]}
-                      disabled={!project.marked}
+                      disabled={!project.marked || project.fixed}
                       onChange={(_, value) => pointsSliderOnChange(project, value)}
                     />
                   </div>
@@ -90,7 +98,7 @@ export default function ProjectCard({
                       max: project.max_points,
                       type: 'number',
                     }}
-                    disabled={!project.marked}
+                    disabled={!project.marked || project.fixed}
                     onChange={(event) => pointsBoxOnChange(project, event.target.value)}
                     onBlur={() => pointsBoxOnBlur(project)}
                   />
@@ -98,12 +106,16 @@ export default function ProjectCard({
               </Grid>
             </div>
             <div className="w-fit mr-auto ml-[40px]">
-              <FormControlLabel
-                control={
-                  <Checkbox checked={project.marked} onChange={() => markedOnChange(project)} />
-                }
-                label="בחר"
-              />
+              {project.fixed ? (
+                <FormControlLabel control={<Checkbox checked disabled />} label="בחר" />
+              ) : (
+                <FormControlLabel
+                  control={
+                    <Checkbox checked={project.marked} onChange={() => markedOnChange(project)} />
+                  }
+                  label="בחר"
+                />
+              )}
             </div>
           </Grid>
         </Grid>
