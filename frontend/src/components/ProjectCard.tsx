@@ -6,9 +6,11 @@ import {
   Slider,
   Input,
   Checkbox,
-  FormControlLabel,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
 } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
+import { Menu as MenuIcon, ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 
 import { Project } from '../schemas';
 
@@ -44,27 +46,22 @@ export default function ProjectCard({
               </div>
             )}
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={11}>
+            <Typography variant="h6" component="p">
+              <span className="ml-[10px]">
+                {project.fixed ? (
+                  <Checkbox checked disabled />
+                ) : (
+                  <Checkbox checked={project.marked} onChange={() => markedOnChange(project)} />
+                )}
+              </span>
+              {project.rank}. {project.name}
+            </Typography>
             <div>
-              <Typography variant="h6" component="p">
-                {project.rank}. {project.name}
-              </Typography>
-              <Typography variant="body1" component="p">
-                {project.description_1}
-              </Typography>
-              <Typography variant="body1" component="p">
-                {project.description_2}
-              </Typography>
-              <Typography variant="body1" component="p">
-                {project.fixed ? 'fixed' : 'not fixed'}
-              </Typography>
-            </div>
-          </Grid>
-          <Grid item xs={5}>
-            <div>
-              <Grid container spacing={4} alignItems="center">
+              <Grid container spacing={2} alignItems="center">
                 <Grid item xs={8}>
                   <div
+                    className="w-[85%] pr-[15%]"
                     onMouseEnter={() => setDragDisabled(true)}
                     onMouseLeave={() => setDragDisabled(false)}>
                     <Slider
@@ -105,17 +102,17 @@ export default function ProjectCard({
                 </Grid>
               </Grid>
             </div>
-            <div className="w-fit mr-auto ml-[40px]">
-              {project.fixed ? (
-                <FormControlLabel control={<Checkbox checked disabled />} label="בחר" />
-              ) : (
-                <FormControlLabel
-                  control={
-                    <Checkbox checked={project.marked} onChange={() => markedOnChange(project)} />
-                  }
-                  label="בחר"
-                />
-              )}
+            <div>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>תאור</AccordionSummary>
+                <AccordionDetails>{project.description_1}</AccordionDetails>
+              </Accordion>
+              <Accordion>
+                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                  שיפור לפי התקציב
+                </AccordionSummary>
+                <AccordionDetails>{project.description_2}</AccordionDetails>
+              </Accordion>
             </div>
           </Grid>
         </Grid>

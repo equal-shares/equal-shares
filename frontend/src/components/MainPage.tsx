@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import {
   Button,
@@ -47,7 +47,7 @@ export default function MainPage({ email, token }: Props) {
   const markedProjects = projects.filter((project) => project.marked);
   const unmarkedProjects = projects.filter((project) => !project.marked);
 
-  useEffect(() => {
+  const resetVote = useCallback(() => {
     setSendingRequest(true);
     postDataRequest(email, token)
       .then((data: DataResponse) => {
@@ -62,6 +62,10 @@ export default function MainPage({ email, token }: Props) {
         setSendingRequest(false);
       });
   }, [email, token]);
+
+  useEffect(() => {
+    resetVote();
+  }, [resetVote]);
 
   const pointsSliderOnChange = (project: Project, value: number | number[]) => {
     if (project.fixed) {
@@ -193,6 +197,14 @@ export default function MainPage({ email, token }: Props) {
     setProjects(sortedProjects);
   };
 
+  const resetVoteOnClick = () => {
+    if (sendingRequest) {
+      return;
+    }
+
+    resetVote();
+  };
+
   const saveOnClick = () => {
     if (sendingRequest) {
       return;
@@ -280,19 +292,12 @@ export default function MainPage({ email, token }: Props) {
         </div>
         <div className="w-full mt-[5px] flex justify-center">
           <Alert className="w-fit" severity="info">
-            יתרת ניקוד: {availablePoints}
+            יתרת תקציב: {availablePoints}
           </Alert>
         </div>
         <div className="w-full mt-[10px] flex justify-center">
-          <div className="ml-[25px] my-auto">
-            <Typography variant="body1" component="p">
-              דוגמאות לניקוד
-            </Typography>
-          </div>
           <ButtonGroup variant="outlined" dir="ltr">
-            <Button>איפוס הכל</Button>
-            <Button>חלוקה שווה</Button>
-            <Button>חלוקה לפי הסדר</Button>
+            <Button onClick={resetVoteOnClick}>איפוס הכל</Button>
           </ButtonGroup>
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
