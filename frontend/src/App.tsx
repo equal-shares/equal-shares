@@ -1,12 +1,14 @@
+import { useEffect } from 'react';
+
 import { ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
 
 import MainPage from './components/MainPage';
 import { getConfig } from './config';
-
-import 'react-toastify/dist/ReactToastify.css';
 import WithoutAuthPage from './components/WithoutAuthPage';
+import NotAuthenticated from './components/NotAuthenticated';
 import { registerPostMessage } from './postMessage';
-import { useEffect } from 'react';
 
 export default function App() {
   const searchParams = new URLSearchParams(window.location.search);
@@ -30,12 +32,7 @@ export default function App() {
   }
 
   if ((!email || !token) && !config.withoutAuthMode) {
-    return (
-      <>
-        <h1>אין אפשרות להציג את הדף</h1>
-        <h2>"email" or "token" is missing in the URL.</h2>
-      </>
-    );
+    return <NotAuthenticated />;
   }
 
   return (

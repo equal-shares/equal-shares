@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-import MainPage from './MainPage';
 import { Button, Container, Input, Typography } from '@mui/material';
+
+import MainPage from './MainPage';
 
 export default function WithoutAuthPage() {
   const [email, setEmail] = useState('');

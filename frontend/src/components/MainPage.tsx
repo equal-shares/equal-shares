@@ -12,12 +12,10 @@ import {
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-
 import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
 import { DataResponse, Project } from '../schemas';
 import { postDataRequest, postVoteRequest } from '../api';
-
 import ProjectCard from './ProjectCard';
 
 import logoImage from '../assets/logo.png';
