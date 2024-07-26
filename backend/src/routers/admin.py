@@ -138,7 +138,7 @@ async def route_add_projects(
 
     for i in range(len(df)):
         row = list(df.iloc[i])
-        project_name, min_points, max_points, description_1, description_2, fixed = list(row)
+        project_name, min_points, max_points, description_2, description_1, fixed = list(row)
 
         if not project_name or not min_points or not max_points or not description_1 or not description_2:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Row {i + 1}: Missing data")
