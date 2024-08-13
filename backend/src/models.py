@@ -5,7 +5,7 @@
 from datetime import datetime
 
 import psycopg
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 from src.database import db_named_query
 
@@ -163,6 +163,10 @@ class Project(BaseModel):
     order_number: int
     created_at: datetime
 
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime) -> str:
+        return value.isoformat()
+
 
 @db_named_query
 def create_project(
@@ -266,6 +270,10 @@ class Voter(BaseModel):
     voter_id: int = 0
     email: str
     created_at: datetime
+
+    @field_serializer("created_at")
+    def serialize_created_at(self, value: datetime) -> str:
+        return value.isoformat()
 
 
 class ProjectVote(BaseModel):
@@ -374,9 +382,9 @@ def get_votes(db: psycopg.Connection) -> list[VoteData]:
     with db.cursor() as cursor:
         cursor.execute(
             """
-            SELECT v.voter_id, v.email, v.created_at, pv.project_id, pv.points, pv.rank
+            SELECT v.id, v.email, v.created_at, pv.project_id, pv.points, pv.rank
             FROM public.voters AS v
-            JOIN public.projects_votes AS pv ON v.voter_id = pv.voter_id
+            JOIN public.projects_votes AS pv ON pv.voter_id = v.id
             ORDER BY v.created_at, pv.rank;
             """
         )
