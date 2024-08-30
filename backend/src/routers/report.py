@@ -265,12 +265,12 @@ def _report_run_algorithm(
     )
 
     _report_log_info(report, "Start computation")
-    # result = run_algorithm(input_data)
+    result = run_algorithm(input_data)
     _report_log_info(report, "Computation finished")
 
-    # report.append_text_to_file("raw_result.json", json.dumps(result.raw_result, indent=4))
+    report.append_text_to_file("raw_result.json", json.dumps(result.raw_result, indent=4))
 
-    # return result
+    return result
 
 
 def _report_save_result_as_csv(report: Report, result: AlgorithmResult) -> None:
