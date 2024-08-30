@@ -46,7 +46,7 @@ WORKDIR /app
 
 EXPOSE 8000
 
-ENTRYPOINT ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "--reload", "src.app:app", "--timeout-keep-alive", "120"]
+ENTRYPOINT ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "--reload", "src.app:app", "--timeout-keep-alive", "600"]
 
 # image for running the app in production
 FROM build as prod
@@ -55,4 +55,4 @@ WORKDIR /app
 
 EXPOSE 8000
 
-ENTRYPOINT ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "src.app:app", "--timeout-keep-alive", "120"]
+ENTRYPOINT ["uvicorn", "--host", "0.0.0.0", "--port", "8000", "src.app:app", "--timeout-keep-alive", "600"]

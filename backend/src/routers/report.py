@@ -15,7 +15,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from src.algorithm.public import AlgorithmInput, AlgorithmResult, ProjectItem, VouterItem, run_algorithm
 from src.config import config
 from src.database import db_dependency
-from src.logger import LoggerName, get_logger
+from src.logger import get_logger
 from src.models import Project, Settings, VoteData, get_projects, get_settings, get_votes
 
 
