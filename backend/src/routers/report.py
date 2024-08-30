@@ -1,5 +1,6 @@
 # Router for the reports and the algorithm.
 
+from enum import StrEnum
 import io
 import json
 import sys
@@ -10,11 +11,12 @@ from uuid import UUID
 
 import pandas as pd
 import psycopg
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response, status
 
+from pydantic import BaseModel
 from src.algorithm.public import AlgorithmInput, AlgorithmResult, ProjectItem, VouterItem, run_algorithm
 from src.config import config
-from src.database import db_dependency
+from src.database import db_dependency, get_db
 from src.logger import get_logger
 from src.models import Project, Settings, VoteData, get_projects, get_settings, get_votes
 
@@ -39,12 +41,20 @@ class InMemoryZip:
         return content
 
 
+class ReportStatus(StrEnum):
+    CREATED = "created"
+    IN_PROGRESS = "in_progress"
+    FINISHED = "finished"
+
+
 class Report:
+    status: ReportStatus
     text_files: dict[str, str]
     binary_files: dict[str, bytes]
     _last_exeption_id: int
 
     def __init__(self) -> None:
+        self.status = ReportStatus.CREATED
         self.text_files = {}
         self.binary_files = {}
         self._last_exeption_id = 0
@@ -73,25 +83,103 @@ class Report:
         return zip_file.get_content()
 
 
-@router.get("/data")
-def route_report_data(
+class ReportsStorage:
+    def __init__(self) -> None:
+        self.reports: dict[int, Report] = {}
+
+    def create_report(self) -> int:
+        if len(self.reports) == 0:
+            report_id = 1
+        else:
+            report_id = max(self.reports.keys()) + 1
+
+        self.reports[report_id] = Report()
+        return report_id
+
+    def get_report(self, report_id: int) -> Report:
+        return self.reports[report_id]
+
+    def remove_report(self, report_id: int) -> None:
+        self.reports.pop(report_id)
+
+
+reports_storage = ReportsStorage()
+
+
+class ReportStarted(BaseModel):
+    report_id: int
+
+
+@router.get("/start")
+def start_report_route(
+    background_tasks: BackgroundTasks,
     admin_key: UUID = Query(description="key for authentication of admin"),
-    db: psycopg.Connection = Depends(db_dependency),
+) -> ReportStarted:
+    if config.admin_key != admin_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    report_id = reports_storage.create_report()
+
+    background_tasks.add_task(create_report_task, report_id)
+
+    return ReportStarted(report_id=report_id)
+
+
+class ReportStatusResponse(BaseModel):
+    report_id: int
+    status: ReportStatus
+    is_finished: bool
+
+
+@router.get("/status")
+def status_report_route(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+    report_id: int = Query(description="id of the report"),
+) -> ReportStatusResponse:
+    if config.admin_key != admin_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    report = reports_storage.get_report(report_id)
+    return ReportStatusResponse(
+        report_id=report_id,
+        status=report.status,
+        is_finished=report.status == ReportStatus.FINISHED,
+    )
+
+
+@router.get("/result")
+def get_report_route(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+    report_id: int = Query(description="id of the report"),
 ) -> Response:
     if config.admin_key != admin_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
-    report = Report()
+    report = reports_storage.get_report(report_id)
 
-    _create_report(report, db)
+    if report.status != ReportStatus.FINISHED:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not finished")
 
     content = report.get_content()
+
+    reports_storage.remove_report(report_id)
 
     return Response(
         content=content,
         media_type="application/zip",
         headers={"Content-Disposition": "attachment; filename=report.zip"},
     )
+
+
+def create_report_task(report_id: int) -> None:
+    with get_db() as db:
+        report = reports_storage.get_report(report_id)
+        report.status = ReportStatus.IN_PROGRESS
+        try:
+            _create_report(report, db)
+        except Exception:
+            _report_log_error(report, "Error while creating report")
+        report.status = ReportStatus.FINISHED
 
 
 def _create_report(report: Report, db: psycopg.Connection) -> None:
