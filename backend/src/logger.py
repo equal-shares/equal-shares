@@ -35,7 +35,7 @@ def init_loggers() -> None:
         },
         "loggers": {
             "app": {"handlers": ["default"], "level": "DEBUG"},
-            "app.algorithm": {"handlers": ["default"], "level": "ERROR"},
+            "app.algorithm": {"handlers": ["default"], "level": "DEBUG"},
             "psycopg": {"handlers": ["default"], "level": "INFO"},
             "psycopg.pool": {"handlers": ["default"], "level": "INFO"},
         },
@@ -44,6 +44,7 @@ def init_loggers() -> None:
     dictConfig(logger_config)
 
     logging.getLogger("app").setLevel(config.logger_level)
+    logging.getLogger("app.algorithm").setLevel(config.logger_level)
 
 
 def get_logger(name: LoggerName = LoggerName.APP) -> logging.Logger:
