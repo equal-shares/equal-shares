@@ -15,7 +15,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from src.algorithm.public import AlgorithmInput, AlgorithmResult, ProjectItem, VouterItem, run_algorithm
 from src.config import config
 from src.database import db_dependency
+from src.logger import LoggerName, get_logger
 from src.models import Project, Settings, VoteData, get_projects, get_settings, get_votes
+
+
+logger = get_logger()
 
 router = APIRouter()
 
@@ -151,6 +155,7 @@ def _report_log_error(report: Report, log: str, without_exeption: bool = False) 
 
 
 def _report_log(report: Report, level: str, log: str, only_in_full: bool = False) -> None:
+    logger.log(level, log)
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if not only_in_full:
         report.append_text_to_file("log.txt", f"{created_at} {level}: {log}\n")
