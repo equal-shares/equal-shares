@@ -155,7 +155,11 @@ def _report_log_error(report: Report, log: str, without_exeption: bool = False) 
 
 
 def _report_log(report: Report, level: str, log: str, only_in_full: bool = False) -> None:
-    logger.log(level, log)
+    if level == "INFO":
+        logger.info(log)
+    elif level == "ERROR":
+        logger.error(log)
+
     created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     if not only_in_full:
         report.append_text_to_file("log.txt", f"{created_at} {level}: {log}\n")
