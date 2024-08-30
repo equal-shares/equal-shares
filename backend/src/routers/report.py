@@ -151,18 +151,22 @@ def status_report_route(
 def get_report_route(
     admin_key: UUID = Query(description="key for authentication of admin"),
     report_id: int = Query(description="id of the report"),
+    remove_report: bool = Query(description="if the report should be removed after downloading", default=True),
 ) -> Response:
     if config.admin_key != admin_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
     report = reports_storage.get_report(report_id)
 
-    if report.status != ReportStatus.FINISHED:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not finished")
+    if remove_report:
+        if report.status != ReportStatus.FINISHED:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not finished")
 
-    content = report.get_content()
+        content = report.get_content()
 
-    reports_storage.remove_report(report_id)
+        reports_storage.remove_report(report_id)
+    else:
+        content = report.get_content()
 
     return Response(
         content=content,
