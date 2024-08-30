@@ -338,7 +338,6 @@ def _report_save_data_as_csv(report: Report, projects: dict[int, Project], votes
 def _report_run_algorithm(
     report: Report, settings: Settings, projects: dict[int, Project], votes: list[VoteData]
 ) -> AlgorithmResult:
-    votes = list(votes)[:5]
     input_data = AlgorithmInput(
         projects=[
             ProjectItem(
