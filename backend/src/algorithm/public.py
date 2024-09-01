@@ -67,8 +67,8 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
 
     for voter_id in range(1, len(voters) + 1):
         sum_bid = 0
-        for item in bids:
-            sum_bid += item[voter_id]
+        for j in bids:
+            sum_bid += bids[j][voter_id]
 
         if sum_bid > data.budget:
             logger.info(f"ERROR: voter_id={voter_id}, sum_bid={sum_bid}")
