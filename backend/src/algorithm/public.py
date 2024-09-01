@@ -35,6 +35,15 @@ class AlgorithmResult:
 
 
 def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
+    for vouter in data.voutes:
+        sum_bid = 0
+        for project_id, cost in vouter.voutes.items():
+            sum_bid += cost
+        if sum_bid > data.budget:
+            print("ERROR", vouter.vouter_id, sum_bid)
+        else:
+            print("OK", vouter.vouter_id, sum_bid)
+
     bids: dict[int, dict[int, int]] = {
         _get_project_algorithm_id(data.projects, project.project_id): dict() for project in data.projects
     }
@@ -65,16 +74,6 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
     #     bids=bids,
     #     budget=data.budget,
     # )
-
-    import json
-    logger.info(json.dumps(
-        {
-            "voters": voters,
-            "cost_min_max": cost_min_max,
-            "bids": bids,
-            "budget": data.budget,
-        }
-    ))
 
     logger.info(f"winners_allocations: {winners_allocations}")
     logger.info(f"candidates_payments_per_voter: {candidates_payments_per_voter}")
