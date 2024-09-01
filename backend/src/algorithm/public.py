@@ -51,11 +51,11 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
 
     return AlgorithmResult(raw_result=(dict(), dict()))
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
-        voters=[vouter.vouter_id for vouter in data.voutes],
-        cost_min_max=[{project.project_id: (project.min_cost, project.max_cost)} for project in data.projects],
-        bids=bids,
-        budget=data.budget,
-    )
+# winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+#     voters=[vouter.vouter_id for vouter in data.voutes],
+#     cost_min_max=[{project.project_id: (project.min_cost, project.max_cost)} for project in data.projects],
+#     bids=bids,
+#     budget=data.budget,
+# )
 
-    return AlgorithmResult(raw_result=(winners_allocations, candidates_payments_per_voter))
+# return AlgorithmResult(raw_result=(winners_allocations, candidates_payments_per_voter))
