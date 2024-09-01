@@ -40,9 +40,9 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
         for project_id, cost in vouter.voutes.items():
             sum_bid += cost
         if sum_bid > data.budget:
-            print("ERROR", vouter.vouter_id, sum_bid)
+            logger.info(f"ERROR: vouter_id={vouter.vouter_id}, sum_bid={sum_bid}")
         else:
-            print("OK", vouter.vouter_id, sum_bid)
+            logger.info(f"OK: vouter_id={vouter.vouter_id}, sum_bid={sum_bid}")
 
     bids: dict[int, dict[int, int]] = {
         _get_project_algorithm_id(data.projects, project.project_id): dict() for project in data.projects
