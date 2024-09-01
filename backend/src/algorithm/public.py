@@ -51,20 +51,30 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
         for project in data.projects
     ]
 
-    logger.info(f"voters: {voters}")
-    logger.info(f"cost_min_max: {cost_min_max}")
-    logger.info(f"bids: {bids}")
-    logger.info(f"budget: {data.budget}")
+    # logger.info(f"voters: {voters}")
+    # logger.info(f"cost_min_max: {cost_min_max}")
+    # logger.info(f"bids: {bids}")
+    # logger.info(f"budget: {data.budget}")
 
     winners_allocations = {}
     candidates_payments_per_voter = {}
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
-        voters=voters,
-        cost_min_max=cost_min_max,
-        bids=bids,
-        budget=data.budget,
-    )
+    # winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+    #     voters=voters,
+    #     cost_min_max=cost_min_max,
+    #     bids=bids,
+    #     budget=data.budget,
+    # )
+
+    import json
+    logger.log(json.dumps(
+        {
+            "voters": voters,
+            "cost_min_max": cost_min_max,
+            "bids": bids,
+            "budget": data.budget,
+        }
+    ))
 
     logger.info(f"winners_allocations: {winners_allocations}")
     logger.info(f"candidates_payments_per_voter: {candidates_payments_per_voter}")
