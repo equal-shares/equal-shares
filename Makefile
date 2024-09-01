@@ -31,3 +31,6 @@ examples-run-algorithm:
 # development
 serv:
 	docker compose -f dev.docker-compose.yaml up --build
+
+ssh-to-prod:
+	ssh root@arielcs.xyz
