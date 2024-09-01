@@ -67,7 +67,7 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
     # )
 
     import json
-    logger.log(json.dumps(
+    logger.info(json.dumps(
         {
             "voters": voters,
             "cost_min_max": cost_min_max,
