@@ -65,6 +65,17 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
     # logger.info(f"bids: {bids}")
     # logger.info(f"budget: {data.budget}")
 
+    for voter_id in range(1, len(voters) + 1):
+        sum_bid = 0
+        for item in bids:
+            sum_bid += item[voter_id]
+
+        if sum_bid > data.budget:
+            logger.info(f"ERROR: voter_id={voter_id}, sum_bid={sum_bid}")
+        else:
+            logger.info(f"OK: voter_id={voter_id}, sum_bid={sum_bid}")
+
+
     winners_allocations = {}
     candidates_payments_per_voter = {}
 
