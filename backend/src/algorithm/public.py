@@ -35,7 +35,9 @@ class AlgorithmResult:
 
 
 def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
-    bids: dict[int, dict[int, int]] = {project.project_id: dict() for project in data.projects}
+    bids: dict[int, dict[int, int]] = {
+        _get_project_algorithm_id(data.projects, project.project_id): dict() for project in data.projects
+    }
 
     for vouter in data.voutes:
         for project_id, cost in vouter.voutes.items():
