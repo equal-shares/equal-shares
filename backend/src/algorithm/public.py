@@ -39,10 +39,15 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
 
     for vouter in data.voutes:
         for project_id, cost in vouter.voutes.items():
-            bids[project_id][_get_voter_algorithm_id(data.voutes, vouter)] = cost
+            bids[_get_project_algorithm_id(data.projects, project_id)][
+                _get_voter_algorithm_id(data.voutes, vouter)
+            ] = cost
 
     voters = [_get_voter_algorithm_id(data.voutes, vouter) for vouter in data.voutes]
-    cost_min_max = [{project.project_id: (project.min_cost, project.max_cost)} for project in data.projects]
+    cost_min_max = [
+        {_get_project_algorithm_id(data.projects, project.project_id): (project.min_cost, project.max_cost)}
+        for project in data.projects
+    ]
 
     logger.info(f"voters: {voters}")
     logger.info(f"cost_min_max: {cost_min_max}")
@@ -70,3 +75,11 @@ def _get_voter_algorithm_id(voutes: list[VouterItem], vouter: VouterItem) -> int
             return i + 1
 
     raise ValueError(f"Vouter {vouter.vouter_id} not found")
+
+
+def _get_project_algorithm_id(projects: list[ProjectItem], project_id: int) -> int:
+    for i, project_item in enumerate(projects):
+        if project_item.project_id == project_id:
+            return i + 1
+
+    raise ValueError(f"Project {project_id} not found")
