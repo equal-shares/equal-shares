@@ -56,6 +56,9 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
         budget=data.budget,
     )
 
+    logger.info(f"winners_allocations: {winners_allocations}")
+    logger.info(f"candidates_payments_per_voter: {candidates_payments_per_voter}")
+
     # return AlgorithmResult(raw_result=(dict(), dict()))
 
     return AlgorithmResult(raw_result=(winners_allocations, candidates_payments_per_voter))
