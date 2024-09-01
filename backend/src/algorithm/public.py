@@ -39,9 +39,9 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
 
     for vouter in data.voutes:
         for project_id, cost in vouter.voutes.items():
-            bids[project_id][vouter.vouter_id] = cost
+            bids[project_id][_get_voter_algorithm_id(data.voutes, vouter)] = cost
 
-    voters = [vouter.vouter_id for vouter in data.voutes]
+    voters = [_get_voter_algorithm_id(data.voutes, vouter) for vouter in data.voutes]
     cost_min_max = [{project.project_id: (project.min_cost, project.max_cost)} for project in data.projects]
 
     logger.info(f"voters: {voters}")
@@ -49,13 +49,21 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
     logger.info(f"bids: {bids}")
     logger.info(f"budget: {data.budget}")
 
-    return AlgorithmResult(raw_result=(dict(), dict()))
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters=voters,
+        cost_min_max=cost_min_max,
+        bids=bids,
+        budget=data.budget,
+    )
 
-# winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
-#     voters=[vouter.vouter_id for vouter in data.voutes],
-#     cost_min_max=[{project.project_id: (project.min_cost, project.max_cost)} for project in data.projects],
-#     bids=bids,
-#     budget=data.budget,
-# )
+    # return AlgorithmResult(raw_result=(dict(), dict()))
 
-# return AlgorithmResult(raw_result=(winners_allocations, candidates_payments_per_voter))
+    return AlgorithmResult(raw_result=(winners_allocations, candidates_payments_per_voter))
+
+
+def _get_voter_algorithm_id(voutes: list[VouterItem], vouter: VouterItem) -> int:
+    for i, vouter_item in enumerate(voutes):
+        if vouter_item.vouter_id == vouter.vouter_id:
+            return i + 1
+
+    raise ValueError(f"Vouter {vouter.vouter_id} not found")
