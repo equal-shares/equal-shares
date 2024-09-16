@@ -37,7 +37,7 @@ def equal_shares(
             if (
                 (total_chosen_project_cost + candidate_cost_of_next_increase <= budget)
                 and (winners_allocations[candidate] + candidate_cost_of_next_increase <= max_bid_for_project[candidate])
-                and (candidate_cost_of_next_increase > 0)
+                and (candidate_cost_of_next_increase > 0)and (rounded_budget <= budget)
             ):
                 logger.debug("Candidate %s ", candidate)
                 is_exhaustive = False
