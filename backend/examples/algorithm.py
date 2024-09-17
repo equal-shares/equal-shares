@@ -116,11 +116,37 @@ def example4() -> None:
     print("candidates_payments_per_voter", candidates_payments_per_voter)
 
 
+
+def test_min_max_equal_shares_passed_3() -> None:
+    """
+    Two projects with the same amount of voters and the price difference between them is 1
+    """
+
+    voters = [1, 2]
+    projects_costs = {11: 99, 12: 98}
+    bids = {11: {2: 99}, 12: {1: 98}}
+    budget = 100
+
+    winners_allocations, candidates_payments_per_voter = equal_shares(
+        voters, projects_costs, budget, bids, 
+        )
+
+    # expected_winners_allocations = {11: 0, 12: 98}
+    # expected_candidates_payments_per_voter = {11: {2: 0}, 12: {1: 98.0}}
+
+    # assert winners_allocations == expected_winners_allocations
+
+    # assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
+    # for key in candidates_payments_per_voter:
+    #     assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+
+
 def main() -> None:
     get_logger(LoggerName.ALGORITHM).setLevel(logging.DEBUG)
     get_logger(LoggerName.ALGORITHM).addHandler(logging.StreamHandler(sys.stderr))
 
-    example1()
+    test_min_max_equal_shares_passed_3()
+
 
 
 if __name__ == "__main__":

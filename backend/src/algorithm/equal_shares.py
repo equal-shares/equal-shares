@@ -14,6 +14,7 @@ def equal_shares(
     projects_costs: dict[int, int],  # min cost per project
     budget: int,
     bids: dict[int, dict[int, int]],
+    budget_increase_per_voter: int = 1,
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     projects = projects_costs.keys()
     max_bid_for_project = find_max(bids)
@@ -37,16 +38,18 @@ def equal_shares(
             if (
                 (total_chosen_project_cost + candidate_cost_of_next_increase <= budget)
                 and (winners_allocations[candidate] + candidate_cost_of_next_increase <= max_bid_for_project[candidate])
-                and (candidate_cost_of_next_increase > 0)and (rounded_budget <= budget)
+                and (candidate_cost_of_next_increase > 0)
+                # and (rounded_budget <= budget)
             ):
-                logger.debug("Candidate %s ", candidate)
                 is_exhaustive = False
+                logger.debug("Candidate %s is not fully funded - allocation is not exhaustive", candidate)
                 break
         if is_exhaustive:
             break
 
         # would the next highest voters_budget work?
-        updated_rounded_budget = rounded_budget + len(voters)  # Add 1 to each voter's voters_budget
+        updated_rounded_budget = rounded_budget + len(voters)*budget_increase_per_voter  # Add 1 to each voter's voters_budget
+
         updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter = (
             equal_shares_fixed_budget(
                 voters,
@@ -60,7 +63,7 @@ def equal_shares(
         logger.info("total_chosen_project_cost=%s", total_chosen_project_cost)
 
         if total_chosen_project_cost > budget:
-            logger.info("total_chosen_project_cost is more than the budget %s; breaking", budget)
+            logger.info("total_chosen_project_cost is more than the budget %s; breaking with winners_allocations=%s", budget, winners_allocations)
             break
 
         # Else, keep increasing the budget
@@ -91,7 +94,7 @@ def break_ties(cost: dict[int, int], bids: dict[int, dict[int, int]], candidates
 
 def equal_shares_fixed_budget(
     voters: list[int],
-    projects_costs: dict[int, int],
+    projects_costs: dict[int, int],  # map project id to minimum project cost
     budget: int,
     bids: dict[int, dict[int, int]],
     max_bid_for_project: dict,
@@ -117,7 +120,9 @@ def equal_shares_fixed_budget(
     }  # Initialize amount invested in each winning projects
 
     updated_bids = copy.deepcopy(bids)
-    updated_cost = copy.deepcopy(projects_costs)
+    updated_cost = copy.deepcopy(projects_costs) 
+        # Initially, updated_cost[project] equals the project minimum cost. 
+        # During the algorithm, the cost changes to the increment for the project.
 
     while True:
         best_candidates = []
@@ -159,7 +164,7 @@ def equal_shares_fixed_budget(
                 continue
 
             # Calculate the effective vote count of candidate:
-            sorted_approvers = {
+            sorted_approvers = { # approvers sorted by increasing budget
                 voter: voters_budgets[voter]
                 for voter in sorted(updated_bids[candidate].keys(), key=lambda i: voters_budgets[i])
             }
@@ -206,15 +211,15 @@ def equal_shares_fixed_budget(
 
         """
         After receiving the selected project, we reduce the cost of the selected project from the Update_bids list
-        and create a new project with a "factor" cost, we filter its data using the
-        filter_bids function.Then they check whether the total price of the project
+        and create a new project with a "CONTINUOUS_COST" cost, we filter its data using the
+        filter_bids function. Then they check whether the total price of the project
         does not exceed the highest price they chose.
         and update "remaining" with the number of voters who chose it at the new price. and continue the while loop.
         """
 
         chosen_candidate_max_bid = max_bid_for_project[chosen_candidate]
-        chosen_candidate_cost = updated_cost[chosen_candidate]
-        chosen_candidate_bids = updated_bids[chosen_candidate]
+        chosen_candidate_cost    = updated_cost[chosen_candidate]
+        chosen_candidate_bids    = updated_bids[chosen_candidate]
         logger.debug(
             "Chosen project: %s, current cost: %s, max bid: %s, updated bids: %s",
             chosen_candidate,
@@ -227,6 +232,12 @@ def equal_shares_fixed_budget(
             positive_bids = {
                 voter: bid for voter, bid in chosen_candidate_bids.items() if bid > 0 and voters_budgets[voter] > 0
             }
+            """
+            The chosen project is in its continuous phase. We increase its allocation up to one of the following thresholds:
+            1. The allocation attains the maximum possible cost for the project:  chosen_candidate_max_bid
+            2. The addition attains the smallest bid of a supporter: min(bid for voter, bid in positive_bids.items())
+            3. The addition attains the sum of budgets of all supporters.
+            """
             chosen_candidate_cost = min(
                 chosen_candidate_max_bid - winners_allocations[chosen_candidate],
                 min(bid for voter, bid in positive_bids.items()),
