@@ -286,7 +286,6 @@ def equal_shares_fixed_budget(
         # check if the curr cost + total update codt <= max value for this projec
         # logger.info(" total project price   = %s", winners_total_cost[chosen_candidate])
 
-        #בודק האם יש הצעה גבוהה יותר לפרוייקט מהמחיר הנוכחי שנבחר
         if winners_allocations[chosen_candidate] < chosen_candidate_max_bid:
             filter_bids(
                 updated_bids,
