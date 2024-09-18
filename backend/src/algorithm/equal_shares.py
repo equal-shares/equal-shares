@@ -1,6 +1,6 @@
 import copy
 
-from final_equal_share.utils import filter_bids, find_max
+from algorithm.utils import filter_bids, find_max
 import logging
 logger = logging.getLogger("equal_shares_logger")
 
