@@ -88,3 +88,20 @@ def filter_bids(
 
         for voter_id in voters_to_remove:
             update_bids[curr_project_id].pop(voter_id)
+
+
+
+def remove_zero_bids(bids):
+    """
+    This function loops through each bid's internal dictionary and
+    creates a new dictionary excluding any key-value pairs where the value is 0.
+    It then updates the original dictionary with the cleaned version.
+    example:
+    input:  bids = {1: {1: 70000, 2: 0, 3: 44000, 4: 0, 5: 28000, 6: 11000, 7: 0, 8: 11000, 9: 20000}}
+    output: bids = {1: {1: 70000, 3: 44000, 5: 28000, 6: 11000, 8: 11000, 9: 20000}}
+    """
+    # Iterate through the main dictionary
+    for project, sub_dict in bids.items():
+        # Create a new dictionary by excluding entries with value 0
+        bids[project] = {voter_id: voter_cost for voter_id, voter_cost in sub_dict.items() if voter_cost != 0}
+    return bids
