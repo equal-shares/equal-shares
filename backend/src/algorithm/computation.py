@@ -1,5 +1,5 @@
-from algorithm.equal_shares import equal_shares
-from algorithm.utils import remove_zero_bids
+from src.algorithm.equal_shares import equal_shares
+from src.algorithm.utils import remove_zero_bids
 
 
 
