@@ -1,5 +1,5 @@
-from src.algorithm.equal_shares import equal_shares
-from src.algorithm.utils import remove_zero_bids
+from equal_shares import equal_shares
+from utils import remove_zero_bids,check_allocations,display_bar_chart,calculate_average_allocations
 
 
 
@@ -27,4 +27,12 @@ def min_max_equal_shares(
         project_id, (min_value, _) = item.popitem()
         projects_costs[project_id] = min_value
     remove_zero_bids(bids)
-    return equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = equal_shares(voters, projects_costs, budget, bids)
+
+    averages = calculate_average_allocations(winners_allocations,voters)
+    # display_bar_chart(cost_min_max, winners_allocations, averages)
+   
+    if check_allocations(cost_min_max,winners_allocations):
+        return  winners_allocations, candidates_payments_per_voter
+    else:
+        print("the result not valid")
