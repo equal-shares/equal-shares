@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass
 
-from src.algorithm.computation import min_max_equal_shares
 from src.logger import get_logger
 
 logger = get_logger()

@@ -1,7 +1,6 @@
 import logging
 
 from src.algorithm.computation import min_max_equal_shares
-from src.algorithm.equal_shares import equal_shares, equal_shares_fixed_budget
 from src.logger import LoggerName, get_logger
 
 voters = [1, 2, 3, 4, 5, 6, 7, 8, 9]

@@ -11,12 +11,12 @@ from uuid import UUID
 
 import pandas as pd
 import psycopg
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, Response, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response, status
 from pydantic import BaseModel
 
 from src.algorithm.public import AlgorithmInput, AlgorithmResult, ProjectItem, VouterItem, run_algorithm
 from src.config import config
-from src.database import db_dependency, get_db
+from src.database import get_db
 from src.logger import get_logger
 from src.models import Project, Settings, VoteData, get_projects, get_settings, get_votes
 
