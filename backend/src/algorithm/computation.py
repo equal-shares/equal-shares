@@ -1,6 +1,9 @@
-from equal_shares import equal_shares
-from utils import remove_zero_bids,check_allocations,display_bar_chart,calculate_average_allocations
+import logging
 
+from equal_shares import equal_shares
+from utils import calculate_average_allocations, check_allocations, remove_zero_bids
+
+logger = logging.getLogger("min_max_equal_shares_logger")
 
 
 def min_max_equal_shares(
@@ -29,10 +32,10 @@ def min_max_equal_shares(
     remove_zero_bids(bids)
     winners_allocations, candidates_payments_per_voter = equal_shares(voters, projects_costs, budget, bids)
 
-    averages = calculate_average_allocations(winners_allocations,voters)
-    # display_bar_chart(cost_min_max, winners_allocations, averages)
-   
-    if check_allocations(cost_min_max,winners_allocations):
-        return  winners_allocations, candidates_payments_per_voter
+    averages = calculate_average_allocations(winners_allocations, voters)
+    logger.debug("averages: %s", averages)
+
+    if check_allocations(cost_min_max, winners_allocations):
+        return winners_allocations, candidates_payments_per_voter
     else:
         print("the result not valid")

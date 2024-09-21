@@ -1,11 +1,12 @@
 import copy
+import logging
 
 from utils import filter_bids, find_max
-import logging
+
 logger = logging.getLogger("equal_shares_logger")
 
 CONTINUOUS_COST = 1  # A cost that signals that the given project is in its continuous increment phase.
-DISTRIBUTION_PARAMETER_COST = 10000 # A const showing the budget distribution parameter#
+DISTRIBUTION_PARAMETER_COST = 10000  # A const showing the budget distribution parameter#
 
 
 def equal_shares(
@@ -14,21 +15,21 @@ def equal_shares(
     budget: int,
     bids: dict[int, dict[int, int]],
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
-    '''
+    """
 
-        :argument
-            voters (list): A list of voter names.
-            projects_costs (list): A dictionary mapping project IDs to their min cost.
-            budget (int): The total budget available for all the projects.
-            bids (dict): A dictionary mapping project IDs to the
-            list of voters who approve them and the cost the voters chose.
+    :argument
+        voters (list): A list of voter names.
+        projects_costs (list): A dictionary mapping project IDs to their min cost.
+        budget (int): The total budget available for all the projects.
+        bids (dict): A dictionary mapping project IDs to the
+        list of voters who approve them and the cost the voters chose.
 
-        :return
-            tuple[dict[int, int], dict[int, dict[int, float]]]:
-            first: A dictionary of the mapping the received project IDs for the maximum cost given for them
-            second: A dictionary that maps the IDs of the projects received for the cost each voter gave them
+    :return
+        tuple[dict[int, int], dict[int, dict[int, float]]]:
+        first: A dictionary of the mapping the received project IDs for the maximum cost given for them
+        second: A dictionary that maps the IDs of the projects received for the cost each voter gave them
 
-    '''
+    """
 
     projects = projects_costs.keys()
     max_bid_for_project = find_max(bids)
@@ -40,7 +41,6 @@ def equal_shares(
     )
     total_chosen_project_cost = sum(winners_allocations[c] for c in winners_allocations)
     logger.info("total_chosen_project_cost=%s", total_chosen_project_cost)
-
 
     while True:
         # Check if current outcome is exhaustive
@@ -54,7 +54,6 @@ def equal_shares(
                 (total_chosen_project_cost + candidate_cost_of_next_increase <= budget)
                 and (winners_allocations[candidate] + candidate_cost_of_next_increase <= max_bid_for_project[candidate])
                 and (candidate_cost_of_next_increase > 0)
-
             ):
                 is_exhaustive = False
                 logger.debug("Candidate %s is not fully funded - allocation is not exhaustive", candidate)
@@ -63,7 +62,9 @@ def equal_shares(
             break
 
         # would the next highest voters_budget work?
-        updated_rounded_budget = rounded_budget + len(voters)*(budget/DISTRIBUTION_PARAMETER_COST)  # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
+        updated_rounded_budget = rounded_budget + len(voters) * (
+            budget / DISTRIBUTION_PARAMETER_COST
+        )  # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
 
         updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter = (
             equal_shares_fixed_budget(
@@ -87,9 +88,6 @@ def equal_shares(
         candidates_payments_per_voter = updated_candidates_payments_per_voter
 
     return winners_allocations, candidates_payments_per_voter
-
-
-
 
 
 def break_ties(cost: dict[int, int], bids: dict[int, dict[int, int]], candidates: list[int]) -> list[int]:
@@ -139,10 +137,9 @@ def equal_shares_fixed_budget(
     updated_bids = copy.deepcopy(bids)
     updated_cost = copy.deepcopy(projects_costs)
 
-
     while True:
         best_candidates = []
-        best_effective_vote_count = 0.0 # best = the max effective supporters in all projects
+        best_effective_vote_count = 0.0  # best = the max effective supporters in all projects
 
         # go through remaining candidates in order of decreasing previous effective vote count
         remaining_candidates_sorted = {
@@ -179,7 +176,7 @@ def equal_shares_fixed_budget(
                     updated_cost[candidate],
                 )
                 del remaining_candidates[candidate]
-                    # The candidate cannot be purchased, so remove him from the candidate list
+                # The candidate cannot be purchased, so remove him from the candidate list
                 continue
 
             # Calculate the effective vote count of candidate:
@@ -247,16 +244,17 @@ def equal_shares_fixed_budget(
             chosen_candidate_bids,
         )
 
-
         if chosen_candidate_cost == CONTINUOUS_COST:
             positive_bids = {
                 voter: bid for voter, bid in chosen_candidate_bids.items() if bid > 0 and voters_budgets[voter] > 0
-
             }
             """
-            The chosen project is in its continuous phase. We increase its allocation up to one of the following thresholds:
-            1. The allocation attains the maximum possible cost for the project:  chosen_candidate_max_bid
-            2. The addition attains the smallest bid of a supporter: min(bid for voter, bid in positive_bids.items())
+            The chosen project is in its continuous phase.
+             We increase its allocation up to one of the following thresholds:
+            1. The allocation attains the maximum possible cost for the project:
+               chosen_candidate_max_bid
+            2. The addition attains the smallest bid of a supporter:
+               min(bid for voter, bid in positive_bids.items())
             3. The addition attains the sum of budgets of all supporters.
             """
             chosen_candidate_cost = min(
