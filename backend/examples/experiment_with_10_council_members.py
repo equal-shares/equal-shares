@@ -88,9 +88,11 @@ def main() -> None:
     get_logger(LoggerName.ALGORITHM).addHandler(logging.StreamHandler())
     
     winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
-        voters, cost_min_max, bids_without_zeros, budget, budget_increase_per_voter = int(1+budget/1000/len(voters)),
+        voters, cost_min_max, budget, bids_without_zeros, 
+        # budget_increase_per_voter = int(1+budget/1000/len(voters)),
         )
-    print(f"\nwinners_allocations={winners_allocations}\n\ncandidates_payments_per_voter={candidates_payments_per_voter}")
+    sum_winners_allocations = sum(winners_allocations.values())
+    print(f"\nsum_winners_allocations={sum_winners_allocations}\nwinners_allocations={winners_allocations}\n\ncandidates_payments_per_voter={candidates_payments_per_voter}")
 
 if __name__ == "__main__":
     main()
