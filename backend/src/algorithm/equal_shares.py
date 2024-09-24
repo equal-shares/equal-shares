@@ -33,7 +33,7 @@ def equal_shares(
 
     projects = projects_costs.keys()
     max_bid_for_project = find_max(bids)
-    rounded_budget = int(budget / len(voters)) * len(voters)  # start with integral per-voter voters_budget
+    rounded_budget: float = int(budget / len(voters)) * len(voters)  # start with integral per-voter voters_budget
     logger.info("\nRunning equal_shares: budget=%s, rounded to %s", budget, rounded_budget)
 
     winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter = equal_shares_fixed_budget(
@@ -110,7 +110,7 @@ def break_ties(cost: dict[int, int], bids: dict[int, dict[int, int]], candidates
 def equal_shares_fixed_budget(
     voters: list[int],
     projects_costs: dict[int, int],
-    budget: int,
+    budget: float,
     bids: dict[int, dict[int, int]],
     max_bid_for_project: dict,
 ) -> tuple[dict[int, int], dict[int, int], dict[int, dict[int, float]]]:

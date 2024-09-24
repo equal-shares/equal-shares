@@ -95,7 +95,7 @@ def filter_bids(
             update_bids[curr_project_id].pop(voter_id)
 
 
-def remove_zero_bids(bids):
+def remove_zero_bids(bids: dict[int, dict[int, int]]) -> None:
     """
     This function loops through each bid's internal dictionary and
     creates a new dictionary excluding any key-value pairs where the value is 0.
@@ -108,10 +108,9 @@ def remove_zero_bids(bids):
     for project, sub_dict in bids.items():
         # Create a new dictionary by excluding entries with value 0
         bids[project] = {voter_id: voter_cost for voter_id, voter_cost in sub_dict.items() if voter_cost != 0}
-    return bids
 
 
-def check_allocations(cost_min_max, winners_allocations):
+def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_allocations: dict[int, int]) -> bool:
     """
     Inputs:
 
@@ -148,7 +147,7 @@ def check_allocations(cost_min_max, winners_allocations):
     return boll_flag
 
 
-def calculate_average_allocations(winners_allocations, voters):
+def calculate_average_allocations(winners_allocations: dict[int, int], voters: list[int]) -> dict[int, float]:
     """
     Inputs:
     winners_allocations: A dictionary where each key represents a winner's allocation value.
@@ -167,7 +166,7 @@ def calculate_average_allocations(winners_allocations, voters):
     # Check if the number of voters is greater than zero to avoid division by zero
     if num_voters == 0:
         print("Error: The voters list is empty. Division by zero is not possible.")
-        return
+        return {}
 
     # Calculate the average for each project_cost in winners_allocations
     averages = {}
@@ -179,5 +178,7 @@ def calculate_average_allocations(winners_allocations, voters):
     return averages
 
 
-def display_bar_chart(cost_min_max, winners_allocations, averages):
+def display_bar_chart(
+    cost_min_max: list[dict[int, tuple[int, int]]], winners_allocations: dict[int, int], averages: dict[int, float]
+) -> None:
     pass
