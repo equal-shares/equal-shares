@@ -35,4 +35,4 @@ def min_max_equal_shares(
     if check_allocations(cost_min_max,winners_allocations):
         return  winners_allocations, candidates_payments_per_voter
     else:
-        print("the result not valid")
+        raise ValueError("the result is not valid")
