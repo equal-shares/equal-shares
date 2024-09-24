@@ -1,7 +1,5 @@
-import matplotlib.pyplot as plt
-import numpy as np
-
 import logging
+
 logger = logging.getLogger("equal_shares_logger")
 
 
@@ -97,7 +95,6 @@ def filter_bids(
             update_bids[curr_project_id].pop(voter_id)
 
 
-
 def remove_zero_bids(bids):
     """
     This function loops through each bid's internal dictionary and
@@ -115,11 +112,11 @@ def remove_zero_bids(bids):
 
 
 def check_allocations(cost_min_max, winners_allocations):
-
-    """ 
+    """
     Inputs:
 
-    cost_min_max is a list of dictionaries where each key is associated with a tuple containing the minimum and maximum costs.
+    cost_min_max is a list of dictionaries where each key is associated with a tuple
+    containing the minimum and maximum costs.
     winners_allocations is a dictionary where each key represents an allocation value.
     Function:
 
@@ -136,16 +133,19 @@ def check_allocations(cost_min_max, winners_allocations):
         if project_cost != 0:
             # Find the corresponding range in cost_min_max
             cost_range = next((entry[project_id] for entry in cost_min_max if project_cost in entry), None)
-            
+
             if cost_range:
                 min_cost, max_cost = cost_range
                 # Check if the project_cost falls within the range
                 if not min_cost <= project_cost <= max_cost:
                     boll_flag = False
-                    logger.info(f"project_cost {project_cost} for project_id {project_id} is NOT within the range {min_cost}-{max_cost}.")                            
+                    logger.info(
+                        f"project_cost {project_cost} for project_id {project_id} is NOT"
+                        f"within the range {min_cost}-{max_cost}."
+                    )
             else:
                 continue
-    return boll_flag 
+    return boll_flag
 
 
 def calculate_average_allocations(winners_allocations, voters):
@@ -155,14 +155,15 @@ def calculate_average_allocations(winners_allocations, voters):
     voters: A list of voters whose size will be used to divide the allocations.
     Function:
 
-    The function first checks the size of the voters list and ensures that it is greater than zero to avoid division by zero.
+    The function first checks the size of the voters list and ensures
+    that it is greater than zero to avoid division by zero.
     For each key in winners_allocations, it divides the allocation value by the number of voters and prints the result.
     The results are stored in a dictionary called averages, which is returned by the function.
-    
+
     """
     # Get the number of voters
     num_voters = len(voters)
-    
+
     # Check if the number of voters is greater than zero to avoid division by zero
     if num_voters == 0:
         print("Error: The voters list is empty. Division by zero is not possible.")
@@ -178,6 +179,5 @@ def calculate_average_allocations(winners_allocations, voters):
     return averages
 
 
-
-def display_bar_chart(cost_min_max, winners_allocations, averages):\
+def display_bar_chart(cost_min_max, winners_allocations, averages):
     pass

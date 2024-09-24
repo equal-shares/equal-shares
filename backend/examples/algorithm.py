@@ -115,6 +115,7 @@ def example4() -> None:
     print("updated_cost", updated_cost)
     print("candidates_payments_per_voter", candidates_payments_per_voter)
 
+
 def example5() -> None:
     print("Running example 5")
 
@@ -122,8 +123,8 @@ def example5() -> None:
     projects_costs = {11: 0, 12: 0}
     # No increments
     bids = {
-        11: {i:100 for i in range(100)},
-        12: {i:100 for i in range(99)},
+        11: {i: 100 for i in range(100)},
+        12: {i: 100 for i in range(99)},
     }
     budget = 100
 
@@ -137,8 +138,6 @@ def example5() -> None:
     print("candidates_payments_per_voter", candidates_payments_per_voter)
 
 
-
-
 def test_min_max_equal_shares_passed_3() -> None:
     """
     Two projects with the same amount of voters and the price difference between them is 1
@@ -150,8 +149,11 @@ def test_min_max_equal_shares_passed_3() -> None:
     budget = 100
 
     winners_allocations, candidates_payments_per_voter = equal_shares(
-        voters, projects_costs, budget, bids, 
-        )
+        voters,
+        projects_costs,
+        budget,
+        bids,
+    )
 
     expected_winners_allocations = {11: 0, 12: 98}
     expected_candidates_payments_per_voter = {11: {2: 0}, 12: {1: 98.0}}
