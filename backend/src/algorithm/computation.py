@@ -1,7 +1,7 @@
 import logging
 
-from equal_shares import equal_shares
-from utils import calculate_average_allocations, check_allocations, remove_zero_bids
+from src.algorithm.equal_shares import equal_shares
+from src.algorithm.utils import calculate_average_allocations, check_allocations, remove_zero_bids
 
 logger = logging.getLogger("min_max_equal_shares_logger")
 
@@ -39,3 +39,4 @@ def min_max_equal_shares(
         return winners_allocations, candidates_payments_per_voter
     else:
         print("the result not valid")
+        return {}, {}

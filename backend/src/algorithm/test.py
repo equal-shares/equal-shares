@@ -1,4 +1,4 @@
-from computation import min_max_equal_shares
+from src.algorithm.computation import min_max_equal_shares
 
 if __name__ == "__main__":
     import time
