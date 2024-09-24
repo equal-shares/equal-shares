@@ -62,9 +62,8 @@ def equal_shares(
             break
 
         # would the next highest voters_budget work?
-        updated_rounded_budget = int(
-            rounded_budget + len(voters) * (budget / DISTRIBUTION_PARAMETER_COST)
-        )  # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
+        updated_rounded_budget = rounded_budget + len(voters) * (budget / DISTRIBUTION_PARAMETER_COST)
+          # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
 
         updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter = (
             equal_shares_fixed_budget(
@@ -83,7 +82,7 @@ def equal_shares(
             break
 
         # Else, keep increasing the budget
-        rounded_budget = int(updated_rounded_budget)
+        rounded_budget = updated_rounded_budget
         winners_allocations = updated_winners_allocations
         candidates_payments_per_voter = updated_candidates_payments_per_voter
 

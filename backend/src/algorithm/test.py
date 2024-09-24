@@ -330,3 +330,28 @@ if __name__ == "__main__":
     # Output the result
     print("The sum of all Projects:", total_sum, ", budget - total = ", budget - total_sum)
     print("----------------------------------------------------------------------------------")
+
+    # T.9 the projects order not continuous [the result same to 8 test].
+    print("T.9  the projects order not continuous [the result same to 8 test]")
+    voters = [1, 5, 3]
+    cost_min_max = [{15: (500, 600)}, {7: (500, 600)}, {9: (500, 600)}]
+    bids = {15: {1: 500, 5: 500, 3: 500}, 7: {1: 500, 5: 500, 3: 500}, 9: {1: 500, 5: 500, 3: 500}}
+    budget = 1500  # Budget
+
+    start_time = time.time()
+
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, cost_min_max, budget, bids)
+    end_time = time.time()
+
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+    print(" T.9 result: ", winners_allocations)
+    print(candidates_payments_per_voter)
+    print(f"Function executed in {elapsed_time:.4f} seconds")
+    # Iterate over each entry in the bids dictionary
+    total_sum = 0
+    for bid in winners_allocations.values():
+        total_sum += bid  # Add the value where the key is 1
+    # Output the result
+    print("The sum of all Projects:", total_sum, ", budget - total = ", budget - total_sum)
+    print("----------------------------------------------------------------------------------")

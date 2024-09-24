@@ -4,5 +4,6 @@
     ],
     "files.associations": {
         "*.css": "scss"
-    }
+    },
+    "makefile.configureOnOpen": false
 }
