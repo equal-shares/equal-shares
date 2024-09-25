@@ -27,11 +27,11 @@ def min_max_equal_shares(
     #     projects_min_costs[project_id] = min_value
     remove_zero_bids(bids)
     winners_allocations, candidates_payments_per_voter = equal_shares(voters, projects_min_costs, budget, bids)
+    if not check_allocations(cost_min_max, winners_allocations):
+        raise ValueError("the result is not valid")
 
     averages = calculate_average_allocations(winners_allocations, voters)
     display_bar_chart(cost_min_max, winners_allocations, averages)
+    
+    return winners_allocations, candidates_payments_per_voter
 
-    if check_allocations(cost_min_max, winners_allocations):
-        return winners_allocations, candidates_payments_per_voter
-    else:
-        raise ValueError("the result is not valid")
