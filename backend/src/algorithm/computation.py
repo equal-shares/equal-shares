@@ -21,10 +21,7 @@ def min_max_equal_shares(
         example:
             cost_min_max = [{1: (200, 700)}, {2: (300, 900)}, {3:(100,100)}] --> cost = [{1:200 }, {2:300}, {3:100}]
     """
-    projects_min_costs = {
-        project_id: min_value 
-        for d in cost_min_max 
-        for project_id, (min_value, _) in d.items()}
+    projects_min_costs = {project_id: min_value for d in cost_min_max for project_id, (min_value, _) in d.items()}
     # for item in cost_min_max:
     #     project_id, (min_value, _) = item.popitem()
     #     projects_min_costs[project_id] = min_value
@@ -37,4 +34,3 @@ def min_max_equal_shares(
     display_bar_chart(cost_min_max, winners_allocations, averages)
 
     return winners_allocations, candidates_payments_per_voter
-

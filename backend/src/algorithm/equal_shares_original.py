@@ -1,11 +1,10 @@
-"""
-ORiginal code taken from this link:
-https://equalshares.net/implementation/computation
+# ORiginal code taken from this link:
+# https://equalshares.net/implementation/computation
 
-Completion method: Add1U
-"""
+# Completion method: Add1U
 
-def equal_shares(voters, projects, cost, approvers, total_budget):
+
+def equal_shares(voters: list, projects: list, cost: dict, approvers: dict, total_budget: int) -> list:
     """
     Computes the Method of Equal Shares for Participatory Budgeting.
 
@@ -21,7 +20,7 @@ def equal_shares(voters, projects, cost, approvers, total_budget):
 
     Example:
         >>> equal_shares(
-        >>>    voters=["v1", "v2", "v3"], 
+        >>>    voters=["v1", "v2", "v3"],
         >>>    projects=["p1", "p2", "p3"],
         >>>    cost={"p1": 100, "p2": 50, "p3": 50},
         >>>    approvers={"p1": ["v1", "v2"], "p2": ["v1"], "p3": ["v3"]},
@@ -59,12 +58,15 @@ def equal_shares(voters, projects, cost, approvers, total_budget):
     mes = utilitarian_completion(voters, projects, cost, approvers, total_budget, mes)
     return mes
 
-def utilitarian_completion(voters, projects, cost, approvers, total_budget, already_winners):
+
+def utilitarian_completion(
+    voters: list, projects: list, cost: dict, approvers: dict, total_budget: int, already_winners: list
+) -> list:
     winners = list(already_winners)
     cost_so_far = sum(cost[c] for c in winners)
     # sort candidates by score
     sorted_projects = sorted(projects, key=lambda c: len(approvers[c]), reverse=True)
-    # for each candidate in order of decreasing score, 
+    # for each candidate in order of decreasing score,
     # try to add it to the committee
     for c in sorted_projects:
         if c in winners or cost_so_far + cost[c] > total_budget:
@@ -73,16 +75,18 @@ def utilitarian_completion(voters, projects, cost, approvers, total_budget, alre
         cost_so_far += cost[c]
     return winners
 
-def break_ties(voters, projects, cost, approvers, choices):
+
+def break_ties(voters: list, projects: list, cost: dict, approvers: dict, choices: list) -> list:
     remaining = choices.copy()
     best_count = max(len(approvers[c]) for c in remaining)
     remaining = [c for c in remaining if len(approvers[c]) == best_count]
     remaining = [min(remaining)]  # Ensure there is only one remaining project, third the min index project
     return remaining
 
-def equal_shares_fixed_budget(voters, projects, cost, approvers, total_budget):
+
+def equal_shares_fixed_budget(voters: list, projects: list, cost: dict, approvers: dict, total_budget: int) -> list:
     budget = {i: total_budget / len(voters) for i in voters}
-    remaining = {} # remaining candidate -> previous effective vote count
+    remaining = {}  # remaining candidate -> previous effective vote count
     for c in projects:
         if cost[c] > 0 and len(approvers[c]) > 0:
             remaining[c] = len(approvers[c])
@@ -104,7 +108,7 @@ def equal_shares_fixed_budget(voters, projects, cost, approvers, total_budget):
                 continue
             # calculate the effective vote count of c
             approvers[c].sort(key=lambda i: budget[i])
-            paid_so_far = 0
+            paid_so_far = 0.0
             denominator = len(approvers[c])
             for i in approvers[c]:
                 # compute payment if remaining approvers pay equally
@@ -128,7 +132,10 @@ def equal_shares_fixed_budget(voters, projects, cost, approvers, total_budget):
             break
         best = break_ties(voters, projects, cost, approvers, best)
         if len(best) > 1:
-            raise Exception(f"Tie-breaking failed: tie between projects {best} could not be resolved. Another tie-breaking needs to be added.")
+            raise Exception(
+                f"Tie-breaking failed: tie between projects {best} could not be resolved. "
+                f"Another tie-breaking needs to be added."
+            )
         best = best[0]
         winners.append(best)
         del remaining[best]
@@ -140,5 +147,3 @@ def equal_shares_fixed_budget(voters, projects, cost, approvers, total_budget):
             else:
                 budget[i] = 0
     return winners
-
-
