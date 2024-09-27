@@ -33,7 +33,9 @@ def test_min_max_equal_shares_passed_1() -> None:
     }
     budget = 900
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters, projects_costs, budget, bids, use_plt=False
+    )
 
     expected_winners_allocations = {11: 130, 12: 0, 13: 200, 14: 250, 15: 320, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
     expected_candidates_payments_per_voter: dict[int, dict[int, float]] = {
@@ -68,7 +70,9 @@ def test_min_max_equal_shares_passed_2() -> None:
     bids = {11: {1: 500, 2: 200}, 12: {1: 300, 2: 300}, 13: {2: 100}}
     budget = 900
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters, projects_costs, budget, bids, use_plt=False
+    )
 
     expected_winners_allocations = {11: 499, 12: 300, 13: 100}
     expected_candidates_payments_per_voter = {11: {1: 399, 2: 100.0}, 12: {1: 150.0, 2: 150.0}, 13: {2: 100.0}}
@@ -92,7 +96,9 @@ def test_min_max_equal_shares_passed_3() -> None:
     bids = {11: {2: 99}, 12: {1: 98}}
     budget = 100
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters, projects_costs, budget, bids, use_plt=False
+    )
 
     expected_winners_allocations = {11: 0, 12: 98}
     expected_candidates_payments_per_voter = {11: {2: 0}, 12: {1: 98.0}}
@@ -120,7 +126,9 @@ def test_min_max_equal_shares_passed_4() -> None:
     }
     budget = 500
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters, projects_costs, budget, bids, use_plt=False
+    )
 
     expected_winners_allocations = {11: 500, 12: 0, 13: 0, 14: 0}
     expected_candidates_payments_per_voter = {
@@ -147,7 +155,9 @@ def test_min_max_equal_shares_passed_5() -> None:
     bids = {11: {1: 600}}
     budget = 1000
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters, projects_costs, budget, bids, use_plt=False
+    )
 
     expected_winners_allocations = {11: 600}
     expected_candidates_payments_per_voter = {11: {1: 600.0}}
@@ -169,7 +179,9 @@ def test_min_max_equal_shares_passed_6() -> None:
     bids = {11: {1: 600}}
     budget = 500
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters, projects_costs, budget, bids, use_plt=False
+    )
 
     expected_winners_allocations = {11: 500}
     expected_candidates_payments_per_voter = {11: {1: 500.0}}
@@ -191,7 +203,9 @@ def test_min_max_equal_shares_passed_7() -> None:
     bids = {11: {1: 600}}
     budget = 500
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters, projects_costs, budget, bids, use_plt=False
+    )
 
     expected_winners_allocations = {11: 0}
     expected_candidates_payments_per_voter = {11: {1: 0}}
@@ -213,7 +227,9 @@ def test_min_max_equal_shares_passed_8() -> None:
     bids = {11: {1: 500, 2: 500, 3: 500}, 12: {1: 500, 2: 500, 3: 500}, 13: {1: 500, 2: 500, 3: 500}}
     budget = 1500
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+        voters, projects_costs, budget, bids, use_plt=False
+    )
 
     expected_candidates_payments_per_voter = {
         11: {1: 166.66666666666666, 2: 166.66666666666666, 3: 166.66666666666666},
