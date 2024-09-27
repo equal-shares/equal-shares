@@ -1,100 +1,56 @@
-# This module is the public interface (Facade) of the algorithm.
+import time
 
-from dataclasses import dataclass
+from pydantic import BaseModel
 
-from src.logger import get_logger
-
-logger = get_logger()
+from src.algorithm.computation import min_max_equal_shares
 
 
-@dataclass
-class VouterItem:
-    vouter_id: int
-    voutes: dict[int, int]
-
-
-@dataclass
-class ProjectItem:
-    project_id: int
-    min_cost: int
-    max_cost: int
-
-
-@dataclass
-class AlgorithmInput:
-    projects: list[ProjectItem]
-    voutes: list[VouterItem]
+class PublicEqualSharesInput(BaseModel):
+    voters: list[int]
+    cost_min_max: list[dict[int, tuple[int, int]]]
     budget: int
+    bids: dict[int, dict[int, int]]
 
 
-@dataclass
-class AlgorithmResult:
-    raw_result: tuple[dict[int, int], dict[int, dict[int, float]]]
+class PublicEqualSharesResponse(BaseModel):
+    results: dict[int, int]
 
 
-def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
-    for vouter in data.voutes:
-        sum_bid = 0
-        for project_id, cost in vouter.voutes.items():
-            sum_bid += cost
-        if sum_bid > data.budget:
-            logger.info(f"ERROR: vouter_id={vouter.vouter_id}, sum_bid={sum_bid}")
-        else:
-            logger.info(f"OK: vouter_id={vouter.vouter_id}, sum_bid={sum_bid}")
-
-    bids: dict[int, dict[int, int]] = {
-        _get_project_algorithm_id(data.projects, project.project_id): dict() for project in data.projects
-    }
-
-    for vouter in data.voutes:
-        for project_id, cost in vouter.voutes.items():
-            bids[_get_project_algorithm_id(data.projects, project_id)][
-                _get_voter_algorithm_id(data.voutes, vouter)
-            ] = cost
-
-    voters = [_get_voter_algorithm_id(data.voutes, vouter) for vouter in data.voutes]
-    cost_min_max = [
-        {_get_project_algorithm_id(data.projects, project.project_id): (project.min_cost, project.max_cost)}
-        for project in data.projects
-    ]
-
-    # logger.info(f"voters: {voters}")
-    # logger.info(f"cost_min_max: {cost_min_max}")
-    # logger.info(f"bids: {bids}")
-    # logger.info(f"budget: {data.budget}")
-
-    winners_allocations: dict = {}
-    candidates_payments_per_voter: dict = {}
-
-    logger.info(f"voters: {voters}")
-    logger.info(f"cost_min_max: {cost_min_max}")
-    logger.info(f"bids: {bids}")
-    logger.info(f"budget: {data.budget}")
-
-    # winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
-    #     voters=voters,
-    #     cost_min_max=cost_min_max,
-    #     bids=bids,
-    #     budget=data.budget,
-    # )
-
-    logger.info(f"winners_allocations: {winners_allocations}")
-    logger.info(f"candidates_payments_per_voter: {candidates_payments_per_voter}")
-
-    return AlgorithmResult(raw_result=(winners_allocations, candidates_payments_per_voter))
+def public_equal_shares(data: PublicEqualSharesInput) -> PublicEqualSharesResponse:
+    results = _run_equal_shares(data.voters, data.cost_min_max, data.budget, data.bids)
+    return PublicEqualSharesResponse(results=results)
 
 
-def _get_voter_algorithm_id(voutes: list[VouterItem], vouter: VouterItem) -> int:
-    for i, vouter_item in enumerate(voutes):
-        if vouter_item.vouter_id == vouter.vouter_id:
-            return i + 1
+def _run_equal_shares(
+    voters: list[int], cost_min_max: list[dict[int, tuple[int, int]]], budget: int, bids: dict[int, dict[int, int]]
+) -> dict[int, int]:
+    start_time = time.time()
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, cost_min_max, budget, bids)
+    end_time = time.time()
 
-    raise ValueError(f"Vouter {vouter.vouter_id} not found")
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+    print(" T.0 result: ", winners_allocations)
+    print(candidates_payments_per_voter)
+    print(f"Function executed in {elapsed_time:.4f} seconds")
+    # Iterate over each entry in the bids dictionary
+    total_sum = 0
+    for bid in winners_allocations.values():
+        total_sum += bid  # Add the value where the key is 1
+    # Output the result
+    print("The sum of all Projects:", total_sum, ", budget - total = ", budget - total_sum)  # Record the end time
+    print("----------------------------------------------------------------------------------")
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+    print(" T.0 result: ", winners_allocations)
+    print(candidates_payments_per_voter)
+    print(f"Function executed in {elapsed_time:.4f} seconds")
+    # Iterate over each entry in the bids dictionary
+    total_sum = 0
+    for bid in winners_allocations.values():
+        total_sum += bid  # Add the value where the key is 1
+    # Output the result
+    print("The sum of all Projects:", total_sum, ", budget - total = ", budget - total_sum)  # Record the end time
+    print("----------------------------------------------------------------------------------")
 
-
-def _get_project_algorithm_id(projects: list[ProjectItem], project_id: int) -> int:
-    for i, project_item in enumerate(projects):
-        if project_item.project_id == project_id:
-            return i + 1
-
-    raise ValueError(f"Project {project_id} not found")
+    return winners_allocations

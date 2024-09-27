@@ -12,6 +12,7 @@ def min_max_equal_shares(
     cost_min_max: list[dict[int, tuple[int, int]]],
     budget: float,
     bids: dict[int, dict[int, int]],
+    use_plt: bool = True,
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """
     The purpose of min_max_equal_shares function is to convert the input in the received format
@@ -23,6 +24,7 @@ def min_max_equal_shares(
             bids (dict): A dictionary mapping project IDs to the
             list of voters who approve them and the cost the voters chose.
             budget (int): The total budget available
+            use_plt (bool): if it is True, the function will use matplotlib
         example:
             cost_min_max = [{1: (200, 700)}, {2: (300, 900)}, {3:(100,100)}] --> cost = [{1:200 }, {2:300}, {3:100}]
     """
@@ -40,5 +42,6 @@ def min_max_equal_shares(
     if not check_allocations(cost, winners_allocations):
         raise ValueError("the result is not valid")
 
-    plot_bid_data(bids_not_zero, cost, averages, winners_allocations)
+    if use_plt:
+        plot_bid_data(bids_not_zero, cost, averages, winners_allocations)
     return winners_allocations, candidates_payments_per_voter

@@ -17,7 +17,12 @@ function getDocumentHeight() {
 function onReceiveMessage(event: MessageEvent) {
   console.log('onReceiveMessage', event, getDocumentHeight());
 
-  const payload = JSON.parse(event.data);
+  let payload;
+  try {
+    payload = JSON.parse(event.data);
+  } catch (error) {
+    return;
+  }
 
   if (event.source !== window.parent) {
     return;

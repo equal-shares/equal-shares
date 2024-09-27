@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Alert,
+  Input,
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { toast } from 'react-toastify';
@@ -19,6 +20,7 @@ import { postDataRequest, postVoteRequest } from '../api';
 import ProjectCard from './ProjectCard';
 
 import logoImage from '../assets/logo.png';
+import Results from './Results';
 
 const TOAST_ID_MAX_POINTS = 'max-points';
 
@@ -35,6 +37,9 @@ export default function MainPage({ email, token }: Props) {
   const [voted, setVoted] = useState<boolean>(false);
   const [maxTotalPoints, setMaxTotalPoints] = useState<number>(1);
   const [pointsStep, setPointsStep] = useState<number>(1);
+  const [openForVoting, setOpenForVoting] = useState<boolean>(true);
+  const [note, setNote] = useState<string>('');
+  const [result, setResult] = useState<{ [key: number]: number } | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
 
   const [dragDisabled, setDragDisabled] = useState<boolean>(false);
@@ -52,6 +57,9 @@ export default function MainPage({ email, token }: Props) {
         setVoted(data.voted);
         setMaxTotalPoints(data.max_total_points);
         setPointsStep(data.points_step);
+        setOpenForVoting(data.open_for_voting);
+        setResult(data.results);
+        setNote(data.note);
         setProjects(data.projects);
         setSendingRequest(false);
       })
@@ -212,6 +220,7 @@ export default function MainPage({ email, token }: Props) {
 
     setSendingRequest(true);
     postVoteRequest(email, token, {
+      note,
       projects: sortedProjects(projects).map((project) => ({
         id: project.id,
         rank: project.rank,
@@ -229,6 +238,8 @@ export default function MainPage({ email, token }: Props) {
       setVoted(data.voted);
       setMaxTotalPoints(data.max_total_points);
       setPointsStep(data.points_step);
+      setOpenForVoting(data.open_for_voting);
+      setNote(data.note);
       setProjects(data.projects);
       setSendingRequest(false);
     });
@@ -249,92 +260,72 @@ export default function MainPage({ email, token }: Props) {
             height={150}
           />
         </div>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>איך מדרגים?</AccordionSummary>
-          <AccordionDetails>
-            <ul className="list-disc px-[20px]">
-              <li>לחצו על "עריכה" על מנת להתחיל בדירוג.</li>
-              <li>
-                החליטו איזה קורסים אתם מוכנים לקחת, סמנו אותם ב-V ומחקו את הסימון מהקורסים שאתם לא
-                מוכנים לקחת.
-              </li>
-              <li>
-                גררו וסדרו את הקורסים שאתם מוכנים לקחת לפי סדר העדיפות שלכם - שימו למעלה את הקורסים
-                שאתם הכי רוצים.{' '}
-              </li>
-              <li>
-                חלקו את 1000 הנקודות שלכם בין הקורסים שאתם מוכנים לקחת - תנו יותר נקודות לקורסים
-                שאתם רוצים יותר.
-              </li>
-              <li>ניתן להשתמש בחיצי המקלדת לניקוד מדויק יותר.</li>
-              <li>לאחר שסיימתם, לחצו על "שמירת הדירוג".</li>
-            </ul>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>שימו לב</AccordionSummary>
-          <AccordionDetails>
-            <ul className="list-disc px-[20px]">
-              <li>
-                אם לא סימנתם V ליד "מוכן/ה לקחת", לא תקבלו את הקורס בשום מקרה - גם אם לא יישאר מקום
-                בקורסים אחרים.{' '}
-              </li>
-              <li>בעת שמירת הדירוג, יתרת הדירוג חייבת לעמוד על 0 נקודות בדיוק.</li>
-            </ul>
-          </AccordionDetails>
-        </Accordion>
-        <div className="mt-[10px]">
-          <Typography className="text-center" variant="h4" component="h2" gutterBottom>
-            הדירוג ייסגר ב: 13/08 בשעה 23:00
-          </Typography>
-        </div>
-        <div className="w-full mt-[5px] flex justify-center">
-          <Alert className="w-fit" severity="info">
-            יתרת תקציב: {availablePoints}
-          </Alert>
-        </div>
-        <div className="w-full mt-[10px] flex justify-center">
-          <ButtonGroup variant="outlined" dir="ltr">
-            <Button onClick={resetVoteOnClick}>איפוס הכל</Button>
-          </ButtonGroup>
-        </div>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="droppable">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {markedProjects.map((project) => (
-                  <Draggable
-                    key={project.id}
-                    draggableId={project.id.toString()}
-                    index={project.rank}
-                    isDragDisabled={dragDisabled}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={provided.draggableProps.style}>
-                        <ProjectCard
-                          project={project}
-                          pointsStep={pointsStep}
-                          pointsSliderOnChange={pointsSliderOnChange}
-                          pointsBoxOnChange={pointsBoxOnChange}
-                          pointsBoxOnBlur={pointsBoxOnBlur}
-                          markedOnChange={markedOnChange}
-                          setDragDisabled={setDragDisabled}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {unmarkedProjects.length > 0 && (
-                  <>
-                    <div className="mt-[30px]"></div>
-                    {unmarkedProjects.map((project) => (
+        {!openForVoting && (
+          <>
+            <div className="w-full mt-[10px] flex justify-center">
+              <Alert className="w-fit" severity="info">
+                הדירוג סגור כרגע
+              </Alert>
+            </div>
+            {result !== null && <Results data={result} projects={projects} />}
+          </>
+        )}
+        {openForVoting && (
+          <>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>איך מדרגים?</AccordionSummary>
+              <AccordionDetails>
+                <ul className="list-disc px-[20px]">
+                  <li>לחצו על "עריכה" על מנת להתחיל בדירוג.</li>
+                  <li>
+                    החליטו איזה קורסים אתם מוכנים לקחת, סמנו אותם ב-V ומחקו את הסימון מהקורסים שאתם
+                    לא מוכנים לקחת.
+                  </li>
+                  <li>
+                    גררו וסדרו את הקורסים שאתם מוכנים לקחת לפי סדר העדיפות שלכם - שימו למעלה את
+                    הקורסים שאתם הכי רוצים.{' '}
+                  </li>
+                  <li>
+                    חלקו את 1000 הנקודות שלכם בין הקורסים שאתם מוכנים לקחת - תנו יותר נקודות לקורסים
+                    שאתם רוצים יותר.
+                  </li>
+                  <li>ניתן להשתמש בחיצי המקלדת לניקוד מדויק יותר.</li>
+                  <li>לאחר שסיימתם, לחצו על "שמירת הדירוג".</li>
+                </ul>
+              </AccordionDetails>
+            </Accordion>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>שימו לב</AccordionSummary>
+              <AccordionDetails>
+                <ul className="list-disc px-[20px]">
+                  <li>
+                    אם לא סימנתם V ליד "מוכן/ה לקחת", לא תקבלו את הקורס בשום מקרה - גם אם לא יישאר
+                    מקום בקורסים אחרים.{' '}
+                  </li>
+                  <li>בעת שמירת הדירוג, יתרת הדירוג חייבת לעמוד על 0 נקודות בדיוק.</li>
+                </ul>
+              </AccordionDetails>
+            </Accordion>
+            <div className="w-full mt-[5px] flex justify-center">
+              <Alert className="w-fit" severity="info">
+                יתרת תקציב: {availablePoints}
+              </Alert>
+            </div>
+            <div className="w-full mt-[10px] flex justify-center">
+              <ButtonGroup variant="outlined" dir="ltr">
+                <Button onClick={resetVoteOnClick}>איפוס הכל</Button>
+              </ButtonGroup>
+            </div>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {markedProjects.map((project) => (
                       <Draggable
                         key={project.id}
                         draggableId={project.id.toString()}
-                        index={project.rank}>
+                        index={project.rank}
+                        isDragDisabled={dragDisabled}>
                         {(provided) => (
                           <div
                             ref={provided.innerRef}
@@ -354,22 +345,63 @@ export default function MainPage({ email, token }: Props) {
                         )}
                       </Draggable>
                     ))}
-                  </>
+                    {unmarkedProjects.length > 0 && (
+                      <>
+                        <div className="mt-[30px]"></div>
+                        {unmarkedProjects.map((project) => (
+                          <Draggable
+                            key={project.id}
+                            draggableId={project.id.toString()}
+                            index={project.rank}>
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                style={provided.draggableProps.style}>
+                                <ProjectCard
+                                  project={project}
+                                  pointsStep={pointsStep}
+                                  pointsSliderOnChange={pointsSliderOnChange}
+                                  pointsBoxOnChange={pointsBoxOnChange}
+                                  pointsBoxOnBlur={pointsBoxOnBlur}
+                                  markedOnChange={markedOnChange}
+                                  setDragDisabled={setDragDisabled}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                      </>
+                    )}
+                    {provided.placeholder}
+                  </div>
                 )}
-                {provided.placeholder}
+              </Droppable>
+            </DragDropContext>
+            <div className="mt-[10px] flex justify-center items-center">
+              <div className="w-[500px]">
+                <Input
+                  fullWidth
+                  multiline
+                  minRows={2}
+                  placeholder="הערות"
+                  value={note}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setNote(e.target.value)}
+                />
               </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-        <div className="mt-[10px] flex justify-center">
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={saveOnClick}
-            disabled={sendingRequest || availablePoints < 0}>
-            {voted ? 'עדכון הדירוג' : 'שלח הדירוג'}
-          </Button>
-        </div>
+            </div>
+            <div className="mt-[10px] flex justify-center">
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={saveOnClick}
+                disabled={sendingRequest || availablePoints < 0}>
+                {voted ? 'עדכון הדירוג' : 'שלח הדירוג'}
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </Container>
   );

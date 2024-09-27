@@ -5,7 +5,7 @@ from pydantic import BaseModel
 
 
 class ProjectSchema(BaseModel):
-    """Project with the data of vouter."""
+    """Project with the data of voter."""
 
     id: int
     name: str
@@ -31,8 +31,12 @@ class DataResponseSchema(BaseModel):
     voted: bool
     max_total_points: int
     points_step: int
+    open_for_voting: bool
+    results: dict | None
+    note: str
     projects: list[ProjectSchema]
 
 
 class VoteRequestBodySchema(BaseModel):
+    note: str
     projects: list[VotedProjectSchema]

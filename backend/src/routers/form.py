@@ -9,8 +9,10 @@ from src.models import (
     ProjectVote,
     Settings,
     VoteProjectInput,
+    get_active_poll,
     get_projects,
     get_settings,
+    get_voter,
     get_voter_votes,
     save_voter_votes,
 )
@@ -21,7 +23,7 @@ router = APIRouter()
 
 
 def _create_data_response_schema(
-    settings: Settings, projects: list[Project], voter_votes: list[ProjectVote]
+    settings: Settings, projects: list[Project], voter_votes: list[ProjectVote], note: str
 ) -> DataResponseSchema:
     projects_data: dict[int, ProjectSchema] = {}
     for project in projects:
@@ -53,6 +55,9 @@ def _create_data_response_schema(
         voted=len(voter_votes) > 0,
         max_total_points=max_total_points,
         points_step=settings.points_step,
+        open_for_voting=settings.open_for_voting,
+        note=note,
+        results=settings.results,
         projects=projects_order,
     )
 
@@ -75,7 +80,10 @@ def route_data(
     projects = get_projects(db)
     votes = get_voter_votes(db, email)
 
-    return _create_data_response_schema(settings, projects, votes)
+    voter = get_voter(db, email)
+    note = voter.note if voter is not None else ""
+
+    return _create_data_response_schema(settings, projects, votes, note)
 
 
 @router.post("/vote")
@@ -87,6 +95,8 @@ def route_vote(
 ) -> DataResponseSchema:
     """Save vote of voter"""
 
+    poll = get_active_poll(db)
+
     if not verify_valid_email(email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email")
 
@@ -94,6 +104,10 @@ def route_vote(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized, the token is invalid")
 
     settings = get_settings(db)
+
+    if not settings.open_for_voting:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Voting is not open for the public")
+
     projects = get_projects(db)
 
     max_total_points = settings.max_total_points
@@ -127,15 +141,16 @@ def route_vote(
     # save votes
     vote_input = [
         VoteProjectInput(
+            poll_id=poll.poll_id,
             project_id=vote.id,
             points=vote.points,
             rank=vote.rank,
         )
         for vote in body.projects
     ]
-    save_voter_votes(db, email, vote_input)
+    save_voter_votes(db, email, body.note, vote_input)
 
     # get the updated votes
     votes = get_voter_votes(db, email)
 
-    return _create_data_response_schema(settings, projects, votes)
+    return _create_data_response_schema(settings, projects, votes, body.note)
