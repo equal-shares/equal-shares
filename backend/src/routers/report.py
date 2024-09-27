@@ -14,6 +14,7 @@ import psycopg
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response, status
 from pydantic import BaseModel
 
+from src.algorithm.public import PublicEqualSharesInput
 from src.config import config
 from src.database import get_db
 from src.logger import get_logger
@@ -94,6 +95,9 @@ class ReportsStorage:
         self.reports[report_id] = Report()
         return report_id
 
+    def report_exists(self, report_id: int) -> bool:
+        return report_id in self.reports
+
     def get_report(self, report_id: int) -> Report:
         return self.reports[report_id]
 
@@ -137,6 +141,9 @@ def status_report_route(
     if config.admin_key != admin_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
 
+    if not reports_storage.report_exists(report_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+
     report = reports_storage.get_report(report_id)
     return ReportStatusResponse(
         report_id=report_id,
@@ -153,6 +160,9 @@ def get_report_route(
 ) -> Response:
     if config.admin_key != admin_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    if not reports_storage.report_exists(report_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
 
     report = reports_storage.get_report(report_id)
 
@@ -210,6 +220,13 @@ def _create_report(report: Report, db: psycopg.Connection) -> None:
     except Exception:
         _report_log_error(report, "Error while saving data as csv files")
 
+    _report_log_info(report, "Save the input for the algorithm")
+    try:
+        _report_save_input_for_algorithm(report, settings, projects, votes)
+        _report_log_info(report, "Input for the algorithm saved")
+    except Exception:
+        _report_log_error(report, "Error while saving input for the algorithm")
+
     _report_log_info(report, "Report creation finished")
 
 
@@ -249,21 +266,24 @@ def _report_load_data(report: Report, db: psycopg.Connection) -> tuple[Settings,
 
     try:
         settings = get_settings(db)
-        report.append_text_to_file("db_settings.json", json.dumps(settings.model_dump(), indent=4))
+        report.append_text_to_file("db_settings.json", json.dumps(settings.model_dump(), indent=4, ensure_ascii=False))
     except Exception:
         _report_log_error(report, "Error while getting data from the database")
 
     try:
         projects_records = get_projects(db)
         report.append_text_to_file(
-            "db_projects.json", json.dumps([project.model_dump() for project in projects_records], indent=4)
+            "db_projects.json",
+            json.dumps([project.model_dump() for project in projects_records], indent=4, ensure_ascii=False),
         )
     except Exception:
         _report_log_error(report, "Error while getting data from the database")
 
     try:
         votes = get_votes(db)
-        report.append_text_to_file("db_votes.json", json.dumps([vote.model_dump() for vote in votes], indent=4))
+        report.append_text_to_file(
+            "db_votes.json", json.dumps([vote.model_dump() for vote in votes], indent=4, ensure_ascii=False)
+        )
     except Exception:
         _report_log_error(report, "Error while getting data from the database")
 
@@ -304,7 +324,7 @@ def _report_save_data_as_csv(report: Report, projects: dict[int, Project], votes
     voters_df = pd.DataFrame([vote.voter.model_dump() for vote in votes])
     votes_df = voters_df.copy()
 
-    votes_df = votes_df[["voter_id", "email"]]
+    votes_df = votes_df[["voter_id", "email", "note"]]
     for project in projects.values():
         votes_df[str(project.project_id) + "_rank"] = None
         votes_df[str(project.project_id) + "_points"] = None
@@ -317,3 +337,18 @@ def _report_save_data_as_csv(report: Report, projects: dict[int, Project], votes
     report.append_text_to_file("projects.csv", projects_df.to_csv(index=False))
     report.append_text_to_file("voters.csv", voters_df.to_csv(index=False))
     report.append_text_to_file("votes.csv", votes_df.to_csv(index=False))
+
+
+def _report_save_input_for_algorithm(
+    report: Report, settings: Settings, projects: dict[int, Project], votes: list[VoteData]
+) -> None:
+    input_for_algorithm = PublicEqualSharesInput(
+        voters=[vote.voter.voter_id for vote in votes],
+        cost_min_max=[{project.project_id: (project.min_points, project.max_points)} for project in projects.values()],
+        budget=settings.max_total_points,
+        bids={vote.voter.voter_id: {project.project_id: project.points for project in vote.projects} for vote in votes},
+    )
+
+    report.append_text_to_file(
+        "input_for_algorithm.json", json.dumps(input_for_algorithm.model_dump(), indent=4, ensure_ascii=False)
+    )

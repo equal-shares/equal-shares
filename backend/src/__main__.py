@@ -5,7 +5,7 @@ import sys
 import uvicorn
 
 from src.app import app
-from src.cli import check_database_command, help_command
+from src.cli import check_database_command, help_command, run_algorithm_command
 
 
 def main() -> None:
@@ -19,6 +19,10 @@ def main() -> None:
 
     if sys.argv[1] == "check-database":
         check_database_command()
+        return
+
+    if sys.argv[1] == "run-algorithm":
+        run_algorithm_command()
         return
 
     print("Unknown command, use 'help' to see available commands.")

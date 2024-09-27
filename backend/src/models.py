@@ -529,13 +529,22 @@ def save_voter_votes(db: psycopg.Connection, email: str, note: str, projects: li
     with db.cursor() as cursor:
         cursor.execute(
             """
-            INSERT INTO public.voters (poll_id, email, note, created_at)
-            VALUES (%s, %s, %s, %s)
-            ON CONFLICT (poll_id, email) DO NOTHING;
+            SELECT poll_id, email FROM public.voters WHERE poll_id = %s AND email = %s;
             """,
-            (voter.email, voter.note, voter.created_at),
+            (poll_id, voter.email),
         )
-        db.commit()
+        voter_exists = cursor.fetchone() is not None
+
+    if not voter_exists:
+        with db.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO public.voters (poll_id, email, note, created_at)
+                VALUES (%s, %s, %s, %s);
+                """,
+                (poll_id, voter.email, voter.note, voter.created_at),
+            )
+            db.commit()
 
     with db.cursor() as cursor:
         cursor.execute(
@@ -607,9 +616,9 @@ def get_votes(db: psycopg.Connection) -> list[VoteData]:
             ProjectVote(
                 poll_id=poll_id,
                 voter_id=voter_id,
-                project_id=row[3],
-                points=row[4],
-                rank=row[5],
+                project_id=row[4],
+                points=row[5],
+                rank=row[6],
             )
         )
 

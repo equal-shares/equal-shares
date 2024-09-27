@@ -38,5 +38,8 @@ test:
 	python -m pytest
 
 # Run examples
+run-algorithm:
+	poetry run python -m src run-algorithm ./input_for_algorithm.json
+
 examples-run-algorithm:
 	python examples/algorithm.py

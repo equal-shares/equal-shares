@@ -9,7 +9,7 @@ import psycopg_pool
 from psycopg.conninfo import make_conninfo
 
 from src.config import config
-from src.exceptions import CriticalException, DBException
+from src.exceptions import CriticalException
 from src.logger import get_logger
 
 g_pool: None | psycopg_pool.ConnectionPool = None
@@ -92,6 +92,6 @@ def db_named_query(func: Callable[..., ReturnT]) -> Callable[..., ReturnT]:
             error_msg = str(e)
             get_logger().error(f"Database error: {error_msg}")
             get_logger().exception(e)
-            raise DBException from e
+            raise e
 
     return wrapper
