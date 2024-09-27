@@ -4,7 +4,39 @@ from src.algorithm.computation import min_max_equal_shares
 from src.logger import LoggerName, get_logger
 
 voters = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
+cost = [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+]
 cost_min_max = [
     {1: (11000, 70000)},
     {2: (1000, 40000)},
@@ -121,13 +153,9 @@ def main() -> None:
         cost_min_max,
         budget,
         bids_without_zeros,
-        # budget_increase_per_voter = int(1+budget/1000/len(voters)),
     )
-    sum_winners_allocations = sum(winners_allocations.values())
     print(
-        f"\nsum_winners_allocations={sum_winners_allocations}"
-        f"\nwinners_allocations={winners_allocations}"
-        f"\n\ncandidates_payments_per_voter={candidates_payments_per_voter}"
+        f"\nwinners_allocations={winners_allocations}\n\ncandidates_payments_per_voter={candidates_payments_per_voter}"
     )
 
 

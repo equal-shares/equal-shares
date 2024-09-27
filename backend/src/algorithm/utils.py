@@ -1,5 +1,8 @@
 import logging
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 logger = logging.getLogger("equal_shares_logger")
 
 
@@ -95,7 +98,7 @@ def filter_bids(
             update_bids[curr_project_id].pop(voter_id)
 
 
-def remove_zero_bids(bids: dict[int, dict[int, int]]) -> None:
+def remove_zero_bids(bids: dict[int, dict[int, int]]) -> dict[int, dict[int, int]]:
     """
     This function loops through each bid's internal dictionary and
     creates a new dictionary excluding any key-value pairs where the value is 0.
@@ -108,14 +111,15 @@ def remove_zero_bids(bids: dict[int, dict[int, int]]) -> None:
     for project, sub_dict in bids.items():
         # Create a new dictionary by excluding entries with value 0
         bids[project] = {voter_id: voter_cost for voter_id, voter_cost in sub_dict.items() if voter_cost != 0}
+    return bids
 
 
 def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_allocations: dict[int, int]) -> bool:
     """
     Inputs:
 
-    cost_min_max is a list of dictionaries where each key is associated with a tuple
-    containing the minimum and maximum costs.
+    cost_min_max is a list of dictionaries where each key is associated
+    with a tuple containing the minimum and maximum costs.
     winners_allocations is a dictionary where each key represents an allocation value.
     Function:
 
@@ -139,46 +143,100 @@ def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_al
                 if not min_cost <= project_cost <= max_cost:
                     boll_flag = False
                     logger.info(
-                        f"project_cost {project_cost} for project_id {project_id} is NOT"
-                        f"within the range {min_cost}-{max_cost}."
+                        f"project_cost {project_cost} for project_id {project_id} "
+                        f"is NOT within the range {min_cost}-{max_cost}."
                     )
             else:
                 continue
     return boll_flag
 
 
-def calculate_average_allocations(winners_allocations: dict[int, int], voters: list[int]) -> dict[int, float]:
+def calculate_average_bids(bids: dict[int, dict[int, int]], voters: list[int]) -> dict[int, float]:
     """
-    Inputs:
-    winners_allocations: A dictionary where each key represents a winner's allocation value.
-    voters: A list of voters whose size will be used to divide the allocations.
-    Function:
+    Function to calculate the average of bids for each project.
 
-    The function first checks the size of the voters list and ensures
-    that it is greater than zero to avoid division by zero.
-    For each key in winners_allocations, it divides the allocation value by the number of voters and prints the result.
-    The results are stored in a dictionary called averages, which is returned by the function.
+    Args:
+    bids (dict): A dictionary where the keys are project IDs and the values are dictionaries of voter bids.
+    len(voters) = N (int): The number to divide the sum of bids for each project.
 
+    Returns:
+    dict: A dictionary where the keys are project IDs and the values are the average bids.
     """
-    # Get the number of voters
-    num_voters = len(voters)
+    average_bids = {}
+    N = len(voters)
+    for project_id, voter_bids in bids.items():
+        total_sum = sum(voter_bids.values())  # Sum all bids for the project
+        average_bids[project_id] = total_sum / N  # Divide by N and store in the dictionary
 
-    # Check if the number of voters is greater than zero to avoid division by zero
-    if num_voters == 0:
-        print("Error: The voters list is empty. Division by zero is not possible.")
-        return {}
-
-    # Calculate the average for each project_cost in winners_allocations
-    averages = {}
-    for project_id, project_cost in winners_allocations.items():
-        average = project_cost / num_voters
-        averages[project_id] = average
-        logger.info(f"Average allocation for project_id {project_id}: {average}")
-
-    return averages
+    return average_bids
 
 
-def display_bar_chart(
-    cost_min_max: list[dict[int, tuple[int, int]]], winners_allocations: dict[int, int], averages: dict[int, float]
+def plot_bid_data(
+    bids: dict[int, dict[int, int]],
+    cost_min_max: list[dict[int, tuple[int, int]]],
+    average_bids: dict[int, float],
+    winners_allocations: dict[int, int],
 ) -> None:
-    pass
+    # Extracting project IDs
+    project_ids = list(bids.keys())
+
+    # Flattening cost_min_max to work with the list of dictionaries
+    cost_min_values = []
+    cost_max_values = []
+    for project_id in project_ids:
+        for cost_dict in cost_min_max:
+            if project_id in cost_dict:
+                cost_min, cost_max = cost_dict[project_id]
+                cost_min_values.append(cost_min)
+                cost_max_values.append(cost_max)
+                break
+
+    # Extracting values for average_bids and winners_allocations
+    avg_bids_values = [average_bids[pid] for pid in project_ids]
+    winners_allocations_values = [winners_allocations[pid] for pid in project_ids]
+
+    # Bar width
+    bar_width = 0.5
+    x_pos = np.arange(len(project_ids))
+
+    # Small offset for equal values
+    small_offset = 0.001
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+
+    # Sort the values (Average Bids, Winners Allocations, Cost Min, Cost Max) per project in ascending order
+    for i, project_id in enumerate(project_ids):
+        values = [
+            ("Average Bids", avg_bids_values[i], "blue"),
+            ("Winners Allocations", winners_allocations_values[i], "green"),
+            ("Cost Min", cost_min_values[i], "red"),
+            ("Cost Max", cost_max_values[i], "orange"),
+        ]
+
+        # Sort the values by the second element (the value itself)
+        values_sorted = sorted(values, key=lambda x: x[1])
+
+        # Plot the sorted bars, applying a small horizontal offset to distinguish equal values
+        cumulative_bottom = 0.0
+        last_value = None
+        for label, value, color in values_sorted:
+            if last_value is not None and value == last_value:
+                # Add small horizontal offset for equal values
+                value += small_offset
+            plt.bar(
+                x_pos[i], value, width=bar_width, label=label if i == 0 else "", color=color, bottom=cumulative_bottom
+            )
+            cumulative_bottom += value
+            last_value = value
+
+    # Adding labels and title
+    plt.xlabel("Project ID")
+    plt.ylabel("Value")
+    plt.title("Bids, Winners Allocations, and Costs for Projects (Sorted and Offset for Equal Values)")
+    plt.xticks(x_pos, [str(item) for item in project_ids])
+    plt.legend()
+
+    # Display the plot
+    plt.tight_layout()
+    plt.show()

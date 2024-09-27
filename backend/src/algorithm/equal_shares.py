@@ -12,7 +12,7 @@ DISTRIBUTION_PARAMETER_COST = 10000  # A const showing the budget distribution p
 def equal_shares(
     voters: list[int],
     projects_costs: dict[int, int],  # min cost per project
-    budget: int,
+    budget: float,
     bids: dict[int, dict[int, int]],
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """
@@ -23,7 +23,17 @@ def equal_shares(
         budget (int): The total budget available for all the projects.
         bids (dict): A dictionary mapping project IDs to the
         list of voters who approve them and the cost the voters chose.
+    :argument
+        voters (list): A list of voter names.
+        projects_costs (list): A dictionary mapping project IDs to their min cost.
+        budget (int): The total budget available for all the projects.
+        bids (dict): A dictionary mapping project IDs to the
+        list of voters who approve them and the cost the voters chose.
 
+    :return
+        tuple[dict[int, int], dict[int, dict[int, float]]]:
+        first: A dictionary of the mapping the received project IDs for the maximum cost given for them
+        second: A dictionary that maps the IDs of the projects received for the cost each voter gave them
     :return
         tuple[dict[int, int], dict[int, dict[int, float]]]:
         first: A dictionary of the mapping the received project IDs for the maximum cost given for them
@@ -249,10 +259,12 @@ def equal_shares_fixed_budget(
                 voter: bid for voter, bid in chosen_candidate_bids.items() if bid > 0 and voters_budgets[voter] > 0
             }
             """
-            The chosen project is in its continuous phase. We increase its
-            allocation up to one of the following thresholds:
-            1. The allocation attains the maximum possible cost for the project:  chosen_candidate_max_bid
-            2. The addition attains the smallest bid of a supporter: min(bid for voter, bid in positive_bids.items())
+            The chosen project is in its continuous phase.
+             We increase its allocation up to one of the following thresholds:
+            1. The allocation attains the maximum possible cost for the project:
+               chosen_candidate_max_bid
+            2. The addition attains the smallest bid of a supporter:
+               min(bid for voter, bid in positive_bids.items())
             3. The addition attains the sum of budgets of all supporters.
             """
             chosen_candidate_cost = min(
