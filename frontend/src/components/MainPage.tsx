@@ -35,6 +35,7 @@ export default function MainPage({ email, token }: Props) {
   const [voted, setVoted] = useState<boolean>(false);
   const [maxTotalPoints, setMaxTotalPoints] = useState<number>(1);
   const [pointsStep, setPointsStep] = useState<number>(1);
+  const [openForVoting, setOpenForVoting] = useState<boolean>(true);
   const [projects, setProjects] = useState<Project[]>([]);
 
   const [dragDisabled, setDragDisabled] = useState<boolean>(false);
@@ -52,6 +53,7 @@ export default function MainPage({ email, token }: Props) {
         setVoted(data.voted);
         setMaxTotalPoints(data.max_total_points);
         setPointsStep(data.points_step);
+        setOpenForVoting(data.open_for_voting);
         setProjects(data.projects);
         setSendingRequest(false);
       })
@@ -249,6 +251,13 @@ export default function MainPage({ email, token }: Props) {
             height={150}
           />
         </div>
+        {!openForVoting && (
+          <div className="w-full mt-[10px] flex justify-center">
+            <Alert className="w-fit" severity="info">
+              הדירוג סגור כרגע
+            </Alert>
+          </div>
+        )}
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>איך מדרגים?</AccordionSummary>
           <AccordionDetails>
@@ -283,58 +292,28 @@ export default function MainPage({ email, token }: Props) {
             </ul>
           </AccordionDetails>
         </Accordion>
-        <div className="mt-[10px]">
-          <Typography className="text-center" variant="h4" component="h2" gutterBottom>
-            הדירוג ייסגר ב: 13/08 בשעה 23:00
-          </Typography>
-        </div>
-        <div className="w-full mt-[5px] flex justify-center">
-          <Alert className="w-fit" severity="info">
-            יתרת תקציב: {availablePoints}
-          </Alert>
-        </div>
-        <div className="w-full mt-[10px] flex justify-center">
-          <ButtonGroup variant="outlined" dir="ltr">
-            <Button onClick={resetVoteOnClick}>איפוס הכל</Button>
-          </ButtonGroup>
-        </div>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="droppable">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {markedProjects.map((project) => (
-                  <Draggable
-                    key={project.id}
-                    draggableId={project.id.toString()}
-                    index={project.rank}
-                    isDragDisabled={dragDisabled}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={provided.draggableProps.style}>
-                        <ProjectCard
-                          project={project}
-                          pointsStep={pointsStep}
-                          pointsSliderOnChange={pointsSliderOnChange}
-                          pointsBoxOnChange={pointsBoxOnChange}
-                          pointsBoxOnBlur={pointsBoxOnBlur}
-                          markedOnChange={markedOnChange}
-                          setDragDisabled={setDragDisabled}
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {unmarkedProjects.length > 0 && (
-                  <>
-                    <div className="mt-[30px]"></div>
-                    {unmarkedProjects.map((project) => (
+        {openForVoting && (
+          <>
+            <div className="w-full mt-[5px] flex justify-center">
+              <Alert className="w-fit" severity="info">
+                יתרת תקציב: {availablePoints}
+              </Alert>
+            </div>
+            <div className="w-full mt-[10px] flex justify-center">
+              <ButtonGroup variant="outlined" dir="ltr">
+                <Button onClick={resetVoteOnClick}>איפוס הכל</Button>
+              </ButtonGroup>
+            </div>
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="droppable">
+                {(provided) => (
+                  <div {...provided.droppableProps} ref={provided.innerRef}>
+                    {markedProjects.map((project) => (
                       <Draggable
                         key={project.id}
                         draggableId={project.id.toString()}
-                        index={project.rank}>
+                        index={project.rank}
+                        isDragDisabled={dragDisabled}>
                         {(provided) => (
                           <div
                             ref={provided.innerRef}
@@ -354,22 +333,51 @@ export default function MainPage({ email, token }: Props) {
                         )}
                       </Draggable>
                     ))}
-                  </>
+                    {unmarkedProjects.length > 0 && (
+                      <>
+                        <div className="mt-[30px]"></div>
+                        {unmarkedProjects.map((project) => (
+                          <Draggable
+                            key={project.id}
+                            draggableId={project.id.toString()}
+                            index={project.rank}>
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                style={provided.draggableProps.style}>
+                                <ProjectCard
+                                  project={project}
+                                  pointsStep={pointsStep}
+                                  pointsSliderOnChange={pointsSliderOnChange}
+                                  pointsBoxOnChange={pointsBoxOnChange}
+                                  pointsBoxOnBlur={pointsBoxOnBlur}
+                                  markedOnChange={markedOnChange}
+                                  setDragDisabled={setDragDisabled}
+                                />
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                      </>
+                    )}
+                    {provided.placeholder}
+                  </div>
                 )}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-        <div className="mt-[10px] flex justify-center">
-          <Button
-            color="primary"
-            variant="contained"
-            onClick={saveOnClick}
-            disabled={sendingRequest || availablePoints < 0}>
-            {voted ? 'עדכון הדירוג' : 'שלח הדירוג'}
-          </Button>
-        </div>
+              </Droppable>
+            </DragDropContext>
+            <div className="mt-[10px] flex justify-center">
+              <Button
+                color="primary"
+                variant="contained"
+                onClick={saveOnClick}
+                disabled={sendingRequest || availablePoints < 0}>
+                {voted ? 'עדכון הדירוג' : 'שלח הדירוג'}
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </Container>
   );

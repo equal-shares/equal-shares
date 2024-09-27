@@ -25,6 +25,7 @@ export type DataResponse = {
   voted: boolean;
   max_total_points: number;
   points_step: number;
+  open_for_voting: boolean;
   projects: Project[];
 };
 

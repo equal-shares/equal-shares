@@ -9,6 +9,7 @@ from src.models import (
     ProjectVote,
     Settings,
     VoteProjectInput,
+    get_active_poll,
     get_projects,
     get_settings,
     get_voter_votes,
@@ -53,6 +54,7 @@ def _create_data_response_schema(
         voted=len(voter_votes) > 0,
         max_total_points=max_total_points,
         points_step=settings.points_step,
+        open_for_voting=settings.open_for_voting,
         projects=projects_order,
     )
 
@@ -87,6 +89,8 @@ def route_vote(
 ) -> DataResponseSchema:
     """Save vote of voter"""
 
+    poll = get_active_poll(db)
+
     if not verify_valid_email(email):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email")
 
@@ -94,6 +98,10 @@ def route_vote(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized, the token is invalid")
 
     settings = get_settings(db)
+
+    if not settings.open_for_voting:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Voting is not open for the public")
+
     projects = get_projects(db)
 
     max_total_points = settings.max_total_points
@@ -127,6 +135,7 @@ def route_vote(
     # save votes
     vote_input = [
         VoteProjectInput(
+            poll_id=poll.poll_id,
             project_id=vote.id,
             points=vote.points,
             rank=vote.rank,
