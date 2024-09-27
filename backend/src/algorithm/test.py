@@ -18,7 +18,6 @@ if __name__ == "__main__":
         {9: (500, 600)},
         {10: (550, 650)},
     ]
-
     bids = {
         1: {1: 100, 2: 130, 3: 0, 4: 150},
         2: {2: 160, 5: 190},
@@ -46,6 +45,18 @@ if __name__ == "__main__":
     winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, cost_min_max, budget, bids)
     end_time = time.time()
 
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+    print(" T.0 result: ", winners_allocations)
+    print(candidates_payments_per_voter)
+    print(f"Function executed in {elapsed_time:.4f} seconds")
+    # Iterate over each entry in the bids dictionary
+    total_sum = 0
+    for bid in winners_allocations.values():
+        total_sum += bid  # Add the value where the key is 1
+    # Output the result
+    print("The sum of all Projects:", total_sum, ", budget - total = ", budget - total_sum)  # Record the end time
+    print("----------------------------------------------------------------------------------")
     # Calculate the elapsed time
     elapsed_time = end_time - start_time
     print(" T.0 result: ", winners_allocations)
@@ -95,14 +106,6 @@ if __name__ == "__main__":
         {30: (100000, 200000)},
         {31: (70000, 150000)},
     ]
-
-    total = 0
-    # Iterate over each dictionary in the list
-    for item in cost_min_max:
-        # For each dictionary, access the tuple and add the second value (max) to the total
-        for key, value in item.items():
-            total += value[1]
-    print("all :", total)
 
     bids = {
         1: {1: 70000, 2: 0, 3: 44000, 4: 0, 5: 28000, 6: 11000, 7: 0, 8: 11000, 9: 20000},
@@ -204,14 +207,10 @@ if __name__ == "__main__":
     print("The sum of all Projects:", total_sum, ", budget - total = ", budget - total_sum)
     print("----------------------------------------------------------------------------------")
 
-    # אלגוריתם קודם עלו בשקל עד שנבחר אחד
-
     # T.4 For 4 projects with same cost and same voters,
     # while the budget suffices for all the 1 ( take the first index) .
-    print(
-        "T.4 Chack break_ties Function For 4 projects with same cost and same voters,"
-        " while the budget suffices for all the 1 ( take the first index) "
-    )
+    print("T.4 Check break_ties Function For 4 projects with same cost and same voters, ")
+    print("while the budget suffices for all the 1 ( take the first index)")
     voters = [1, 2, 3, 4]  # voter
     cost_min_max = [{1: (500, 600)}, {2: (500, 600)}, {3: (500, 600)}, {4: (500, 600)}]
     bids = {
@@ -315,7 +314,7 @@ if __name__ == "__main__":
     print("T.8 For 3 projects with same cost and same voters, while the budget suffices for all the 3")
     voters = [1, 2, 3]
     cost_min_max = [{1: (500, 600)}, {2: (500, 600)}, {3: (500, 600)}]
-    bids = {1: {1: 500, 2: 500, 3: 500}, 2: {1: 500, 2: 500, 3: 500}, 3: {1: 500, 2: 500, 3: 500}}  # for each project
+    bids = {1: {1: 500, 2: 500, 3: 500}, 2: {1: 500, 2: 500, 3: 500}, 3: {1: 500, 2: 500, 3: 500}}
     budget = 1500  # Budget
 
     start_time = time.time()
@@ -325,6 +324,31 @@ if __name__ == "__main__":
     # Calculate the elapsed time
     elapsed_time = end_time - start_time
     print(" T.8 result: ", winners_allocations)
+    print(candidates_payments_per_voter)
+    print(f"Function executed in {elapsed_time:.4f} seconds")
+    # Iterate over each entry in the bids dictionary
+    total_sum = 0
+    for bid in winners_allocations.values():
+        total_sum += bid  # Add the value where the key is 1
+    # Output the result
+    print("The sum of all Projects:", total_sum, ", budget - total = ", budget - total_sum)
+    print("----------------------------------------------------------------------------------")
+
+    # T.9 the projects order not continuous [the result same to 8 test].
+    print("T.9  the projects order not continuous [the result same to 8 test]")
+    voters = [1, 5, 3]
+    cost_min_max = [{15: (500, 600)}, {7: (500, 600)}, {9: (500, 600)}]
+    bids = {15: {1: 500, 5: 500, 3: 500}, 7: {1: 500, 5: 500, 3: 500}, 9: {1: 500, 5: 500, 3: 500}}
+    budget = 1500  # Budget
+
+    start_time = time.time()
+
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, cost_min_max, budget, bids)
+    end_time = time.time()
+
+    # Calculate the elapsed time
+    elapsed_time = end_time - start_time
+    print(" T.9 result: ", winners_allocations)
     print(candidates_payments_per_voter)
     print(f"Function executed in {elapsed_time:.4f} seconds")
     # Iterate over each entry in the bids dictionary
