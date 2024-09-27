@@ -6,6 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'plugin:react-hooks/recommended',
     "plugin:prettier/recommended",
+    'plugin:jsdoc/recommended-typescript-error',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
@@ -15,5 +16,6 @@ module.exports = {
       'warn',
       { allowConstantExport: true },
     ],
+    'jsdoc/require-jsdoc': 'off', // Don't enforce jsdoc for all. It will be enforced only if exists JSDoc comment.
   },
 }
