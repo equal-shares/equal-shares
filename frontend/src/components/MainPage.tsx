@@ -20,6 +20,7 @@ import { postDataRequest, postVoteRequest } from '../api';
 import ProjectCard from './ProjectCard';
 
 import logoImage from '../assets/logo.png';
+import Results from './Results';
 
 const TOAST_ID_MAX_POINTS = 'max-points';
 
@@ -38,6 +39,7 @@ export default function MainPage({ email, token }: Props) {
   const [pointsStep, setPointsStep] = useState<number>(1);
   const [openForVoting, setOpenForVoting] = useState<boolean>(true);
   const [note, setNote] = useState<string>('');
+  const [result, setResult] = useState<{ [key: number]: number } | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
 
   const [dragDisabled, setDragDisabled] = useState<boolean>(false);
@@ -56,6 +58,7 @@ export default function MainPage({ email, token }: Props) {
         setMaxTotalPoints(data.max_total_points);
         setPointsStep(data.points_step);
         setOpenForVoting(data.open_for_voting);
+        setResult(data.results);
         setNote(data.note);
         setProjects(data.projects);
         setSendingRequest(false);
@@ -258,11 +261,14 @@ export default function MainPage({ email, token }: Props) {
           />
         </div>
         {!openForVoting && (
-          <div className="w-full mt-[10px] flex justify-center">
-            <Alert className="w-fit" severity="info">
-              הדירוג סגור כרגע
-            </Alert>
-          </div>
+          <>
+            <div className="w-full mt-[10px] flex justify-center">
+              <Alert className="w-fit" severity="info">
+                הדירוג סגור כרגע
+              </Alert>
+            </div>
+            {result !== null && <Results data={result} projects={projects} />}
+          </>
         )}
         {openForVoting && (
           <>
