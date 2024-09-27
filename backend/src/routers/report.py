@@ -14,7 +14,6 @@ import psycopg
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query, Response, status
 from pydantic import BaseModel
 
-from src.algorithm.public import AlgorithmInput, AlgorithmResult, ProjectItem, VouterItem, run_algorithm
 from src.config import config
 from src.database import get_db
 from src.logger import get_logger
@@ -211,21 +210,7 @@ def _create_report(report: Report, db: psycopg.Connection) -> None:
     except Exception:
         _report_log_error(report, "Error while saving data as csv files")
 
-    _report_log_info(report, "Run the algorithm")
-    try:
-        result = _report_run_algorithm(report, settings, projects, votes)
-        _report_log_info(report, "Algorithm finished")
-    except Exception:
-        _report_log_error(report, "Error while running the algorithm")
-
     _report_log_info(report, "Report creation finished")
-
-    _report_log_info(report, "Save the result in readable format")
-    try:
-        _report_save_result_as_csv(report, result)
-        _report_log_info(report, "Result saved as csv files")
-    except Exception:
-        _report_log_error(report, "Error while saving result as csv files")
 
 
 def _report_log_info(report: Report, log: str) -> None:
@@ -332,37 +317,3 @@ def _report_save_data_as_csv(report: Report, projects: dict[int, Project], votes
     report.append_text_to_file("projects.csv", projects_df.to_csv(index=False))
     report.append_text_to_file("voters.csv", voters_df.to_csv(index=False))
     report.append_text_to_file("votes.csv", votes_df.to_csv(index=False))
-
-
-def _report_run_algorithm(
-    report: Report, settings: Settings, projects: dict[int, Project], votes: list[VoteData]
-) -> AlgorithmResult:
-    input_data = AlgorithmInput(
-        projects=[
-            ProjectItem(
-                project_id=project.project_id,
-                min_cost=project.min_points,
-                max_cost=project.max_points,
-            )
-            for project in projects.values()
-        ],
-        voutes=[
-            VouterItem(
-                vouter_id=vote.voter.voter_id, voutes={project.project_id: project.points for project in vote.projects}
-            )
-            for vote in votes
-        ],
-        budget=settings.max_total_points,
-    )
-
-    _report_log_info(report, "Start computation")
-    result = run_algorithm(input_data)
-    _report_log_info(report, "Computation finished")
-
-    report.append_text_to_file("raw_result.json", json.dumps(result.raw_result, indent=4))
-
-    return result
-
-
-def _report_save_result_as_csv(report: Report, result: AlgorithmResult) -> None:
-    pass
