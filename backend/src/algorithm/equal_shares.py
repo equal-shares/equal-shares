@@ -19,7 +19,6 @@ def equal_shares(
     bids: dict[int, dict[int, int]],
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """
-    """
 
     :argument
         voters (list): A list of voter names.
@@ -43,7 +42,6 @@ def equal_shares(
         first: A dictionary of the mapping the received project IDs for the maximum cost given for them
         second: A dictionary that maps the IDs of the projects received for the cost each voter gave them
 
-    """
     """
 
     projects = projects_costs.keys()
