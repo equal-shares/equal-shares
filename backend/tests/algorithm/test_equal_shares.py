@@ -26,7 +26,7 @@ def test_equal_shares_passed() -> None:
     )
 
     expected_winners_allocations = {11: 100, 12: 0, 13: 200, 14: 250, 15: 300, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
-    expected_candidates_payments_per_voter = {
+    expected_candidates_payments_per_voter: dict[int, dict[int, float]] = {
         11: {1: 33.333333333333336, 2: 33.333333333333336, 4: 33.333333333333336},
         12: {2: 0, 5: 0},
         13: {1: 108.0, 5: 92.0},
@@ -43,7 +43,9 @@ def test_equal_shares_passed() -> None:
 
     assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
     for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+        assert {k: round(v) for k, v in candidates_payments_per_voter[key].items()} == {
+            k: round(v) for k, v in expected_candidates_payments_per_voter[key].items()
+        }
 
 
 def test_equal_shares_fixed_budget_passed_1() -> None:

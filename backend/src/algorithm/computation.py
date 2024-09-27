@@ -1,3 +1,5 @@
+from src.algorithm.equal_shares import equal_shares
+from src.algorithm.utils import calculate_average_allocations, check_allocations, display_bar_chart, remove_zero_bids
 import copy
 import logging
 
@@ -36,11 +38,10 @@ def min_max_equal_shares(
 
     averages = calculate_average_bids(bids_not_zero, voters)
     logger.debug("averages: %s", averages)
-    if check_allocations(cost, winners_allocations):
+    
+    if not check_allocations(cost, winners_allocations):
+        raise ValueError("the result is not valid")
+    
+    plot_bid_data(bids_not_zero, cost, averages, winners_allocations)
+    return winners_allocations, candidates_payments_per_voter
 
-        print("winners_allocations :", winners_allocations)
-        plot_bid_data(bids_not_zero, cost, averages, winners_allocations)
-        return winners_allocations, candidates_payments_per_voter
-    else:
-        print("the result not valid")
-        return {}, {}

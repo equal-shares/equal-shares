@@ -111,7 +111,7 @@ def remove_zero_bids(bids: dict[int, dict[int, int]]) -> dict[int, dict[int, int
     for project, sub_dict in bids.items():
         # Create a new dictionary by excluding entries with value 0
         bids[project] = {voter_id: voter_cost for voter_id, voter_cost in sub_dict.items() if voter_cost != 0}
-    return bids
+
 
 
 def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_allocations: dict[int, int]) -> bool:
@@ -136,6 +136,7 @@ def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_al
         if project_cost != 0:
             # Find the corresponding range in cost_min_max
             cost_range = next((entry[project_id] for entry in cost_min_max if project_cost in entry), None)
+
 
             if cost_range:
                 min_cost, max_cost = cost_range

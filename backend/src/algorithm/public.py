@@ -63,8 +63,8 @@ def run_algorithm(data: AlgorithmInput) -> AlgorithmResult:
     # logger.info(f"bids: {bids}")
     # logger.info(f"budget: {data.budget}")
 
-    winners_allocations = {}
-    candidates_payments_per_voter = {}
+    winners_allocations: dict = {}
+    candidates_payments_per_voter: dict = {}
 
     logger.info(f"voters: {voters}")
     logger.info(f"cost_min_max: {cost_min_max}")

@@ -3,10 +3,13 @@ import logging
 
 from src.algorithm.utils import filter_bids, find_max
 
+
+from src.algorithm.utils import filter_bids, find_max
+
 logger = logging.getLogger("equal_shares_logger")
 
 CONTINUOUS_COST = 1  # A cost that signals that the given project is in its continuous increment phase.
-DISTRIBUTION_PARAMETER_COST = 100000  # A const showing the budget distribution parameter#
+DISTRIBUTION_PARAMETER_COST = 10000  # A const showing the budget distribution parameter#
 
 
 def equal_shares(
@@ -16,7 +19,14 @@ def equal_shares(
     bids: dict[int, dict[int, int]],
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """
+    """
 
+    :argument
+        voters (list): A list of voter names.
+        projects_costs (list): A dictionary mapping project IDs to their min cost.
+        budget (int): The total budget available for all the projects.
+        bids (dict): A dictionary mapping project IDs to the
+        list of voters who approve them and the cost the voters chose.
     :argument
         voters (list): A list of voter names.
         projects_costs (list): A dictionary mapping project IDs to their min cost.
@@ -28,12 +38,17 @@ def equal_shares(
         tuple[dict[int, int], dict[int, dict[int, float]]]:
         first: A dictionary of the mapping the received project IDs for the maximum cost given for them
         second: A dictionary that maps the IDs of the projects received for the cost each voter gave them
+    :return
+        tuple[dict[int, int], dict[int, dict[int, float]]]:
+        first: A dictionary of the mapping the received project IDs for the maximum cost given for them
+        second: A dictionary that maps the IDs of the projects received for the cost each voter gave them
 
+    """
     """
 
     projects = projects_costs.keys()
     max_bid_for_project = find_max(bids)
-    rounded_budget = int(budget / len(voters)) * len(voters)  # start with integral per-voter voters_budget
+    rounded_budget: float = int(budget / len(voters)) * len(voters)  # start with integral per-voter voters_budget
     logger.info("\nRunning equal_shares: budget=%s, rounded to %s", budget, rounded_budget)
 
     winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter = equal_shares_fixed_budget(
@@ -62,8 +77,9 @@ def equal_shares(
             break
 
         # would the next highest voters_budget work?
-        updated_rounded_budget = rounded_budget + len(voters) * (budget / DISTRIBUTION_PARAMETER_COST)
-        # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
+        updated_rounded_budget = rounded_budget + len(voters) * (
+            budget / DISTRIBUTION_PARAMETER_COST
+        )  # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
 
         updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter = (
             equal_shares_fixed_budget(
@@ -109,7 +125,7 @@ def break_ties(cost: dict[int, int], bids: dict[int, dict[int, int]], candidates
 def equal_shares_fixed_budget(
     voters: list[int],
     projects_costs: dict[int, int],
-    budget: int,
+    budget: float,
     bids: dict[int, dict[int, int]],
     max_bid_for_project: dict,
 ) -> tuple[dict[int, int], dict[int, int], dict[int, dict[int, float]]]:
