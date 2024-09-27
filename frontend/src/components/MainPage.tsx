@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 
 import {
   Button,
@@ -9,6 +9,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   Alert,
+  Input,
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { toast } from 'react-toastify';
@@ -36,6 +37,7 @@ export default function MainPage({ email, token }: Props) {
   const [maxTotalPoints, setMaxTotalPoints] = useState<number>(1);
   const [pointsStep, setPointsStep] = useState<number>(1);
   const [openForVoting, setOpenForVoting] = useState<boolean>(true);
+  const [note, setNote] = useState<string>('');
   const [projects, setProjects] = useState<Project[]>([]);
 
   const [dragDisabled, setDragDisabled] = useState<boolean>(false);
@@ -54,6 +56,7 @@ export default function MainPage({ email, token }: Props) {
         setMaxTotalPoints(data.max_total_points);
         setPointsStep(data.points_step);
         setOpenForVoting(data.open_for_voting);
+        setNote(data.note);
         setProjects(data.projects);
         setSendingRequest(false);
       })
@@ -214,6 +217,7 @@ export default function MainPage({ email, token }: Props) {
 
     setSendingRequest(true);
     postVoteRequest(email, token, {
+      note,
       projects: sortedProjects(projects).map((project) => ({
         id: project.id,
         rank: project.rank,
@@ -231,6 +235,8 @@ export default function MainPage({ email, token }: Props) {
       setVoted(data.voted);
       setMaxTotalPoints(data.max_total_points);
       setPointsStep(data.points_step);
+      setOpenForVoting(data.open_for_voting);
+      setNote(data.note);
       setProjects(data.projects);
       setSendingRequest(false);
     });
@@ -367,6 +373,18 @@ export default function MainPage({ email, token }: Props) {
                 )}
               </Droppable>
             </DragDropContext>
+            <div className="mt-[10px] flex justify-center items-center">
+              <div className="w-[500px]">
+                <Input
+                  fullWidth
+                  multiline
+                  minRows={2}
+                  placeholder="הערות"
+                  value={note}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setNote(e.target.value)}
+                />
+              </div>
+            </div>
             <div className="mt-[10px] flex justify-center">
               <Button
                 color="primary"

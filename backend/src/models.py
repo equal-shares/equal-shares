@@ -6,11 +6,16 @@ from datetime import datetime
 
 import psycopg
 from fastapi import HTTPException, status
+from psycopg.types.json import Json
 from pydantic import BaseModel, field_serializer
 
 from src.database import db_named_query
 
-_TABLES_NAMES = ["settings", "projects", "voters", "projects_votes"]
+# Deprecated tables, if table removed it should be here!
+_DEPRECATED_TABLES_NAMES: list[str] = []
+
+# All tables that used in the project should be here!
+_TABLES_NAMES = ["polls", "settings", "projects", "voters", "projects_votes"]
 
 
 @db_named_query
@@ -37,6 +42,15 @@ def get_tables_exists(db: psycopg.Connection) -> dict[str, bool]:
 
 
 @db_named_query
+def delete_tables(db: psycopg.Connection) -> None:
+    """Delete the tables in the database."""
+    with db.cursor() as cursor:
+        for table_name in _DEPRECATED_TABLES_NAMES + _TABLES_NAMES:
+            cursor.execute(f"DROP TABLE IF EXISTS public.{table_name};")
+        db.commit()
+
+
+@db_named_query
 def create_tables(db: psycopg.Connection) -> None:
     """Create the tables in the database."""
     with db.cursor() as cursor:
@@ -56,7 +70,8 @@ def create_tables(db: psycopg.Connection) -> None:
                 poll_id INTEGER NOT NULL,
                 max_total_points INTEGER NOT NULL,
                 points_step INTEGER NOT NULL,
-                open_for_voting BOOLEAN NOT NULL
+                open_for_voting BOOLEAN NOT NULL,
+                results JSON
             );
             """
         )
@@ -84,6 +99,7 @@ def create_tables(db: psycopg.Connection) -> None:
                 poll_id INTEGER NOT NULL,
                 id SERIAL PRIMARY KEY,
                 email TEXT NOT NULL UNIQUE,
+                note VARCHAR(1024) NOT NULL,
                 created_at TIMESTAMP NOT NULL
             );
             """
@@ -130,6 +146,15 @@ def create_poll(db: psycopg.Connection, name: str) -> Poll:
         assert row is not None
 
         poll_id = int(row[0])
+
+        cursor.execute(
+            """
+            INSERT INTO public.settings (poll_id, max_total_points, points_step, open_for_voting)
+            VALUES (%s, 1000, 100, FALSE);
+            """,
+            (poll_id,),
+        )
+        db.commit()
 
     return Poll(poll_id=poll_id, name=name, active=False)
 
@@ -232,20 +257,23 @@ class Settings(BaseModel):
     max_total_points: int
     points_step: int
     open_for_voting: bool
+    results: dict | None
 
 
 @db_named_query
 def update_settings(db: psycopg.Connection, settings: Settings) -> None:
     poll_id = get_active_poll(db).poll_id
 
+    results = Json(settings.results) if settings.results is not None else None
+
     with db.cursor() as cursor:
         cursor.execute(
             """
             UPDATE public.settings
-            SET max_total_points = %s, points_step = %s, open_for_voting = %s
+            SET max_total_points = %s, points_step = %s, open_for_voting = %s, results = %s
             WHERE poll_id = %s;
             """,
-            (settings.max_total_points, settings.points_step, settings.open_for_voting, poll_id),
+            (settings.max_total_points, settings.points_step, settings.open_for_voting, results, poll_id),
         )
 
         db.commit()
@@ -259,7 +287,7 @@ def get_settings(db: psycopg.Connection) -> Settings:
         cursor.execute(
             (
                 """
-            SELECT max_total_points, points_step, open_for_voting
+            SELECT max_total_points, points_step, open_for_voting, results
             FROM public.settings
             WHERE poll_id = %s;
             """
@@ -267,10 +295,16 @@ def get_settings(db: psycopg.Connection) -> Settings:
             (poll_id,),
         )
         row = cursor.fetchone()
-        if row is None:
-            return Settings(poll_id=poll_id, max_total_points=0, points_step=1, open_for_voting=False)
 
-    return Settings(poll_id=poll_id, max_total_points=row[0], points_step=row[1], open_for_voting=row[2])
+        assert row is not None
+
+    return Settings(
+        poll_id=poll_id,
+        max_total_points=row[0],
+        points_step=row[1],
+        open_for_voting=row[2],
+        results=row[3],
+    )
 
 
 @db_named_query
@@ -426,6 +460,7 @@ class Voter(BaseModel):
     poll_id: int
     voter_id: int = 0
     email: str
+    note: str
     created_at: datetime
 
     @field_serializer("created_at")
@@ -465,7 +500,7 @@ def get_voter(db: psycopg.Connection, email: str) -> Voter | None:
     with db.cursor() as cursor:
         cursor.execute(
             """
-            SELECT id, email, created_at
+            SELECT id, email, note, created_at
             FROM public.voters
             WHERE poll_id = %s AND email = %s;
             """,
@@ -476,11 +511,11 @@ def get_voter(db: psycopg.Connection, email: str) -> Voter | None:
     if row is None:
         return None
 
-    return Voter(poll_id=poll_id, voter_id=row[0], email=row[1], created_at=row[2])
+    return Voter(poll_id=poll_id, voter_id=row[0], email=row[1], note=row[2], created_at=row[3])
 
 
 @db_named_query
-def save_voter_votes(db: psycopg.Connection, email: str, projects: list[VoteProjectInput]) -> Voter:
+def save_voter_votes(db: psycopg.Connection, email: str, note: str, projects: list[VoteProjectInput]) -> Voter:
     """
     Save the votes of a voter.
     If the voter does not exist, it will be created.
@@ -489,16 +524,16 @@ def save_voter_votes(db: psycopg.Connection, email: str, projects: list[VoteProj
 
     poll_id = get_active_poll(db).poll_id
 
-    voter = Voter(poll_id=poll_id, email=email, created_at=datetime.now())
+    voter = Voter(poll_id=poll_id, email=email, note=note, created_at=datetime.now())
 
     with db.cursor() as cursor:
         cursor.execute(
             """
-            INSERT INTO public.voters (poll_id, email, created_at)
-            VALUES (%s, %s, %s)
+            INSERT INTO public.voters (poll_id, email, note, created_at)
+            VALUES (%s, %s, %s, %s)
             ON CONFLICT (poll_id, email) DO NOTHING;
             """,
-            (voter.email, voter.created_at),
+            (voter.email, voter.note, voter.created_at),
         )
         db.commit()
 
@@ -548,7 +583,7 @@ def get_votes(db: psycopg.Connection) -> list[VoteData]:
     with db.cursor() as cursor:
         cursor.execute(
             """
-            SELECT v.id, v.email, v.created_at, pv.project_id, pv.points, pv.rank
+            SELECT v.id, v.email, v.note, v.created_at, pv.project_id, pv.points, pv.rank
             FROM public.voters AS v
             JOIN public.projects_votes AS pv ON pv.voter_id = v.id
             WHERE v.poll_id = %s
@@ -564,7 +599,7 @@ def get_votes(db: psycopg.Connection) -> list[VoteData]:
         if voter_id not in votes:
             votes[voter_id] = VoteData(
                 poll_id=poll_id,
-                voter=Voter(poll_id=poll_id, voter_id=voter_id, email=row[1], created_at=row[2]),
+                voter=Voter(poll_id=poll_id, voter_id=voter_id, email=row[1], note=row[2], created_at=row[3]),
                 projects=[],
             )
 

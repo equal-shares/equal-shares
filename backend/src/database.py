@@ -47,7 +47,6 @@ def init_db() -> None:
         g_pool.wait()
     except psycopg.errors.Error as e:
         get_logger().exception(e)
-        print(e)
         raise CriticalException("Database connection failed") from e
 
 

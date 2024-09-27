@@ -26,9 +26,12 @@ export type DataResponse = {
   max_total_points: number;
   points_step: number;
   open_for_voting: boolean;
+  results: { [key: number]: number };
+  note: string;
   projects: Project[];
 };
 
 export type VoteRequestBody = {
+  note: string;
   projects: VotedProject[];
 };

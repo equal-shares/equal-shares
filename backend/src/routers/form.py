@@ -12,6 +12,7 @@ from src.models import (
     get_active_poll,
     get_projects,
     get_settings,
+    get_voter,
     get_voter_votes,
     save_voter_votes,
 )
@@ -22,7 +23,7 @@ router = APIRouter()
 
 
 def _create_data_response_schema(
-    settings: Settings, projects: list[Project], voter_votes: list[ProjectVote]
+    settings: Settings, projects: list[Project], voter_votes: list[ProjectVote], note: str
 ) -> DataResponseSchema:
     projects_data: dict[int, ProjectSchema] = {}
     for project in projects:
@@ -55,6 +56,8 @@ def _create_data_response_schema(
         max_total_points=max_total_points,
         points_step=settings.points_step,
         open_for_voting=settings.open_for_voting,
+        note=note,
+        results=settings.results,
         projects=projects_order,
     )
 
@@ -77,7 +80,10 @@ def route_data(
     projects = get_projects(db)
     votes = get_voter_votes(db, email)
 
-    return _create_data_response_schema(settings, projects, votes)
+    voter = get_voter(db, email)
+    note = voter.note if voter is not None else ""
+
+    return _create_data_response_schema(settings, projects, votes, note)
 
 
 @router.post("/vote")
@@ -142,9 +148,9 @@ def route_vote(
         )
         for vote in body.projects
     ]
-    save_voter_votes(db, email, vote_input)
+    save_voter_votes(db, email, body.note, vote_input)
 
     # get the updated votes
     votes = get_voter_votes(db, email)
 
-    return _create_data_response_schema(settings, projects, votes)
+    return _create_data_response_schema(settings, projects, votes, body.note)

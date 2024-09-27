@@ -32,8 +32,11 @@ class DataResponseSchema(BaseModel):
     max_total_points: int
     points_step: int
     open_for_voting: bool
+    results: dict | None
+    note: str
     projects: list[ProjectSchema]
 
 
 class VoteRequestBodySchema(BaseModel):
+    note: str
     projects: list[VotedProjectSchema]

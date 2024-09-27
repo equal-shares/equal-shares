@@ -6,7 +6,7 @@ from uuid import UUID
 
 import pandas as pd
 import psycopg
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile, status
 
 from src.config import config
 from src.database import db_dependency
@@ -16,6 +16,7 @@ from src.models import (
     create_project,
     create_tables,
     delete_projects_and_votes,
+    delete_tables,
     delete_votes,
     get_active_poll,
     get_poll_by_id,
@@ -30,6 +31,23 @@ from src.models import (
 from src.security import create_token, verify_valid_email, verify_valid_token
 
 router = APIRouter()
+
+
+@router.delete("/delete-tables")
+def route_delete_tables(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+    db: psycopg.Connection = Depends(db_dependency),
+) -> dict:
+    """
+    # Delete all the tables in the database
+    """
+
+    if config.admin_key != admin_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    delete_tables(db)
+
+    return {"status": "ok", "message": "All tables have been deleted"}
 
 
 @router.get("/create-tables")
@@ -162,7 +180,9 @@ def route_delete_projects_and_votes(
     admin_key: UUID = Query(description="key for authentication of admin"),
     db: psycopg.Connection = Depends(db_dependency),
 ) -> dict:
-    """Delete all projects and votes from the poll"""
+    """
+    # Delete ALL projects and votes from the poll
+    """
 
     if config.admin_key != admin_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
@@ -177,7 +197,9 @@ def route_delete_votes(
     admin_key: UUID = Query(description="key for authentication of admin"),
     db: psycopg.Connection = Depends(db_dependency),
 ) -> dict:
-    """Delete all votes from the poll"""
+    """
+    # Delete all votes from the poll
+    """
 
     if config.admin_key != admin_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
@@ -191,10 +213,12 @@ def route_delete_votes(
 async def route_set_settings(
     admin_key: UUID = Query(description="key for authentication of admin"),
     max_total_points: int | None = Query(
-        description="the maximum total points a voter can give to all the projects in total"
+        description="the maximum total points a voter can give to all the projects in total", default=None
     ),
-    points_step: int | None = Query(description="the step of points that can be given to a project"),
-    open_for_voting: bool | None = Query(description="if the Poll is open for voting or not"),
+    points_step: int | None = Query(description="the step of points that can be given to a project", default=None),
+    open_for_voting: bool | None = Query(
+        description="if the Poll is open for voting or not", default=None, enum=[True, False]
+    ),
     db: psycopg.Connection = Depends(db_dependency),
 ) -> dict:
     """
@@ -224,11 +248,68 @@ async def route_set_settings(
 
     update_settings(db, settings)
 
+    settings = get_settings(db)
+
     return {
         "max_total_points": settings.max_total_points,
         "points_step": settings.points_step,
         "open_for_voting": settings.open_for_voting,
     }
+
+
+@router.post("/remove-results")
+def route_remove_results(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+    db: psycopg.Connection = Depends(db_dependency),
+) -> dict:
+    """
+    Remove the results of the poll.
+    Remove the results that are showed in the form page on the graph if the poll is closed for voting.
+    """
+
+    if config.admin_key != admin_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    settings = get_settings(db)
+    settings.results = None
+
+    update_settings(db, settings)
+
+    return {"status": "ok", "message": "Results have been removed"}
+
+
+@router.post("/set-results")
+def route_set_results(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+    results: dict[int, int] = Body(description="the results of the poll", examples=[{1: 100, 2: 300, 3: 150}]),
+    db: psycopg.Connection = Depends(db_dependency),
+) -> dict:
+    """
+    Set the results of the poll
+    Set the results that are showed in the form page on the graph if the poll is closed for voting.
+    """
+
+    if config.admin_key != admin_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    results_keys = list(results.keys())
+
+    if len(results_keys) != len(set(results_keys)):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Results cannot have duplicate project ids")
+
+    settings = get_settings(db)
+    projects = get_projects(db)
+
+    projects_ids = {project.project_id for project in projects}
+
+    if set(results_keys) != projects_ids:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Results must have all the projects")
+
+    settings.results = results
+
+    update_settings(db, settings)
+
+    return {"status": "ok", "message": "Results have been set"}
 
 
 @router.post("/add-projects")
@@ -339,10 +420,7 @@ def route_get_projects(
     projects = get_projects(db)
 
     return {
-        "settings": {
-            "max_total_points": settings.max_total_points,
-            "points_step": settings.points_step,
-        },
+        "settings": settings,
         "projects": projects,
     }
 
