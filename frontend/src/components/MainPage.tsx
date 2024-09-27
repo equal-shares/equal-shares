@@ -258,42 +258,42 @@ export default function MainPage({ email, token }: Props) {
             </Alert>
           </div>
         )}
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>איך מדרגים?</AccordionSummary>
-          <AccordionDetails>
-            <ul className="list-disc px-[20px]">
-              <li>לחצו על "עריכה" על מנת להתחיל בדירוג.</li>
-              <li>
-                החליטו איזה קורסים אתם מוכנים לקחת, סמנו אותם ב-V ומחקו את הסימון מהקורסים שאתם לא
-                מוכנים לקחת.
-              </li>
-              <li>
-                גררו וסדרו את הקורסים שאתם מוכנים לקחת לפי סדר העדיפות שלכם - שימו למעלה את הקורסים
-                שאתם הכי רוצים.{' '}
-              </li>
-              <li>
-                חלקו את 1000 הנקודות שלכם בין הקורסים שאתם מוכנים לקחת - תנו יותר נקודות לקורסים
-                שאתם רוצים יותר.
-              </li>
-              <li>ניתן להשתמש בחיצי המקלדת לניקוד מדויק יותר.</li>
-              <li>לאחר שסיימתם, לחצו על "שמירת הדירוג".</li>
-            </ul>
-          </AccordionDetails>
-        </Accordion>
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>שימו לב</AccordionSummary>
-          <AccordionDetails>
-            <ul className="list-disc px-[20px]">
-              <li>
-                אם לא סימנתם V ליד "מוכן/ה לקחת", לא תקבלו את הקורס בשום מקרה - גם אם לא יישאר מקום
-                בקורסים אחרים.{' '}
-              </li>
-              <li>בעת שמירת הדירוג, יתרת הדירוג חייבת לעמוד על 0 נקודות בדיוק.</li>
-            </ul>
-          </AccordionDetails>
-        </Accordion>
         {openForVoting && (
           <>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>איך מדרגים?</AccordionSummary>
+              <AccordionDetails>
+                <ul className="list-disc px-[20px]">
+                  <li>לחצו על "עריכה" על מנת להתחיל בדירוג.</li>
+                  <li>
+                    החליטו איזה קורסים אתם מוכנים לקחת, סמנו אותם ב-V ומחקו את הסימון מהקורסים שאתם
+                    לא מוכנים לקחת.
+                  </li>
+                  <li>
+                    גררו וסדרו את הקורסים שאתם מוכנים לקחת לפי סדר העדיפות שלכם - שימו למעלה את
+                    הקורסים שאתם הכי רוצים.{' '}
+                  </li>
+                  <li>
+                    חלקו את 1000 הנקודות שלכם בין הקורסים שאתם מוכנים לקחת - תנו יותר נקודות לקורסים
+                    שאתם רוצים יותר.
+                  </li>
+                  <li>ניתן להשתמש בחיצי המקלדת לניקוד מדויק יותר.</li>
+                  <li>לאחר שסיימתם, לחצו על "שמירת הדירוג".</li>
+                </ul>
+              </AccordionDetails>
+            </Accordion>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>שימו לב</AccordionSummary>
+              <AccordionDetails>
+                <ul className="list-disc px-[20px]">
+                  <li>
+                    אם לא סימנתם V ליד "מוכן/ה לקחת", לא תקבלו את הקורס בשום מקרה - גם אם לא יישאר
+                    מקום בקורסים אחרים.{' '}
+                  </li>
+                  <li>בעת שמירת הדירוג, יתרת הדירוג חייבת לעמוד על 0 נקודות בדיוק.</li>
+                </ul>
+              </AccordionDetails>
+            </Accordion>
             <div className="w-full mt-[5px] flex justify-center">
               <Alert className="w-fit" severity="info">
                 יתרת תקציב: {availablePoints}
