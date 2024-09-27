@@ -92,7 +92,7 @@ def test_min_max_equal_shares_passed_3() -> None:
     bids = {11: {2: 99}, 12: {1: 98}}
     budget = 100
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, bids, budget)
+    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, projects_costs, budget, bids)
 
     expected_winners_allocations = {11: 0, 12: 98}
     expected_candidates_payments_per_voter = {11: {2: 0}, 12: {1: 98.0}}

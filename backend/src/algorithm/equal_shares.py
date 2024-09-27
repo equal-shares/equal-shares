@@ -3,9 +3,6 @@ import logging
 
 from src.algorithm.utils import filter_bids, find_max
 
-
-from src.algorithm.utils import filter_bids, find_max
-
 logger = logging.getLogger("equal_shares_logger")
 
 CONTINUOUS_COST = 1  # A cost that signals that the given project is in its continuous increment phase.
@@ -15,7 +12,7 @@ DISTRIBUTION_PARAMETER_COST = 10000  # A const showing the budget distribution p
 def equal_shares(
     voters: list[int],
     projects_costs: dict[int, int],  # min cost per project
-    budget: int,
+    budget: float,
     bids: dict[int, dict[int, int]],
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """

@@ -1,5 +1,3 @@
-from src.algorithm.equal_shares import equal_shares
-from src.algorithm.utils import calculate_average_allocations, check_allocations, display_bar_chart, remove_zero_bids
 import copy
 import logging
 
@@ -12,7 +10,7 @@ logger = logging.getLogger("min_max_equal_shares_logger")
 def min_max_equal_shares(
     voters: list[int],
     cost_min_max: list[dict[int, tuple[int, int]]],
-    budget: int,
+    budget: float,
     bids: dict[int, dict[int, int]],
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """
@@ -38,10 +36,9 @@ def min_max_equal_shares(
 
     averages = calculate_average_bids(bids_not_zero, voters)
     logger.debug("averages: %s", averages)
-    
+
     if not check_allocations(cost, winners_allocations):
         raise ValueError("the result is not valid")
-    
+
     plot_bid_data(bids_not_zero, cost, averages, winners_allocations)
     return winners_allocations, candidates_payments_per_voter
-

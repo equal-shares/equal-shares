@@ -111,7 +111,7 @@ def remove_zero_bids(bids: dict[int, dict[int, int]]) -> dict[int, dict[int, int
     for project, sub_dict in bids.items():
         # Create a new dictionary by excluding entries with value 0
         bids[project] = {voter_id: voter_cost for voter_id, voter_cost in sub_dict.items() if voter_cost != 0}
-
+    return bids
 
 
 def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_allocations: dict[int, int]) -> bool:
@@ -136,7 +136,6 @@ def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_al
         if project_cost != 0:
             # Find the corresponding range in cost_min_max
             cost_range = next((entry[project_id] for entry in cost_min_max if project_cost in entry), None)
-
 
             if cost_range:
                 min_cost, max_cost = cost_range
@@ -175,7 +174,7 @@ def calculate_average_bids(bids: dict[int, dict[int, int]], voters: list[int]) -
 def plot_bid_data(
     bids: dict[int, dict[int, int]],
     cost_min_max: list[dict[int, tuple[int, int]]],
-    average_bids: dict[int, int],
+    average_bids: dict[int, float],
     winners_allocations: dict[int, int],
 ) -> None:
     # Extracting project IDs
@@ -219,7 +218,7 @@ def plot_bid_data(
         values_sorted = sorted(values, key=lambda x: x[1])
 
         # Plot the sorted bars, applying a small horizontal offset to distinguish equal values
-        cumulative_bottom = 0
+        cumulative_bottom = 0.0
         last_value = None
         for label, value, color in values_sorted:
             if last_value is not None and value == last_value:
@@ -235,7 +234,7 @@ def plot_bid_data(
     plt.xlabel("Project ID")
     plt.ylabel("Value")
     plt.title("Bids, Winners Allocations, and Costs for Projects (Sorted and Offset for Equal Values)")
-    plt.xticks(x_pos, project_ids)
+    plt.xticks(x_pos, [str(item) for item in project_ids])
     plt.legend()
 
     # Display the plot
