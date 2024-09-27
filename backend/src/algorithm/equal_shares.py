@@ -6,7 +6,7 @@ from src.algorithm.utils import filter_bids, find_max
 logger = logging.getLogger("equal_shares_logger")
 
 CONTINUOUS_COST = 1  # A cost that signals that the given project is in its continuous increment phase.
-DISTRIBUTION_PARAMETER_COST = 10000  # A const showing the budget distribution parameter#
+DISTRIBUTION_PARAMETER_COST = 100000  # A const showing the budget distribution parameter#
 
 
 def equal_shares(
@@ -63,7 +63,7 @@ def equal_shares(
 
         # would the next highest voters_budget work?
         updated_rounded_budget = rounded_budget + len(voters) * (budget / DISTRIBUTION_PARAMETER_COST)
-          # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
+        # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
 
         updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter = (
             equal_shares_fixed_budget(

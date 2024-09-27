@@ -1,7 +1,8 @@
+import copy
 import logging
 
 from src.algorithm.equal_shares import equal_shares
-from src.algorithm.utils import calculate_average_allocations, check_allocations, remove_zero_bids
+from src.algorithm.utils import calculate_average_bids, check_allocations, plot_bid_data, remove_zero_bids
 
 logger = logging.getLogger("min_max_equal_shares_logger")
 
@@ -25,17 +26,20 @@ def min_max_equal_shares(
         example:
             cost_min_max = [{1: (200, 700)}, {2: (300, 900)}, {3:(100,100)}] --> cost = [{1:200 }, {2:300}, {3:100}]
     """
+    cost = copy.deepcopy(cost_min_max)
     projects_costs = {}
     for item in cost_min_max:
         project_id, (min_value, _) = item.popitem()
         projects_costs[project_id] = min_value
-    remove_zero_bids(bids)
-    winners_allocations, candidates_payments_per_voter = equal_shares(voters, projects_costs, budget, bids)
+    bids_not_zero = remove_zero_bids(bids)
+    winners_allocations, candidates_payments_per_voter = equal_shares(voters, projects_costs, budget, bids_not_zero)
 
-    averages = calculate_average_allocations(winners_allocations, voters)
+    averages = calculate_average_bids(bids_not_zero, voters)
     logger.debug("averages: %s", averages)
+    if check_allocations(cost, winners_allocations):
 
-    if check_allocations(cost_min_max, winners_allocations):
+        print("winners_allocations :", winners_allocations)
+        plot_bid_data(bids_not_zero, cost, averages, winners_allocations)
         return winners_allocations, candidates_payments_per_voter
     else:
         print("the result not valid")
