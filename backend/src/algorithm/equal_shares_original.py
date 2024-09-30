@@ -1,7 +1,6 @@
-# ORiginal code taken from this link:
+# Original code of the MES method, taken from this link:
 # https://equalshares.net/implementation/computation
-
-# Completion method: Add1U
+# With completion method: Add1U
 
 
 def equal_shares(voters: list, projects: list, cost: dict, approvers: dict, total_budget: int) -> list:

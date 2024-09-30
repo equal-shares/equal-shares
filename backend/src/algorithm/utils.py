@@ -2,6 +2,7 @@ import logging
 
 import matplotlib.pyplot as plt
 import numpy as np
+import copy
 
 logger = logging.getLogger("equal_shares_logger")
 
@@ -112,6 +113,23 @@ def remove_zero_bids(bids: dict[int, dict[int, int]]) -> dict[int, dict[int, int
         # Create a new dictionary by excluding entries with value 0
         bids[project] = {voter_id: voter_cost for voter_id, voter_cost in sub_dict.items() if voter_cost != 0}
     return bids
+
+
+def get_project_min_costs(cost_min_max:list)->dict:
+    """
+    Convert the cost-min-max format 
+    to a dict that maps each project to its minimum cost.
+
+    >>> cost_min_max=[{11: (200, 300)}, {12: (300,400)}, {13: (100,150)}]
+    >>> get_project_min_costs(cost_min_max)
+    {11: 200, 12: 300, 13: 100}
+    """
+    projects_min_costs = {}
+    for item in copy.deepcopy(cost_min_max):
+        project_id, (min_value, _) = item.popitem()
+        projects_min_costs[project_id] = min_value
+    return projects_min_costs
+
 
 
 def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_allocations: dict[int, int]) -> bool:
