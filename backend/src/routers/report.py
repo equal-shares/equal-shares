@@ -183,6 +183,30 @@ def get_report_route(
     )
 
 
+@router.get("/single-report")
+def single_report_route(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+) -> Response:
+    if config.admin_key != admin_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    report_id = reports_storage.create_report()
+
+    create_report_task(report_id)
+
+    report = reports_storage.get_report(report_id)
+
+    content = report.get_content()
+
+    reports_storage.remove_report(report_id)
+
+    return Response(
+        content=content,
+        media_type="application/zip",
+        headers={"Content-Disposition": "attachment; filename=report.zip"},
+    )
+
+
 def create_report_task(report_id: int) -> None:
     with get_db() as db:
         report = reports_storage.get_report(report_id)
