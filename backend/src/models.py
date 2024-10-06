@@ -81,14 +81,15 @@ def create_tables(db: psycopg.Connection) -> None:
             CREATE TABLE public.projects (
                 poll_id INTEGER NOT NULL,
                 id SERIAL PRIMARY KEY,
-                name TEXT NOT NULL UNIQUE,
+                name TEXT NOT NULL,
                 min_points INTEGER NOT NULL,
                 max_points INTEGER NOT NULL,
                 description_1 TEXT NOT NULL,
                 description_2 TEXT NOT NULL,
                 fixed BOOLEAN NOT NULL,
                 order_number INTEGER NOT NULL,
-                created_at TIMESTAMP NOT NULL
+                created_at TIMESTAMP NOT NULL,
+                UNIQUE(poll_id, name)
             );
             """
         )
@@ -98,9 +99,10 @@ def create_tables(db: psycopg.Connection) -> None:
             CREATE TABLE public.voters (
                 poll_id INTEGER NOT NULL,
                 id SERIAL PRIMARY KEY,
-                email TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL,
                 note VARCHAR(1024) NOT NULL,
-                created_at TIMESTAMP NOT NULL
+                created_at TIMESTAMP NOT NULL,
+                UNIQUE(poll_id, email)
             );
             """
         )

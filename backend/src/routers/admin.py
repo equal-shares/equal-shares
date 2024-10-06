@@ -88,7 +88,7 @@ def route_init_poll_from_file(
     dump_voters = seed_data.voters
     dump_projects_votes = seed_data.projects_votes
 
-    for poll_name in ["2024-first-poll-copy-1", "2024-first-poll-copy-2"]:
+    for poll_name in ["2024-first-poll", "2024-first-poll-copy-1", "2024-first-poll-copy-2"]:
         current_poll_id = create_poll(db, poll_name).poll_id
 
         set_poll_active(db, current_poll_id)
