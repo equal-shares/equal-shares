@@ -88,47 +88,48 @@ def route_init_poll_from_file(
     dump_voters = seed_data.voters
     dump_projects_votes = seed_data.projects_votes
 
-    current_poll_id = create_poll(db, "2024-first-poll").poll_id
+    for poll_name in ["2024-first-poll-copy-1", "2024-first-poll-copy-2"]:
+        current_poll_id = create_poll(db, poll_name).poll_id
 
-    set_poll_active(db, current_poll_id)
+        set_poll_active(db, current_poll_id)
 
-    settings = get_settings(db)
-    settings.max_total_points = 3000000
-    settings.points_step = 1000
-    update_settings(db, settings)
+        settings = get_settings(db)
+        settings.max_total_points = 3000000
+        settings.points_step = 1000
+        update_settings(db, settings)
 
-    projects = {}
-    for dump_project in dump_projects:
-        project = create_project(
-            db,
-            name=dump_project["name"],
-            min_points=dump_project["min_points"],
-            max_points=dump_project["max_points"],
-            description_1=dump_project["description_1"],
-            description_2=dump_project["description_2"],
-            fixed=dump_project["fixed"],
-            order_number=dump_project["order_number"],
-        )
-        projects[dump_project["id"]] = project
-
-    for dump_voter in dump_voters:
-        votes = [vote for vote in dump_projects_votes if vote["voter_id"] == dump_voter["id"]]
-        vote_input = [
-            VoteProjectInput(
-                poll_id=current_poll_id,
-                project_id=projects[dump_vote["project_id"]].project_id,
-                points=dump_vote["points"],
-                rank=dump_vote["rank"],
+        projects = {}
+        for dump_project in dump_projects:
+            project = create_project(
+                db,
+                name=dump_project["name"],
+                min_points=dump_project["min_points"],
+                max_points=dump_project["max_points"],
+                description_1=dump_project["description_1"],
+                description_2=dump_project["description_2"],
+                fixed=dump_project["fixed"],
+                order_number=dump_project["order_number"],
             )
-            for dump_vote in votes
-        ]
+            projects[dump_project["id"]] = project
 
-        save_voter_votes(
-            db,
-            email=dump_voter["email"],
-            note="",
-            projects=vote_input,
-        )
+        for dump_voter in dump_voters:
+            votes = [vote for vote in dump_projects_votes if vote["voter_id"] == dump_voter["id"]]
+            vote_input = [
+                VoteProjectInput(
+                    poll_id=current_poll_id,
+                    project_id=projects[dump_vote["project_id"]].project_id,
+                    points=dump_vote["points"],
+                    rank=dump_vote["rank"],
+                )
+                for dump_vote in votes
+            ]
+
+            save_voter_votes(
+                db,
+                email=dump_voter["email"],
+                note="",
+                projects=vote_input,
+            )
 
     return {
         "projects": get_projects(db),
