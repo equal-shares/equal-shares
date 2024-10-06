@@ -84,9 +84,9 @@ def route_init_poll_from_file(
     import src.routers.seed_data as seed_data
 
     return {
-        "projects": json.dumps(seed_data.projects),
-        "voters": json.dumps(seed_data.voters),
-        "projects_votes": json.dumps(seed_data.projects_votes),
+        "projects": json.dumps(seed_data.projects, ensure_ascii=False),
+        "voters": json.dumps(seed_data.voters, ensure_ascii=False),
+        "projects_votes": json.dumps(seed_data.projects_votes, ensure_ascii=False),
     }
 
 
