@@ -88,7 +88,7 @@ def route_init_poll_from_file(
     dump_voters = seed_data.voters
     dump_projects_votes = seed_data.projects_votes
 
-    current_poll_id = 1
+    current_poll_id = create_poll(db, "2024-first-poll").poll_id
 
     set_poll_active(db, current_poll_id)
 
@@ -116,7 +116,7 @@ def route_init_poll_from_file(
         vote_input = [
             VoteProjectInput(
                 poll_id=current_poll_id,
-                project_id=projects[dump_vote["id"]].project_id,
+                project_id=projects[dump_vote["project_id"]].project_id,
                 points=dump_vote["points"],
                 rank=dump_vote["rank"],
             )
