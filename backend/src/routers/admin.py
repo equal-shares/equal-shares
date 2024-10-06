@@ -11,6 +11,7 @@ from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, Upload
 from src.config import config
 from src.database import db_dependency
 from src.models import (
+    VoteProjectInput,
     check_project_exists,
     create_poll,
     create_project,
@@ -25,6 +26,8 @@ from src.models import (
     get_projects,
     get_settings,
     get_tables_exists,
+    get_votes,
+    save_voter_votes,
     set_poll_active,
     update_settings,
 )
@@ -79,14 +82,57 @@ def route_create_tables(
 def route_init_poll_from_file(
     db: psycopg.Connection = Depends(db_dependency),
 ) -> dict:
-    import json
-
     import src.routers.seed_data as seed_data
 
+    dump_projects = seed_data.projects
+    dump_voters = seed_data.voters
+    dump_projects_votes = seed_data.projects_votes
+
+    current_poll_id = 1
+
+    set_poll_active(db, current_poll_id)
+
+    settings = get_settings(db)
+    settings.max_total_points = 3000000
+    settings.points_step = 1000
+    update_settings(db, settings)
+
+    projects = {}
+    for dump_project in dump_projects:
+        project = create_project(
+            db,
+            name=dump_project["name"],
+            min_points=dump_project["min_points"],
+            max_points=dump_project["max_points"],
+            description_1=dump_project["description_1"],
+            description_2=dump_project["description_2"],
+            fixed=dump_project["fixed"],
+            order_number=dump_project["order_number"],
+        )
+        projects[dump_project["id"]] = project
+
+    for dump_voter in dump_voters:
+        votes = [vote for vote in dump_projects_votes if vote["voter_id"] == dump_voter["id"]]
+        vote_input = [
+            VoteProjectInput(
+                poll_id=current_poll_id,
+                project_id=projects[dump_vote["id"]].project_id,
+                points=dump_vote["points"],
+                rank=dump_vote["rank"],
+            )
+            for dump_vote in votes
+        ]
+
+        save_voter_votes(
+            db,
+            email=dump_voter["email"],
+            note="",
+            projects=vote_input,
+        )
+
     return {
-        "projects": json.dumps(seed_data.projects, ensure_ascii=False),
-        "voters": json.dumps(seed_data.voters, ensure_ascii=False),
-        "projects_votes": json.dumps(seed_data.projects_votes, ensure_ascii=False),
+        "projects": get_projects(db),
+        "votes": get_votes(db),
     }
 
 
