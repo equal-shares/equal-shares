@@ -1,7 +1,6 @@
 import logging
 
 from src.algorithm.computation import min_max_equal_shares
-from src.algorithm.average_first import average_first
 from src.logger import LoggerName, get_logger
 
 voters = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -118,16 +117,10 @@ def main() -> None:
     get_logger(LoggerName.ALGORITHM).addHandler(logging.StreamHandler())
 
     winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
-        voters,
-        cost_min_max,
-        budget,
-        bids_without_zeros,
-        use_plt=True
+        voters, cost_min_max, budget, bids_without_zeros, use_plt=True
     )
-    total_allocation = sum([allocation for project,allocation in winners_allocations.items()])
-    print(
-        f"\nwinners_allocations={winners_allocations}\ntotal_allocation={total_allocation}"
-    )
+    total_allocation = sum([allocation for project, allocation in winners_allocations.items()])
+    print(f"\nwinners_allocations={winners_allocations}\ntotal_allocation={total_allocation}")
 
 
 if __name__ == "__main__":
