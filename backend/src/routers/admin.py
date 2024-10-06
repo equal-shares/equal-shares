@@ -75,6 +75,21 @@ def route_create_tables(
     return {"status": "ok", "message": "Tables have been created"}
 
 
+@router.put("/init-poll-from-file")
+def route_init_poll_from_file(
+    db: psycopg.Connection = Depends(db_dependency),
+) -> dict:
+    import json
+
+    import src.routers.seed_data as seed_data
+
+    return {
+        "projects": json.dumps(seed_data.projects),
+        "voters": json.dumps(seed_data.voters),
+        "projects_votes": json.dumps(seed_data.projects_votes),
+    }
+
+
 @router.get("/polls/list")
 def route_get_polls_list(
     admin_key: UUID = Query(description="key for authentication of admin"),
