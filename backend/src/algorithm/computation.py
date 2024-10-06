@@ -30,6 +30,7 @@ def min_max_equal_shares(
             budget (int): The total budget available
             use_plt (bool): if it is True, the function will use matplotlib
 
+    >>> import numpy as np
     >>> voters = [1, 2]
     >>> cost_min_max=[{11: (200, 300)}, {12: (300,400)}, {13: (100,150)}]
     >>> bids = {11: {1: 500, 2: 200}, 12: {1: 300, 2: 300}, 13: {2: 100}}

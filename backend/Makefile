@@ -35,7 +35,8 @@ fix-lint: fix lint
 
 # Run the tests for the backend
 test:
-	python -m pytest
+	poetry run python -m doctest src/algorithm/**.py
+	poetry run pytest
 
 # Run examples
 run-algorithm:

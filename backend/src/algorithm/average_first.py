@@ -36,6 +36,7 @@ def average_first(
             budget (int): The total budget available
             use_plt (bool): if it is True, the function will use matplotlib
 
+    >>> import numpy as np
     >>> voters = [1, 2]
     >>> cost_min_max=[{11: (200, 500)}, {12: (300,300)}, {13: (100,150)}]
     >>> bids = {11: {1: 500, 2: 200}, 12: {1: 300, 2: 300}, 13: {2: 100}}
@@ -44,8 +45,8 @@ def average_first(
     >>> winners_allocations, candidates_payments_per_voter = average_first(
     ...     voters, cost_min_max, 900, bids, use_plt=False
     ... )
-    >>> {k: np.round(v) for k, v in winners_allocations.items()}  # {11: 499.0, 12: 300, 13: 100}
-    {11: 350.0, 12: 300.0, 13: 100}
+    >>> {k: np.round(v) for k, v in winners_allocations.items()}  # {11: 499, 12: 300, 13: 100}
+    {11: 350, 12: 300, 13: 100}
     """
     projects_min_costs = get_project_min_costs(cost_min_max)
     bids_not_zero = remove_zero_bids(bids)

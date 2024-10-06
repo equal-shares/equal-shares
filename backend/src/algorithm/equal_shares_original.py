@@ -19,12 +19,13 @@ def equal_shares(voters: list, projects: list, cost: dict, approvers: dict, tota
 
     Example:
         >>> equal_shares(
-        >>>    voters=["v1", "v2", "v3"],
-        >>>    projects=["p1", "p2", "p3"],
-        >>>    cost={"p1": 100, "p2": 50, "p3": 50},
-        >>>    approvers={"p1": ["v1", "v2"], "p2": ["v1"], "p3": ["v3"]},
-        >>>    total_budget=150)
-        ["p1", "p3"]
+        ...    voters=["v1", "v2", "v3"],
+        ...    projects=["p1", "p2", "p3"],
+        ...    cost={"p1": 100, "p2": 50, "p3": 50},
+        ...    approvers={"p1": ["v1", "v2"], "p2": ["v1"], "p3": ["v3"]},
+        ...    total_budget=150
+        ... )
+        ['p1', 'p3']
 
     """
     mes = equal_shares_fixed_budget(voters, projects, cost, approvers, total_budget)
