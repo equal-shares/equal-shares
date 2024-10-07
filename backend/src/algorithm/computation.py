@@ -38,7 +38,7 @@ def min_max_equal_shares(
     ...     voters, cost_min_max, 900, bids, use_plt=False
     ... )
     >>> {k:np.round(v) for k,v in winners_allocations.items()}
-    {11: 499.0, 12: 300, 13: 100}
+    {11: 499, 12: 300, 13: 100}
     """
     projects_min_costs = get_project_min_costs(cost_min_max)
     bids_not_zero = remove_zero_bids(bids)
@@ -52,4 +52,9 @@ def min_max_equal_shares(
 
     if use_plt:
         plot_bid_data(bids_not_zero, cost_min_max, averages, winners_allocations)
-    return winners_allocations, candidates_payments_per_voter
+
+    rounded_winners_allocations = {
+        project_id: int(allocation) for project_id, allocation in winners_allocations.items()
+    }
+
+    return rounded_winners_allocations, candidates_payments_per_voter
