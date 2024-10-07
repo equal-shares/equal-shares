@@ -370,7 +370,11 @@ def _report_save_input_for_algorithm(
     for project_id in projects.keys():
         bids[project_id] = {}
         for vote in votes:
-            bids[project_id][vote.voter.voter_id] = vote.projects[project_id].points
+            found_project_voute = [item for item in vote.projects if item.project_id == project_id]
+            if len(found_project_voute) == 0:
+                bids[project_id][vote.voter.voter_id] = 0
+            else:
+                bids[project_id][vote.voter.voter_id] = found_project_voute[0].points
 
     input_for_algorithm = PublicEqualSharesInput(
         voters=[vote.voter.voter_id for vote in votes],
