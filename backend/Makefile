@@ -38,6 +38,10 @@ test:
 	poetry run python -m doctest src/algorithm/**.py
 	poetry run pytest
 
+# Run the load test
+test-locust:
+	poetry run locust --host https://api.arielcs.xyz
+
 # Run examples
 run-algorithm:
 	poetry run python -m src run-algorithm ./input_for_algorithm.json
