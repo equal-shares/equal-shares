@@ -366,11 +366,17 @@ def _report_save_data_as_csv(report: Report, projects: dict[int, Project], votes
 def _report_save_input_for_algorithm(
     report: Report, settings: Settings, projects: dict[int, Project], votes: list[VoteData]
 ) -> None:
+    bids: dict[int, dict[int, int]] = {}
+    for project_id in projects.keys():
+        bids[project_id] = {}
+        for vote in votes:
+            bids[project_id][vote.voter.voter_id] = vote.projects[project_id].points
+
     input_for_algorithm = PublicEqualSharesInput(
         voters=[vote.voter.voter_id for vote in votes],
         cost_min_max=[{project.project_id: (project.min_points, project.max_points)} for project in projects.values()],
         budget=settings.max_total_points,
-        bids={vote.voter.voter_id: {project.project_id: project.points for project in vote.projects} for vote in votes},
+        bids=bids,
     )
 
     report.append_text_to_file(
