@@ -32,19 +32,13 @@ class CreateTokenResponse(BaseModel):
 
 class LoadTestUser(HttpUser):
     user_email: str
-    already_run: bool = False
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.user_email = fake_emails.generate()
-        self.already_run = False
 
     @task
     def full_form(self) -> None:
-        if self.already_run:
-            return
-        self.already_run = True
-
         self.client.get("/health-check")
 
         res = self.client.get(f"/admin/create-token?admin_key={LOCUST_ADMIN_KEY}&email={self.user_email}")
@@ -62,3 +56,5 @@ class LoadTestUser(HttpUser):
 
         if res.status_code != 200:
             raise Exception("Failed to get form data")
+
+        self.stop()
