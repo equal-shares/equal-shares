@@ -5,10 +5,10 @@ export default function NotAuthenticated() {
     <Container component="main" maxWidth={false} sx={{ maxWidth: 800 }}>
       <div className="justify-items-center item-center">
         <Typography className="text-center" variant="h3" component="h1" gutterBottom>
-          בבקשה להתחבר קודם
+          כדי להצביע במערכת התקציב ולהיכנס להגרלה
         </Typography>
         <Typography className="text-center" variant="h3" component="h1" gutterBottom>
-          כדי הצביע צריך קודם להתחבר
+          אנא התחבר תחילה
         </Typography>
       </div>
     </Container>
