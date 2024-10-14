@@ -247,7 +247,7 @@ export default function MainPage({ email, token }: Props) {
 
   return (
     <Container component="main" maxWidth={false}>
-      <div className="justify-items-center item-center">
+      <div className="justify-items-center item-center max-w-[90vw]">
         <Typography className="text-center" variant="h3" component="h1" gutterBottom>
           דירוג פרוייקטים
         </Typography>
