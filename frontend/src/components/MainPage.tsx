@@ -246,7 +246,7 @@ export default function MainPage({ email, token }: Props) {
   };
 
   return (
-    <Container component="main" maxWidth={false} sx={{ maxWidth: 800 }}>
+    <Container component="main" maxWidth={false}>
       <div className="justify-items-center item-center">
         <Typography className="text-center" variant="h3" component="h1" gutterBottom>
           דירוג פרוייקטים
