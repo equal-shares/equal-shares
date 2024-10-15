@@ -269,9 +269,7 @@ export default function MainPage({ email, token }: Props) {
             </div>
             <div>
               {markedProjects.map((project) => (
-                <div
-                key={project.id}
-                  >
+                <div key={project.id}>
                   <ProjectCard
                     project={project}
                     pointsStep={pointsStep}
@@ -281,28 +279,26 @@ export default function MainPage({ email, token }: Props) {
                     markedOnChange={markedOnChange}
                   />
                 </div>
-                ))}
-                {unmarkedProjects.length > 0 && (
-                  <>
-                    <div className="mt-[30px]"></div>
-                    {unmarkedProjects.map((project) => (
-                      <div
-                        key={project.id}
-                      >
-                        <ProjectCard
-                          project={project}
-                          pointsStep={pointsStep}
-                          pointsSliderOnChange={pointsSliderOnChange}
-                          pointsBoxOnChange={pointsBoxOnChange}
-                          pointsBoxOnBlur={pointsBoxOnBlur}
-                          markedOnChange={markedOnChange}
-                          setDragDisabled={setDragDisabled}
-                        />
-                      </div>
-                    ))}
-                  </>
-                )}
-              </div>
+              ))}
+              {unmarkedProjects.length > 0 && (
+                <>
+                  <div className="mt-[30px]"></div>
+                  {unmarkedProjects.map((project) => (
+                    <div key={project.id}>
+                      <ProjectCard
+                        project={project}
+                        pointsStep={pointsStep}
+                        pointsSliderOnChange={pointsSliderOnChange}
+                        pointsBoxOnChange={pointsBoxOnChange}
+                        pointsBoxOnBlur={pointsBoxOnBlur}
+                        markedOnChange={markedOnChange}
+                        setDragDisabled={setDragDisabled}
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
             <div className="mt-[10px] flex justify-center items-center">
               <div className="w-[500px]">
                 <Input

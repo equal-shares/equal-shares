@@ -58,9 +58,7 @@ export default function ProjectCard({
             <div>
               <Grid container spacing={2} alignItems="center">
                 <Grid item md={8} xs={6}>
-                  <div
-                    className="w-[85%] pr-[15%]"
-                  >
+                  <div className="w-[85%] pr-[15%]">
                     <Slider
                       value={project.points}
                       min={project.min_points}
