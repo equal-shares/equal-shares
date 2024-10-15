@@ -59,7 +59,7 @@ export default function ProjectCard({
             </Typography>
             <div>
               <Grid container spacing={2} alignItems="center">
-                <Grid item md={8} xs={12}>
+                <Grid item md={8} xs={6}>
                   <div
                     className="w-[85%] pr-[15%]"
                     onMouseEnter={() => setDragDisabled(true)}
@@ -84,7 +84,7 @@ export default function ProjectCard({
                     />
                   </div>
                 </Grid>
-                <Grid item md={4} xs={12}>
+                <Grid item md={4} xs={6}>
                   <Input
                     value={project.points_text}
                     size="small"
