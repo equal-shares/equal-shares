@@ -247,41 +247,135 @@ flowchart LR
 ## Requirements
 
 ### For Using Locally
+1. Git
 
-* docker
+   - Installation:
+
+     ```bash
+
+     sudo apt-get update
+
+     sudo apt-get install git
+
+     ```
+
+   - Verify installation:
+
+     ```bash
+
+     git --version
+
+     ```
+
+2. Docker
+
+   - Installation:
+
+     ```bash
+
+     # Add Docker's official GPG key:
+
+     sudo apt-get update
+
+     sudo apt-get install ca-certificates curl
+
+     sudo install -m 0755 -d /etc/apt/keyrings
+
+     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+
+     sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+     # Add the repository to Apt sources:
+
+     echo \
+
+       "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+
+       $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+
+       sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+     sudo apt-get update
+
+     # Install Docker packages:
+
+     sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+     ```
+
+   - Set up Docker:
+
+     ```bash
+
+     # Start the Docker service
+
+     sudo systemctl start docker
+
+     # Verify that Docker is running
+
+     sudo systemctl status docker
+
+     # Enable Docker to start on boot
+
+     sudo systemctl enable docker
+
+     # Verify the installation
+
+     sudo docker run hello-world
+
+     ```
 
 ### For Development
 
 * conda
 * node 21.5.0
 
-## Installation - Local
-
-Run the following commands to install:
+1. Clone the repository:
 
 ```bash
-git clone git@github.com:equal-shares/equal-shares.git
+
+git clone https://github.com/equal-shares/equal-shares.git
+
 cd equal-shares
+
 ```
 
-Create or Copy the RSA keys of the API to the backend directory.
+2. Generate or copy the RSA keys for the API:
 
-* ./backend/equal-shares-api-private-key.pem
-* ./backend/equal-shares-api-public-key.pem
+   To generate new keys:
 
-Then run the following commands to install and run the services:
+   ```bash
+
+    cd backend
+    ssh-keygen -t rsa -b 2048 -f equal-shares-api-private-key.pem
+    mv equal-shares-api-private-key.pem.pub equal-shares-api-public-key.pem
+    cd ..
+
+   ```
+
+   Alternatively, if you have existing keys, copy them to:
+
+   - ./backend/equal-shares-api-private-key.pem
+
+   - ./backend/equal-shares-api-public-key.pem
+
+3. Run the following command to install and run the services:
 
 ```bash
-docker compose -f dev.docker-compose.yaml up --build
+
+sudo docker compose -f dev.docker-compose.yaml up --build
+
 ```
 
-or For Linux \ MacOS:
+or For Linux / MacOS:
 
 ```bash
+
 make serve
+
 ```
 
-For Windows run the script file `windows-serve.bat`
+For Windows, run the script file windows-serve.bat
 
 ### For Development
 
