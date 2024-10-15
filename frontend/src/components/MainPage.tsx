@@ -292,7 +292,6 @@ export default function MainPage({ email, token }: Props) {
                         pointsBoxOnChange={pointsBoxOnChange}
                         pointsBoxOnBlur={pointsBoxOnBlur}
                         markedOnChange={markedOnChange}
-                        setDragDisabled={setDragDisabled}
                       />
                     </div>
                   ))}
