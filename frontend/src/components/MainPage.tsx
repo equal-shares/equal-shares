@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { DragDropContext, Droppable, Draggable, DropResult } from 'react-beautiful-dnd';
 
 import { DataResponse, Project } from '../schemas';
 import { postDataRequest, postVoteRequest } from '../api';
@@ -42,7 +41,6 @@ export default function MainPage({ email, token }: Props) {
   const [result, setResult] = useState<{ [key: number]: number } | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
 
-  const [dragDisabled, setDragDisabled] = useState<boolean>(false);
   const [sendingRequest, setSendingRequest] = useState<boolean>(false);
 
   const availablePoints = projects.reduce((acc, project) => acc - project.points, maxTotalPoints);
@@ -164,45 +162,6 @@ export default function MainPage({ email, token }: Props) {
     setProjects(sortedProjects([...newProjects]));
   };
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) {
-      return;
-    }
-
-    const draggedProject = projects[result.source.index - 1];
-    const destinationProject = projects[result.destination.index - 1];
-
-    if (draggedProject.fixed || destinationProject.fixed) {
-      return;
-    }
-
-    if (draggedProject.marked !== destinationProject.marked) {
-      if (destinationProject.marked) {
-        if (availablePoints - draggedProject.min_points < 0) {
-          toast('אין מספיק יתרת תקציב להסיף את הפרוייקט הזה, הסר מפרוייקט אחר', {
-            type: 'error',
-            toastId: TOAST_ID_MAX_POINTS,
-          });
-          return;
-        }
-      }
-      draggedProject.marked = destinationProject.marked;
-      draggedProject.points = draggedProject.marked ? draggedProject.min_points : 0;
-      draggedProject.points_text = draggedProject.points.toString();
-    }
-
-    const reorderedProjects = Array.from(projects);
-    const [removed] = reorderedProjects.splice(result.source.index - 1, 1);
-    reorderedProjects.splice(result.destination.index - 1, 0, removed);
-
-    const sortedProjects = reorderedProjects.map((project, index) => {
-      project.rank = index + 1;
-      return project;
-    });
-
-    setProjects(sortedProjects);
-  };
-
   const resetVoteOnClick = () => {
     if (sendingRequest) {
       return;
@@ -308,69 +267,42 @@ export default function MainPage({ email, token }: Props) {
                 <Button onClick={resetVoteOnClick}>איפוס הכל</Button>
               </ButtonGroup>
             </div>
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="droppable">
-                {(provided) => (
-                  <div {...provided.droppableProps} ref={provided.innerRef}>
-                    {markedProjects.map((project) => (
-                      <Draggable
+            <div>
+              {markedProjects.map((project) => (
+                <div
+                key={project.id}
+                  >
+                  <ProjectCard
+                    project={project}
+                    pointsStep={pointsStep}
+                    pointsSliderOnChange={pointsSliderOnChange}
+                    pointsBoxOnChange={pointsBoxOnChange}
+                    pointsBoxOnBlur={pointsBoxOnBlur}
+                    markedOnChange={markedOnChange}
+                  />
+                </div>
+                ))}
+                {unmarkedProjects.length > 0 && (
+                  <>
+                    <div className="mt-[30px]"></div>
+                    {unmarkedProjects.map((project) => (
+                      <div
                         key={project.id}
-                        draggableId={project.id.toString()}
-                        index={project.rank}
-                        isDragDisabled={dragDisabled}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={provided.draggableProps.style}>
-                            <ProjectCard
-                              project={project}
-                              pointsStep={pointsStep}
-                              pointsSliderOnChange={pointsSliderOnChange}
-                              pointsBoxOnChange={pointsBoxOnChange}
-                              pointsBoxOnBlur={pointsBoxOnBlur}
-                              markedOnChange={markedOnChange}
-                              setDragDisabled={setDragDisabled}
-                            />
-                          </div>
-                        )}
-                      </Draggable>
+                      >
+                        <ProjectCard
+                          project={project}
+                          pointsStep={pointsStep}
+                          pointsSliderOnChange={pointsSliderOnChange}
+                          pointsBoxOnChange={pointsBoxOnChange}
+                          pointsBoxOnBlur={pointsBoxOnBlur}
+                          markedOnChange={markedOnChange}
+                          setDragDisabled={setDragDisabled}
+                        />
+                      </div>
                     ))}
-                    {unmarkedProjects.length > 0 && (
-                      <>
-                        <div className="mt-[30px]"></div>
-                        {unmarkedProjects.map((project) => (
-                          <Draggable
-                            key={project.id}
-                            draggableId={project.id.toString()}
-                            index={project.rank}>
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                style={provided.draggableProps.style}>
-                                <ProjectCard
-                                  project={project}
-                                  pointsStep={pointsStep}
-                                  pointsSliderOnChange={pointsSliderOnChange}
-                                  pointsBoxOnChange={pointsBoxOnChange}
-                                  pointsBoxOnBlur={pointsBoxOnBlur}
-                                  markedOnChange={markedOnChange}
-                                  setDragDisabled={setDragDisabled}
-                                />
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                      </>
-                    )}
-                    {provided.placeholder}
-                  </div>
+                  </>
                 )}
-              </Droppable>
-            </DragDropContext>
+              </div>
             <div className="mt-[10px] flex justify-center items-center">
               <div className="w-[500px]">
                 <Input

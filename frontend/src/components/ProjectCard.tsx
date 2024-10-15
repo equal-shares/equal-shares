@@ -21,7 +21,6 @@ export type ProjectCardProps = {
   pointsBoxOnChange: (project: Project, textValue: string) => void;
   pointsBoxOnBlur: (project: Project) => void;
   markedOnChange: (project: Project) => void;
-  setDragDisabled: (disabled: boolean) => void;
 };
 
 export default function ProjectCard({
@@ -31,7 +30,6 @@ export default function ProjectCard({
   pointsBoxOnChange,
   pointsBoxOnBlur,
   markedOnChange,
-  setDragDisabled,
 }: ProjectCardProps) {
   return (
     <Card className="my-[4px]" sx={{ boxShadow: 3 }}>
@@ -62,8 +60,7 @@ export default function ProjectCard({
                 <Grid item md={8} xs={6}>
                   <div
                     className="w-[85%] pr-[15%]"
-                    onMouseEnter={() => setDragDisabled(true)}
-                    onMouseLeave={() => setDragDisabled(false)}>
+                  >
                     <Slider
                       value={project.points}
                       min={project.min_points}
