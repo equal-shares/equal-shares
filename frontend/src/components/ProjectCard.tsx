@@ -88,7 +88,7 @@ export default function ProjectCard({
                   <Input
                     value={project.points_text}
                     size="small"
-                    sx={{ input: { textAlign: 'center' } }}
+                    sx={{ input: { fontSize: '12px', textAlign: 'center' } }}
                     inputProps={{
                       step: pointsStep,
                       min: project.min_points,
