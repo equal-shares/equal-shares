@@ -1,5 +1,6 @@
-import json, logging
-from src.algorithm.public import PublicEqualSharesInput, PublicEqualSharesResponse, public_equal_shares
+import json
+import logging
+from src.algorithm.public import PublicEqualSharesInput
 from src.logger import LoggerName, get_logger
 
 from src.algorithm.computation import min_max_equal_shares
@@ -18,7 +19,7 @@ def get_bid_sums(voters: list, bids: dict) -> dict:
     return bid_sums
 
 
-def run_json_example(input_json_path:str, results_json_path:str=None):
+def run_json_example(input_json_path: str, results_json_path: str = None):
     with open(input_json_path, "r") as f:
         data_json = json.load(f)
     # print(data)
@@ -26,7 +27,7 @@ def run_json_example(input_json_path:str, results_json_path:str=None):
 
     bid_sums = get_bid_sums(data.voters, data.bids)
     print("bid sums: ", bid_sums, "\n")
-    
+
     project_min_costs = get_project_min_costs(data.cost_min_max)
 
     averages = calculate_average_bids(data.bids, data.voters)
@@ -59,7 +60,7 @@ def run_json_example(input_json_path:str, results_json_path:str=None):
     #         json.dump(res.model_dump()["results"], f, indent=2)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     get_logger(LoggerName.ALGORITHM).setLevel(logging.INFO)
     get_logger(LoggerName.ALGORITHM).addHandler(logging.StreamHandler())
 
