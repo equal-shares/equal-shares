@@ -42,9 +42,13 @@ test:
 test-locust:
 	poetry run locust --host https://api.arielcs.xyz
 
-# Run examples
+# Run the algorithm
 run-algorithm:
 	poetry run python -m src run-algorithm ./input_for_algorithm.json
 
+run-algorithm-with-result:
+	poetry run python -m src run-algorithm ./input_for_algorithm.json results.json
+
+# Run the examples
 examples-run-algorithm:
 	python examples/algorithm.py
