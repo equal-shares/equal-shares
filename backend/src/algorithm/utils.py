@@ -131,6 +131,22 @@ def get_project_min_costs(cost_min_max: list) -> dict:
     return projects_min_costs
 
 
+def get_project_max_costs(cost_min_max: list) -> dict:
+    """
+    Convert the cost-min-max format
+    to a dict that maps each project to its minimum cost.
+
+    >>> cost_min_max=[{11: (200, 300)}, {12: (300,400)}, {13: (100,150)}]
+    >>> get_project_max_costs(cost_min_max)
+    {11: 300, 12: 400, 13: 150}
+    """
+    projects_max_costs = {}
+    for item in copy.deepcopy(cost_min_max):
+        project_id, (_, max_value) = item.popitem()
+        projects_max_costs[project_id] = max_value
+    return projects_max_costs
+
+
 def check_allocations(cost_min_max: list[dict[int, tuple[int, int]]], winners_allocations: dict[int, int]) -> bool:
     """
     Inputs:
