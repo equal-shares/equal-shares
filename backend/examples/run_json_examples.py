@@ -29,7 +29,7 @@ def normalize_bids(voters: list, bids: dict, bid_sums: dict, budget: int) -> dic
     return normalized_project_bids
 
 
-def run_json_example(input_json_path: str, results_json_path: str = None):
+def run_json_example(input_json_path: str, results_json_path: str = "") -> None:
     with open(input_json_path, "r") as f:
         data_json = json.load(f)
     # print(data)
