@@ -35,11 +35,20 @@ fix-lint: fix lint
 
 # Run the tests for the backend
 test:
-	python -m pytest
+	poetry run python -m doctest src/algorithm/**.py
+	poetry run pytest
 
-# Run examples
+# Run the load test
+test-locust:
+	poetry run locust --host https://api.arielcs.xyz
+
+# Run the algorithm
 run-algorithm:
-	poetry run python -m src run-algorithm ./input_for_algorithm.json
+	poetry run python -m src run-algorithm input_for_algorithm.json
 
+run-algorithm-with-result:
+	poetry run python -m src run-algorithm input_for_algorithm.json results.json
+
+# Run the examples
 examples-run-algorithm:
 	python examples/algorithm.py

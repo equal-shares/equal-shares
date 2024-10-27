@@ -60,4 +60,4 @@ def run_algorithm_command() -> None:
 
     if results_json_path:
         with open(results_json_path, "w") as f:
-            json.dump(res.model_dump(), f)
+            json.dump(res.model_dump()["results"], f, indent=2)

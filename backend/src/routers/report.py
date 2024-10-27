@@ -183,6 +183,30 @@ def get_report_route(
     )
 
 
+@router.get("/single-report")
+def single_report_route(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+) -> Response:
+    if config.admin_key != admin_key:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized")
+
+    report_id = reports_storage.create_report()
+
+    create_report_task(report_id)
+
+    report = reports_storage.get_report(report_id)
+
+    content = report.get_content()
+
+    reports_storage.remove_report(report_id)
+
+    return Response(
+        content=content,
+        media_type="application/zip",
+        headers={"Content-Disposition": "attachment; filename=report.zip"},
+    )
+
+
 def create_report_task(report_id: int) -> None:
     with get_db() as db:
         report = reports_storage.get_report(report_id)
@@ -342,11 +366,21 @@ def _report_save_data_as_csv(report: Report, projects: dict[int, Project], votes
 def _report_save_input_for_algorithm(
     report: Report, settings: Settings, projects: dict[int, Project], votes: list[VoteData]
 ) -> None:
+    bids: dict[int, dict[int, int]] = {}
+    for project_id in projects.keys():
+        bids[project_id] = {}
+        for vote in votes:
+            found_project_voute = [item for item in vote.projects if item.project_id == project_id]
+            if len(found_project_voute) == 0:
+                bids[project_id][vote.voter.voter_id] = 0
+            else:
+                bids[project_id][vote.voter.voter_id] = found_project_voute[0].points
+
     input_for_algorithm = PublicEqualSharesInput(
         voters=[vote.voter.voter_id for vote in votes],
         cost_min_max=[{project.project_id: (project.min_points, project.max_points)} for project in projects.values()],
         budget=settings.max_total_points,
-        bids={vote.voter.voter_id: {project.project_id: project.points for project in vote.projects} for vote in votes},
+        bids=bids,
     )
 
     report.append_text_to_file(

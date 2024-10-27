@@ -135,6 +135,8 @@ For Ariel University
   * renew-ssl.sh - renewing the SSL Certificate
   * rest-env-files.sh - copying the environment files to the /app directory
   * restart.sh - restarting the services
+* wp
+  * functions.php - A PHP code for adding the vote website inside `iframe` as Elementor widget. For WordPress
 * dev.docker-compose.yml - for local development
 * environment.yml - conda environment
 * LICENSE - MIT license

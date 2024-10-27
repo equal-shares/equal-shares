@@ -1,9 +1,13 @@
-import copy
 import logging
-import numpy as np
 
 from src.algorithm.equal_shares import equal_shares
-from src.algorithm.utils import calculate_average_bids, check_allocations, plot_bid_data, remove_zero_bids, get_project_min_costs
+from src.algorithm.utils import (
+    calculate_average_bids,
+    check_allocations,
+    get_project_min_costs,
+    plot_bid_data,
+    remove_zero_bids,
+)
 
 logger = logging.getLogger("min_max_equal_shares_logger")
 
@@ -21,16 +25,20 @@ def min_max_equal_shares(
         Args:
             voters (list): A list of voter names.
             cost_min_max (dict): A dictionary mapping project IDs to their min and max costs.
-            bids (dict): A dictionary mapping project IDs to the list of voters who approve them and the cost the voters chose.
+            bids (dict): A dictionary mapping project IDs to the list of voters
+                         who approve them and the cost the voters chose.
             budget (int): The total budget available
             use_plt (bool): if it is True, the function will use matplotlib
-    
+
+    >>> import numpy as np
     >>> voters = [1, 2]
     >>> cost_min_max=[{11: (200, 300)}, {12: (300,400)}, {13: (100,150)}]
     >>> bids = {11: {1: 500, 2: 200}, 12: {1: 300, 2: 300}, 13: {2: 100}}
-    >>> winners_allocations, candidates_payments_per_voter = min_max_equal_shares(voters, cost_min_max, 900, bids, use_plt=False)
+    >>> winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
+    ...     voters, cost_min_max, 900, bids, use_plt=False
+    ... )
     >>> {k:np.round(v) for k,v in winners_allocations.items()}
-    {11: 499.0, 12: 300, 13: 100}
+    {11: 499, 12: 300, 13: 100}
     """
     projects_min_costs = get_project_min_costs(cost_min_max)
     bids_not_zero = remove_zero_bids(bids)
@@ -44,4 +52,9 @@ def min_max_equal_shares(
 
     if use_plt:
         plot_bid_data(bids_not_zero, cost_min_max, averages, winners_allocations)
-    return winners_allocations, candidates_payments_per_voter
+
+    rounded_winners_allocations = {
+        project_id: int(allocation) for project_id, allocation in winners_allocations.items()
+    }
+
+    return rounded_winners_allocations, candidates_payments_per_voter
