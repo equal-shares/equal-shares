@@ -23,8 +23,7 @@ def normalize_bids(voters: list, bids: dict, bid_sums: dict, budget: int) -> dic
     normalized_project_bids = dict()
     for project, project_bids in bids.items():
         normalized_project_bids[project] = {
-            voter: int(bid*budget/bid_sums[voter])
-            for voter, bid in project_bids.items()
+            voter: int(bid * budget / bid_sums[voter]) for voter, bid in project_bids.items()
         }
     return normalized_project_bids
 
