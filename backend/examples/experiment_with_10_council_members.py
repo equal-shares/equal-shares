@@ -3,6 +3,7 @@ import logging
 from src.algorithm.computation import min_max_equal_shares
 from src.algorithm.average_first import average_first
 from src.logger import LoggerName, get_logger
+from src.algorithm.utils import calculate_average_bids, get_project_min_costs
 
 voters = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
@@ -112,22 +113,39 @@ bids_without_zeros = {
 
 budget = 3000000
 
+def get_bid_sums(voters:list, bids:dict)->dict:
+    bid_sums = {}
+    for voter in voters:
+        voter_total_bid = 0
+        for project, project_bids in bids.items():
+            if voter in project_bids:
+                voter_total_bid += project_bids[voter]
+        bid_sums[voter] = voter_total_bid
+    return bid_sums
+
 
 def main() -> None:
     get_logger(LoggerName.ALGORITHM).setLevel(logging.INFO)
     get_logger(LoggerName.ALGORITHM).addHandler(logging.StreamHandler())
 
-    winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
-        voters,
-        cost_min_max,
-        budget,
-        bids_without_zeros,
-        use_plt=True
-    )
-    total_allocation = sum([allocation for project,allocation in winners_allocations.items()])
-    print(
-        f"\nwinners_allocations={winners_allocations}\ntotal_allocation={total_allocation}"
-    )
+    print("bid sums: ", get_bid_sums(voters, bids_without_zeros), "\n")
+    project_min_costs = get_project_min_costs(cost_min_max)
+
+    averages  = calculate_average_bids(bids_without_zeros, voters)
+    total_allocation = sum([allocation for project,allocation in averages.items()])
+    print(f"\naverages: \nwinners_allocations={averages}\ntotal_allocation={total_allocation}")
+
+    mes_winners, candidates_payments_per_voter = min_max_equal_shares(voters, cost_min_max, budget, bids_without_zeros, use_plt=False)
+    total_allocation = sum([allocation for project,allocation in mes_winners.items()])
+    print(f"\nmin_max_equal_shares: \nwinners_allocations={mes_winners}\ntotal_allocation={total_allocation}")
+
+    averagefirst_winners, candidates_payments_per_voter = average_first(voters, cost_min_max, budget, bids_without_zeros, use_plt=False)
+    total_allocation = sum([allocation for project,allocation in averagefirst_winners.items()])
+    print(f"\naverage_first: \nwinners_allocations={averagefirst_winners}\ntotal_allocation={total_allocation}")
+
+    print(f"Project,Minimum,Average,AverageThenMES,MES")
+    for project,avg in averages.items():
+        print(f"{project},{project_min_costs[project]},{mes_winners[project]},{averages[project]},{averagefirst_winners[project]}")
 
 
 if __name__ == "__main__":
