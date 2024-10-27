@@ -137,12 +137,14 @@ def main() -> None:
     print(f"\naverages: \nwinners_allocations={averages}\ntotal_allocation={total_allocation}")
 
     mes_winners, candidates_payments_per_voter = min_max_equal_shares(
-        voters, cost_min_max, budget, bids_without_zeros, use_plt=False)
+        voters, cost_min_max, budget, bids_without_zeros, use_plt=False
+    )
     total_allocation = sum([allocation for project, allocation in mes_winners.items()])
     print(f"\nmin_max_equal_shares: \nwinners_allocations={mes_winners}\ntotal_allocation={total_allocation}")
 
     averagefirst_winners, candidates_payments_per_voter = average_first(
-        voters, cost_min_max, budget, bids_without_zeros, use_plt=False)
+        voters, cost_min_max, budget, bids_without_zeros, use_plt=False
+    )
     total_allocation = sum([allocation for project, allocation in averagefirst_winners.items()])
     print(f"\naverage_first: \nwinners_allocations={averagefirst_winners}\ntotal_allocation={total_allocation}")
 
