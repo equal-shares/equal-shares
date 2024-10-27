@@ -18,6 +18,7 @@ def get_bid_sums(voters: list, bids: dict) -> dict:
         bid_sums[voter] = voter_total_bid
     return bid_sums
 
+
 def normalize_bids(voters: list, bids: dict, bid_sums: dict, budget: int) -> dict:
     normalized_project_bids = dict()
     for project, project_bids in bids.items():
@@ -26,7 +27,6 @@ def normalize_bids(voters: list, bids: dict, bid_sums: dict, budget: int) -> dic
             for voter, bid in project_bids.items()
         }
     return normalized_project_bids
-
 
 
 def run_json_example(input_json_path: str, results_json_path: str = None):
