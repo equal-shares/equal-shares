@@ -113,7 +113,8 @@ bids_without_zeros = {
 
 budget = 3000000
 
-def get_bid_sums(voters:list, bids:dict)->dict:
+
+def get_bid_sums(voters: list, bids: dict) -> dict:
     bid_sums = {}
     for voter in voters:
         voter_total_bid = 0
@@ -131,21 +132,27 @@ def main() -> None:
     print("bid sums: ", get_bid_sums(voters, bids_without_zeros), "\n")
     project_min_costs = get_project_min_costs(cost_min_max)
 
-    averages  = calculate_average_bids(bids_without_zeros, voters)
-    total_allocation = sum([allocation for project,allocation in averages.items()])
+    averages = calculate_average_bids(bids_without_zeros, voters)
+    total_allocation = sum([allocation for project, allocation in averages.items()])
     print(f"\naverages: \nwinners_allocations={averages}\ntotal_allocation={total_allocation}")
 
-    mes_winners, candidates_payments_per_voter = min_max_equal_shares(voters, cost_min_max, budget, bids_without_zeros, use_plt=False)
-    total_allocation = sum([allocation for project,allocation in mes_winners.items()])
+    mes_winners, candidates_payments_per_voter = min_max_equal_shares(
+        voters, cost_min_max, budget, bids_without_zeros, use_plt=False)
+    total_allocation = sum([allocation for project, allocation in mes_winners.items()])
     print(f"\nmin_max_equal_shares: \nwinners_allocations={mes_winners}\ntotal_allocation={total_allocation}")
 
-    averagefirst_winners, candidates_payments_per_voter = average_first(voters, cost_min_max, budget, bids_without_zeros, use_plt=False)
-    total_allocation = sum([allocation for project,allocation in averagefirst_winners.items()])
+    averagefirst_winners, candidates_payments_per_voter = average_first(
+        voters, cost_min_max, budget, bids_without_zeros, use_plt=False)
+    total_allocation = sum([allocation for project, allocation in averagefirst_winners.items()])
     print(f"\naverage_first: \nwinners_allocations={averagefirst_winners}\ntotal_allocation={total_allocation}")
 
-    print(f"Project,Minimum,Average,AverageThenMES,MES")
-    for project,avg in averages.items():
-        print(f"{project},{project_min_costs[project]},{mes_winners[project]},{averages[project]},{averagefirst_winners[project]}")
+    print("Project,Minimum,Average,AverageThenMES,MES")
+    for project, avg in averages.items():
+        min_cost = project_min_costs[project]
+        average = averages[project]
+        mes_win = mes_winners[project]
+        avg_win = averagefirst_winners[project]
+        print(f"{project},{min_cost},{mes_win},{average},{avg_win}")
 
 
 if __name__ == "__main__":
