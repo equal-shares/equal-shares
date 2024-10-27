@@ -14,6 +14,7 @@ from src.algorithm.utils import (
     plot_bid_data,
     remove_zero_bids,
 )
+from src.algorithm.equal_shares import CONTINUOUS_COST
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ def average_first(
     use_plt: bool = True,
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """
-    The purpose of min_max_equal_shares function is to convert the input in the received format
+    The purpose of this function is to convert the input in the received format
     to a format suitable for the equal_shares function (Selects the minimum value)
         Args:
             voters (list): A list of voter names.
@@ -63,16 +64,19 @@ def average_first(
         if averages[project_id] >= min_cost:
             allocation = int(averages[project_id])
             winners_allocations[project_id] = allocation
-            projects_min_costs[project_id] = 0
+            projects_min_costs[project_id] = CONTINUOUS_COST
 
             # Update bids:
             bids_not_zero[project_id] = {
-                voter: max(0, bid - allocation) for voter, bid in bids_not_zero[project_id].items()
+                # voter: max(0, bid - allocation) for voter, bid in bids_not_zero[project_id].items()
+                voter: (bid - allocation) for voter, bid in bids_not_zero[project_id].items() if bid>allocation
             }
             budget -= allocation
         else:
             winners_allocations[project_id] = 0
             projects_min_costs[project_id] = min_cost
+    print("projects_min_costs", projects_min_costs)
+    print("bids_not_zero", bids_not_zero)
     winners_additional_allocations, candidates_payments_per_voter = equal_shares(
         voters, projects_min_costs, budget, bids_not_zero
     )
