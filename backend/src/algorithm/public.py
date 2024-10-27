@@ -18,6 +18,10 @@ class PublicEqualSharesResponse(BaseModel):
 
 def public_equal_shares(data: PublicEqualSharesInput) -> PublicEqualSharesResponse:
     results = _run_equal_shares(data.voters, data.cost_min_max, data.budget, data.bids)
+
+    # fix results and make them integers
+    results = {int(k): int(v) for k, v in results.items()}
+
     return PublicEqualSharesResponse(results=results)
 
 
