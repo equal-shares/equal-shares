@@ -68,9 +68,7 @@ def average_first(
 
             # Update bids:
             bids_not_zero[project_id] = {
-                voter: (bid - allocation)
-                for voter, bid in bids_not_zero[project_id].items()
-                if bid > allocation
+                voter: (bid - allocation) for voter, bid in bids_not_zero[project_id].items() if bid > allocation
             }
             budget -= allocation
         else:
