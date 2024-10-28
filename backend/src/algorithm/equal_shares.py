@@ -1,5 +1,6 @@
 import copy
 import logging
+from typing import Any
 
 from src.algorithm.utils import filter_bids, find_max
 
@@ -108,7 +109,7 @@ def break_ties(cost: dict[int, int], bids: dict[int, dict[int, int]], candidates
     return remaining
 
 
-def distribute_cost_among_voters(cost: int, voters_and_budgets: list[tuple[any, float]]) -> list[tuple[any, float]]:
+def distribute_cost_among_voters(cost: float, voters_and_budgets: list[tuple[Any, float]]) -> list[tuple[Any, float]]:
     """
     :argument
         cost (int): the total cost of the project to be funded.
