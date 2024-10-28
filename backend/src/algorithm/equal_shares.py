@@ -178,7 +178,7 @@ def equal_shares_fixed_budget(
     updated_bids = copy.deepcopy(bids)
     updated_cost = copy.deepcopy(projects_costs)
 
-    def debug_totals():
+    def debug_totals() -> None:
         total_allocation = sum(winners_allocations.values())
         total_budget = sum(voters_budgets.values())
         logger.info(
