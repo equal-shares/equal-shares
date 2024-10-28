@@ -1,6 +1,7 @@
 import json
 import logging
 from src.algorithm.public import PublicEqualSharesInput
+from src.algorithm.equal_shares import logger as equal_shares_logger
 from src.logger import LoggerName, get_logger
 
 from src.algorithm.computation import min_max_equal_shares
@@ -50,12 +51,14 @@ def run_json_example(input_json_path: str, results_json_path: str = "") -> None:
     total_allocation = sum([allocation for project, allocation in averages.items()])
     print(f"\naverages: \nwinners_allocations={averages}\ntotal_allocation={total_allocation}")
 
+    print("\n\n=== min_max_equal_shares ===\n")
     mes_winners, candidates_payments_per_voter = min_max_equal_shares(
         data.voters, data.cost_min_max, data.budget, normalized_bids, use_plt=False
     )
     total_allocation = sum([allocation for project, allocation in mes_winners.items()])
     print(f"\nmin_max_equal_shares: \nwinners_allocations={mes_winners}\ntotal_allocation={total_allocation}")
 
+    print("\n\n=== average_first ===\n")
     averagefirst_winners, candidates_payments_per_voter = average_first(
         data.voters, data.cost_min_max, data.budget, normalized_bids, use_plt=False
     )
@@ -78,8 +81,8 @@ def run_json_example(input_json_path: str, results_json_path: str = "") -> None:
 
 
 if __name__ == "__main__":
-    get_logger(LoggerName.ALGORITHM).setLevel(logging.INFO)
-    get_logger(LoggerName.ALGORITHM).addHandler(logging.StreamHandler())
+    equal_shares_logger.setLevel(logging.WARNING)
+    equal_shares_logger.addHandler(logging.StreamHandler())
 
     run_json_example("experiment_with_10_council_members.json", "experiment_with_10_council_members_results.json")
     # run_json_example("experiment_with_200_students.json", "experiment_with_200_students_results.json")
