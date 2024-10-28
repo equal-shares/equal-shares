@@ -108,10 +108,7 @@ def break_ties(cost: dict[int, int], bids: dict[int, dict[int, int]], candidates
     return remaining
 
 
-def distribute_cost_among_voters(
-        cost: int,
-        voters_and_budgets: list[tuple[any, float]]
-) -> list[tuple[any, float]]:
+def distribute_cost_among_voters(cost: int, voters_and_budgets: list[tuple[any, float]]) -> list[tuple[any, float]]:
     """
     :argument
         cost (int): the total cost of the project to be funded.
@@ -139,8 +136,8 @@ def distribute_cost_among_voters(
     num_of_voters = len(voters_and_budgets)
     remaining_cost = cost
     for i, (voter, voter_budget) in enumerate(voters_and_budgets):
-        if voter_budget*(num_of_voters-i) >= remaining_cost:
-            voter_contribution = remaining_cost/(num_of_voters-i)
+        if voter_budget * (num_of_voters - i) >= remaining_cost:
+            voter_contribution = remaining_cost / (num_of_voters - i)
         else:
             voter_contribution = voter_budget
         voters_and_contributions.append((voter, voter_contribution))
@@ -183,8 +180,12 @@ def equal_shares_fixed_budget(
     def debug_totals():
         total_allocation = sum(winners_allocations.values())
         total_budget = sum(voters_budgets.values())
-        logger.info("  *** total_allocation: %s, total_budget: %s, total_total: %s",
-                    total_allocation, total_budget, total_allocation+total_budget)
+        logger.info(
+            "  *** total_allocation: %s, total_budget: %s, total_total: %s",
+            total_allocation,
+            total_budget,
+            total_allocation + total_budget,
+        )
 
     while True:
         # debug_totals()

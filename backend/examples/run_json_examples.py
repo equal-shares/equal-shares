@@ -41,7 +41,7 @@ def run_json_example(input_json_path: str, results_json_path: str = "") -> None:
     normalized_bid_sums = get_bid_sums(data.voters, normalized_bids)
     print("normalized bid sums: ", normalized_bid_sums, "\n")
 
-    # normalized_bids = data.bids
+    normalized_bids = data.bids
 
     project_min_costs = get_project_min_costs(data.cost_min_max)
     project_max_costs = get_project_max_costs(data.cost_min_max)

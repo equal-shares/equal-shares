@@ -54,11 +54,7 @@ def test_min_max_equal_shares_passed_1() -> None:
 
     assert winners_allocations == expected_winners_allocations
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert {k: round(v) for k, v in candidates_payments_per_voter[key].items()} == {
-            k: round(v) for k, v in expected_candidates_payments_per_voter[key].items()
-        }
+    compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
 
 
 def test_min_max_equal_shares_passed_2() -> None:
@@ -80,11 +76,7 @@ def test_min_max_equal_shares_passed_2() -> None:
 
     assert {k: round(v) for k, v in winners_allocations.items()} == expected_winners_allocations
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert {
-            k: round(v) for k, v in candidates_payments_per_voter[key].items()
-        } == expected_candidates_payments_per_voter[key]
+    compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
 
 
 def test_min_max_equal_shares_passed_3() -> None:
@@ -106,9 +98,7 @@ def test_min_max_equal_shares_passed_3() -> None:
 
     assert winners_allocations == expected_winners_allocations
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
 
 
 def test_min_max_equal_shares_passed_4() -> None:
@@ -141,9 +131,7 @@ def test_min_max_equal_shares_passed_4() -> None:
 
     assert winners_allocations == expected_winners_allocations
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
 
 
 def test_min_max_equal_shares_passed_5() -> None:
@@ -165,9 +153,7 @@ def test_min_max_equal_shares_passed_5() -> None:
 
     assert winners_allocations == expected_winners_allocations
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
 
 
 def test_min_max_equal_shares_passed_6() -> None:
@@ -189,9 +175,7 @@ def test_min_max_equal_shares_passed_6() -> None:
 
     assert winners_allocations == expected_winners_allocations
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
 
 
 def test_min_max_equal_shares_passed_7() -> None:
@@ -213,9 +197,7 @@ def test_min_max_equal_shares_passed_7() -> None:
 
     assert winners_allocations == expected_winners_allocations
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
 
 
 def test_min_max_equal_shares_passed_8() -> None:
@@ -241,8 +223,11 @@ def test_min_max_equal_shares_passed_8() -> None:
 
     assert winners_allocations == expected_winners_allocations
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for candidate, payments in candidates_payments_per_voter.items():
+    compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
+
+
+def compare_dicts(outcome, expected):
+    assert outcome.keys() == expected.keys()
+    for candidate, payments in outcome.items():
         for voter, _ in payments.items():
-            assert np.round(candidates_payments_per_voter[candidate][voter]) == \
-                np.round(expected_candidates_payments_per_voter[candidate][voter])
+            assert np.round(outcome[candidate][voter]) == np.round(expected[candidate][voter])
