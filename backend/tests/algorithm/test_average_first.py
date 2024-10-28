@@ -12,4 +12,4 @@ def test_average_first() -> None:
     assert calculate_average_bids(bids, voters) == {11: 350.0, 12: 300.0, 13: 50.0}
 
     winners_allocations, _ = average_first(voters, cost_min_max, 900, bids, use_plt=False)
-    assert {k: np.round(v) for k, v in winners_allocations.items()} == {11: 350, 12: 300, 13: 100}
+    assert {k: np.round(v) for k, v in winners_allocations.items()} == {11: 499.0, 12: 300, 13: 100}

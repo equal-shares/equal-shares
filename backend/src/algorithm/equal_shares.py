@@ -107,15 +107,15 @@ def break_ties(cost: dict[int, int], bids: dict[int, dict[int, int]], candidates
     remaining = [min(remaining)]  # Ensure there is only one remaining project, third the min index project
     return remaining
 
+
 def distribute_cost_among_voters(
         cost: int,
-        voters_and_budgets: list[tuple[any,float]]
-) -> list[tuple[any,float]]:
+        voters_and_budgets: list[tuple[any, float]]
+) -> list[tuple[any, float]]:
     """
     :argument
         cost (int): the total cost of the project to be funded.
         voters_and_budgets: a list of pairs; each pair is (voter_id, voter_budget).
-        
     :return
         a list of pairs; each pair is (voter_id, voter_contribution_to_funding).
 
@@ -132,23 +132,23 @@ def distribute_cost_among_voters(
     >>> distribute_cost_among_voters(66, [("a",11.), ("b",12.), ("c",13.)])
     Traceback (most recent call last):
     ...
-    ValueError: Project not fully funded: cost=66, remaining_cost=30.0, contributions=[('a', 11.0), ('b', 12.0), ('c', 13.0)]
+    ValueError: Project not fully funded: cost=66, remaining_cost=30.0
     """
     voters_and_budgets = sorted(voters_and_budgets, key=lambda x: x[1])  # sort by ascending budget
     voters_and_contributions = []
     num_of_voters = len(voters_and_budgets)
     remaining_cost = cost
-    for i,(voter,voter_budget) in enumerate(voters_and_budgets):
+    for i, (voter, voter_budget) in enumerate(voters_and_budgets):
         if voter_budget*(num_of_voters-i) >= remaining_cost:
             voter_contribution = remaining_cost/(num_of_voters-i)
         else:
             voter_contribution = voter_budget
-        voters_and_contributions.append( (voter, voter_contribution) )
+        voters_and_contributions.append((voter, voter_contribution))
         remaining_cost -= voter_contribution
-    if remaining_cost>1:
-        raise ValueError(f"Project not fully funded: cost={cost}, remaining_cost={remaining_cost}, contributions={voters_and_contributions}")
+    if remaining_cost > 1:
+        raise ValueError(f"Project not fully funded: cost={cost}, remaining_cost={remaining_cost}")
     return voters_and_contributions
-    
+
 
 def equal_shares_fixed_budget(
     voters: list[int],
@@ -183,7 +183,8 @@ def equal_shares_fixed_budget(
     def debug_totals():
         total_allocation = sum(winners_allocations.values())
         total_budget = sum(voters_budgets.values())
-        logger.info("  *** total_allocation: %s, total_budget: %s, total_total: %s", total_allocation, total_budget, total_allocation+total_budget)
+        logger.info("  *** total_allocation: %s, total_budget: %s, total_total: %s",
+                    total_allocation, total_budget, total_allocation+total_budget)
 
     while True:
         # debug_totals()
@@ -318,19 +319,19 @@ def equal_shares_fixed_budget(
         # Deducts from the voters_budget of each voter who chose the current
         # project the relative part for the current project
         #
-        voters_and_budgets=[(voter,voters_budgets[voter]) for voter in chosen_candidate_bids.keys()]
+        voters_and_budgets = [(voter, voters_budgets[voter]) for voter in chosen_candidate_bids.keys()]
         voters_and_contributions = distribute_cost_among_voters(chosen_candidate_cost, voters_and_budgets)
-        for voter,voter_payment in voters_and_contributions:
-        # best_max_payment = chosen_candidate_cost / best_effective_vote_count
-        # for i in chosen_candidate_bids.keys():
-        #     if voters_budgets[i] > best_max_payment:
-        #         voter_payment = best_max_payment
-        #         if chosen_candidate==61:
-        #             logger.info("   Voter %s pays his relative part %s", i, voter_payment)
-        #     else:
-        #         voter_payment = voters_budgets[i]
-        #         if chosen_candidate==61:
-        #             logger.info("   Voter %s pays his entire remaining budget %s", i, voter_payment)
+        for voter, voter_payment in voters_and_contributions:
+            # best_max_payment = chosen_candidate_cost / best_effective_vote_count
+            # for i in chosen_candidate_bids.keys():
+            #     if voters_budgets[i] > best_max_payment:
+            #         voter_payment = best_max_payment
+            #         if chosen_candidate==61:
+            #             logger.info("   Voter %s pays his relative part %s", i, voter_payment)
+            #     else:
+            #         voter_payment = voters_budgets[i]
+            #         if chosen_candidate==61:
+            #             logger.info("   Voter %s pays his entire remaining budget %s", i, voter_payment)
             logger.debug("   Voter %s contributes %s", voter, voter_payment)
             voters_budgets[voter] -= voter_payment
             candidates_payments_per_voter[chosen_candidate][voter] += voter_payment

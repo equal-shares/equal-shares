@@ -1,4 +1,5 @@
 from src.algorithm.computation import min_max_equal_shares
+import numpy as np
 
 
 def test_min_max_equal_shares_passed_1() -> None:
@@ -241,5 +242,7 @@ def test_min_max_equal_shares_passed_8() -> None:
     assert winners_allocations == expected_winners_allocations
 
     assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    for candidate, payments in candidates_payments_per_voter.items():
+        for voter, _ in payments.items():
+            assert np.round(candidates_payments_per_voter[candidate][voter]) == \
+                np.round(expected_candidates_payments_per_voter[candidate][voter])

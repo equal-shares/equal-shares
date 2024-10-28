@@ -2,7 +2,6 @@ import json
 import logging
 from src.algorithm.public import PublicEqualSharesInput
 from src.algorithm.equal_shares import logger as equal_shares_logger
-from src.logger import LoggerName, get_logger
 
 from src.algorithm.computation import min_max_equal_shares
 from src.algorithm.average_first import average_first

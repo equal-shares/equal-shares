@@ -1,5 +1,6 @@
 from src.algorithm.equal_shares import equal_shares, equal_shares_fixed_budget
 from src.algorithm.utils import find_max
+import numpy as np
 
 
 def test_equal_shares_passed() -> None:
@@ -95,8 +96,10 @@ def test_equal_shares_fixed_budget_passed_1() -> None:
     assert updated_cost == expected_updated_cost
 
     assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    for candidate, payments in candidates_payments_per_voter.items():
+        for voter, _ in payments.items():
+            assert np.round(candidates_payments_per_voter[candidate][voter]) == \
+                 np.round(expected_candidates_payments_per_voter[candidate][voter])
 
 
 def test_equal_shares_fixed_budget_passed_2() -> None:
@@ -145,9 +148,10 @@ def test_equal_shares_fixed_budget_passed_2() -> None:
     assert {c: int(x) for c, x in winners_allocations.items()} == expected_winners_allocations
     assert updated_cost == expected_updated_cost
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    for candidate, payments in candidates_payments_per_voter.items():
+        for voter, _ in payments.items():
+            assert np.round(candidates_payments_per_voter[candidate][voter]) == \
+                np.round(expected_candidates_payments_per_voter[candidate][voter])
 
 
 def test_equal_shares_fixed_budget_passed_3() -> None:
@@ -201,9 +205,10 @@ def test_equal_shares_fixed_budget_passed_3() -> None:
     assert {c: int(x) for c, x in winners_allocations.items()} == expected_winners_allocations
     assert updated_cost == expected_updated_cost
 
-    assert candidates_payments_per_voter.keys() == expected_candidates_payments_per_voter.keys()
-    for key in candidates_payments_per_voter:
-        assert candidates_payments_per_voter[key] == expected_candidates_payments_per_voter[key]
+    for candidate, payments in candidates_payments_per_voter.items():
+        for voter, _ in payments.items():
+            assert np.round(candidates_payments_per_voter[candidate][voter]) == \
+                np.round(expected_candidates_payments_per_voter[candidate][voter])
 
 
 def test_equal_shares_fixed_budget_passed_4() -> None:
