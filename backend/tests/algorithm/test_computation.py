@@ -226,7 +226,7 @@ def test_min_max_equal_shares_passed_8() -> None:
     compare_dicts(candidates_payments_per_voter, expected_candidates_payments_per_voter)
 
 
-def compare_dicts(outcome, expected) -> None:
+def compare_dicts(outcome: dict, expected: dict) -> None:
     assert outcome.keys() == expected.keys()
     for candidate, payments in outcome.items():
         for voter, _ in payments.items():
