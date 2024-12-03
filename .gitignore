@@ -16,4 +16,8 @@ node_modules
 backend/equal-shares-api-public-key.pem
 backend/equal-shares-api-private-key.pem
 
+# log files
 *.log
+
+# macOS
+.DS_Store

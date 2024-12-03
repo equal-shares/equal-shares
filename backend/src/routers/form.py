@@ -122,13 +122,27 @@ def route_vote(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project ids")
 
     for vote_project in projects_votes.values():
+        # Check for negative values
+        if vote_project.points < 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="Negative points are not allowed"
+            )
+        
+        # Check points are divisible by points_step
+        if vote_project.points % settings.points_step != 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Points must be divisible by {settings.points_step}"
+            )
+        
+        # Check if the points are in the project range
+        if vote_project.points < project.min_points or vote_project.points > project.max_points:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid points")
+
         project = projects_dict.get(vote_project.id)
         if project is None:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project id")
-
-        if vote_project.points > 0:
-            if vote_project.points < project.min_points or vote_project.points > project.max_points:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid points")
 
     total_points = sum(vote.points for vote in projects_votes.values())
     if total_points > max_total_points:
