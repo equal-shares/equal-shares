@@ -149,9 +149,10 @@ def route_vote(
             if project is None:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project id")
 
-            # Check if the points are in the project range
-            if vote_project.points < project.min_points or vote_project.points > project.max_points:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid points")
+            if vote_project.points > 0:
+                # Check if the points are in the project range
+                if vote_project.points < project.min_points or vote_project.points > project.max_points:
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid points")
 
         total_points = sum(vote.points for vote in projects_votes.values())
         if total_points > max_total_points:
