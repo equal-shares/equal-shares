@@ -113,7 +113,7 @@ def create_tables(db: psycopg.Connection) -> None:
                 poll_id INTEGER NOT NULL,
                 voter_id INTEGER NOT NULL,
                 project_id INTEGER NOT NULL,
-                points INTEGER NOT NULL,
+                points INTEGER NOT NULL CHECK (points >= 0),
                 rank INTEGER NOT NULL,
                 UNIQUE(voter_id, project_id),
                 UNIQUE(voter_id, rank)
