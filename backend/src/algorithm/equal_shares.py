@@ -6,8 +6,8 @@ from src.algorithm.utils import filter_bids, find_max
 
 logger = logging.getLogger("equal_shares_logger")
 
-CONTINUOUS_COST = 1  # A cost that signals that the given project is in its continuous increment phase.
-DISTRIBUTION_PARAMETER_COST = 10000  # A const showing the budget distribution parameter#
+CONTINUOUS_COST = 1  # A constant that signals that the given project is in its continuous increment phase.
+DISTRIBUTION_PARAMETER_COST = 10  # The amount of increase in each voter's budget at each iteration. Smaller = more accurate but longer time.
 
 
 def equal_shares(
