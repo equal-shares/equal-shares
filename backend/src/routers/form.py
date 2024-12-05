@@ -155,8 +155,11 @@ def route_vote(
                     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid points")
 
         total_points = sum(vote.points for vote in projects_votes.values())
-        if total_points > max_total_points:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Total points exceed the limit")
+        if total_points != max_total_points:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="Total points must equal exactly the maximum allowed points"
+            )
 
         ranks = {vote.rank for vote in projects_votes.values()}
         if ranks != set(range(1, len(ranks) + 1)):
