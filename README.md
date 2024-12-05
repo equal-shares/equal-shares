@@ -30,6 +30,7 @@ For Ariel University
     - [For Development](#for-development-1)
   - [Usage](#usage)
     - [Management](#management)
+    - [Voting Rules](#voting-rules)
   - [Development](#development)
     - [Linters and Formatters](#linters-and-formatters)
     - [Testing](#testing)
@@ -451,6 +452,10 @@ In the API Dashbord run /admin/add-projects
 
 Get the Projects and Settings as JSON format: \
 In the API Dashbord run /admin/projects
+
+### Voting Rules
+* All votes must allocate the entire available budget exactly
+* The system will not accept votes where the total allocated points differ from the maximum allowed points
 
 ## Development
 
