@@ -19,6 +19,10 @@ from src.models import (
 from src.schemas import DataResponseSchema, ProjectSchema, VoteRequestBodySchema
 from src.security import verify_valid_email, verify_valid_token
 
+from src.logger import get_logger
+
+logger = get_logger()
+
 router = APIRouter()
 
 
@@ -94,63 +98,90 @@ def route_vote(
     db: psycopg.Connection = Depends(db_dependency),
 ) -> DataResponseSchema:
     """Save vote of voter"""
+    try:
+        logger.info(f"Received vote request - email: {email}")
+        logger.info(f"Vote data: {body}")
 
-    poll = get_active_poll(db)
+        poll = get_active_poll(db)
 
-    if not verify_valid_email(email):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email")
+        if not verify_valid_email(email):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid email")
 
-    if not verify_valid_token(email, token):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized, the token is invalid")
+        if not verify_valid_token(email, token):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized, the token is invalid")
 
-    settings = get_settings(db)
+        settings = get_settings(db)
 
-    if not settings.open_for_voting:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Voting is not open for the public")
+        if not settings.open_for_voting:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Voting is not open for the public")
 
-    projects = get_projects(db)
+        projects = get_projects(db)
 
-    max_total_points = settings.max_total_points
-    max_total_points -= sum([project.min_points for project in projects if project.fixed])
+        max_total_points = settings.max_total_points
+        max_total_points -= sum([project.min_points for project in projects if project.fixed])
 
-    projects_dict = {project.project_id: project for project in projects}
+        projects_dict = {project.project_id: project for project in projects}
 
-    # validate vote
-    projects_votes = {vote.id: vote for vote in body.projects}
+        logger.info(f"Validating vote with settings: points_step={settings.points_step}, max_total_points={settings.max_total_points}")
 
-    if set(projects_votes.keys()) != set(projects_dict.keys()):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project ids")
+        # validate vote
+        projects_votes = {vote.id: vote for vote in body.projects}
 
-    for vote_project in projects_votes.values():
-        project = projects_dict.get(vote_project.id)
-        if project is None:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project id")
+        if set(projects_votes.keys()) != set(projects_dict.keys()):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project ids")
 
-        if vote_project.points > 0:
-            if vote_project.points < project.min_points or vote_project.points > project.max_points:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid points")
+        for vote_project in projects_votes.values():
+            # Check for negative values
+            if vote_project.points < 0:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, 
+                    detail="Negative points are not allowed"
+                )
+            
+            # Check points are divisible by points_step
+            if vote_project.points % settings.points_step != 0:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Points must be divisible by {settings.points_step}"
+                )
+            
+            project = projects_dict.get(vote_project.id)
+            if project is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project id")
 
-    total_points = sum(vote.points for vote in projects_votes.values())
-    if total_points > max_total_points:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Total points exceed the limit")
+            if vote_project.points > 0:
+                # Check if the points are in the project range
+                if vote_project.points < project.min_points or vote_project.points > project.max_points:
+                    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid points")
 
-    ranks = {vote.rank for vote in projects_votes.values()}
-    if ranks != set(range(1, len(ranks) + 1)):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid ranks")
+        total_points = sum(vote.points for vote in projects_votes.values())
+        if total_points != max_total_points:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, 
+                detail="Total points must equal exactly the maximum allowed points"
+            )
 
-    # save votes
-    vote_input = [
-        VoteProjectInput(
-            poll_id=poll.poll_id,
-            project_id=vote.id,
-            points=vote.points,
-            rank=vote.rank,
-        )
-        for vote in body.projects
-    ]
-    save_voter_votes(db, email, body.note, vote_input)
+        ranks = {vote.rank for vote in projects_votes.values()}
+        if ranks != set(range(1, len(ranks) + 1)):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid ranks")
 
-    # get the updated votes
-    votes = get_voter_votes(db, email)
+        # save votes
+        vote_input = [
+            VoteProjectInput(
+                poll_id=poll.poll_id,
+                project_id=vote.id,
+                points=vote.points,
+                rank=vote.rank,
+            )
+            for vote in body.projects
+        ]
+        save_voter_votes(db, email, body.note, vote_input)
 
-    return _create_data_response_schema(settings, projects, votes, body.note)
+        # get the updated votes
+        votes = get_voter_votes(db, email)
+
+        return _create_data_response_schema(settings, projects, votes, body.note)
+    
+    except HTTPException as e:
+        logger.error(f"Vote validation failed: {e.detail}")
+        raise

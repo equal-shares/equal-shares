@@ -1,7 +1,7 @@
 # contains the API schemas
 # schema - object that the API return or receive
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ProjectSchema(BaseModel):
@@ -23,7 +23,7 @@ class ProjectSchema(BaseModel):
 class VotedProjectSchema(BaseModel):
     id: int
     rank: int
-    points: int
+    points: int = Field(ge=0)  # ensures points >= 0
     marked: bool
 
 

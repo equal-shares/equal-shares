@@ -244,6 +244,9 @@ export default function MainPage({ email, token }: Props) {
                     חלקו את התקציב שלכם בין הפרויקטים שאתם מוכנים לקחת - תנו יותר כסף לפרויקטים שאתם
                     רוצים יותר. ניתן להשתמש בחיצי המקלדת לניקוד מדויק יותר.
                   </li>
+                  <li>
+                    חובה לחלק את כל התקציב בדיוק (יתרת התקציב חייבת להיות 0).
+                  </li>
                   <li>לאחר שסיימתם, לחצו על "שמירת הדירוג".</li>
                 </ul>
               </AccordionDetails>
@@ -258,8 +261,12 @@ export default function MainPage({ email, token }: Props) {
               </AccordionDetails>
             </Accordion>
             <div className="w-full mt-[5px] flex justify-center">
-              <Alert className="w-fit" severity="info">
+              <Alert 
+                className="w-fit" 
+                severity={availablePoints === 0 ? "success" : "info"}
+              >
                 יתרת תקציב: {availablePoints}
+                {availablePoints !== 0 && " (יש להקצות את כל התקציב)"}
               </Alert>
             </div>
             <div className="w-full mt-[10px] flex justify-center">
@@ -315,8 +322,8 @@ export default function MainPage({ email, token }: Props) {
                 color="primary"
                 variant="contained"
                 onClick={saveOnClick}
-                disabled={sendingRequest || availablePoints < 0}>
-                {voted ? 'עדכון הדירוג' : 'שלח הדירוג'}
+                disabled={sendingRequest || availablePoints !== 0}>
+                {voted ? 'עדכון הדירוג' : 'שלח'}
               </Button>
             </div>
           </>
