@@ -9,9 +9,10 @@ To run the examples in this folder (for development & research) do:
 cd backend
 poetry config virtualenvs.create false
 poetry install
+pip install -e .
 ```
 
 Then you should be able to run
 ```
-python examples/algorithm.py
+python examples/run_small_examples.py
 ```

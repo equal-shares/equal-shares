@@ -2,12 +2,13 @@ import copy
 import logging
 from typing import Any
 
-from src.algorithm.utils import filter_bids, find_max
+from src.algorithm.utils import filter_bids, find_max, remove_invalid_bids
 
 logger = logging.getLogger("equal_shares_logger")
 
 CONTINUOUS_COST = 1  # A constant that signals that the given project is in its continuous increment phase.
-DISTRIBUTION_PARAMETER_COST = 10  # The amount of increase in each voter's budget at each iteration. Smaller = more accurate but longer time.
+DISTRIBUTION_PARAMETER_COST = 1000000  # The amount of increase in each voter's budget at each iteration is budget/DISTRIBUTION_PARAMETER_COST.
+        # If DISTRIBUTION_PARAMETER_COST is larger, then the computation is more accurate, but requires longer time.
 
 
 def equal_shares(
@@ -33,15 +34,16 @@ def equal_shares(
     """
 
     projects = projects_costs.keys()
+    bids = remove_invalid_bids(voters, bids)
     max_bid_for_project = find_max(bids)
     rounded_budget: float = int(budget / len(voters)) * len(voters)  # start with integral per-voter voters_budget
-    logger.info("\nRunning equal_shares: budget=%s, rounded to %s", budget, rounded_budget)
+    logger.warning("\nRunning equal_shares: budget=%s, rounded to %s", budget, rounded_budget)
 
     winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter = equal_shares_fixed_budget(
         voters, projects_costs, rounded_budget, bids, max_bid_for_project
     )
     total_chosen_project_cost = sum(winners_allocations[c] for c in winners_allocations)
-    logger.info("total_chosen_project_cost=%s", total_chosen_project_cost)
+    logger.warning("total_chosen_project_cost=%s", total_chosen_project_cost)
 
     while True:
         # Check if current outcome is exhaustive
@@ -57,16 +59,16 @@ def equal_shares(
                 and (candidate_cost_of_next_increase > 0)
             ):
                 is_exhaustive = False
-                logger.info("Candidate %s is not fully funded - allocation is not exhaustive", candidate)
+                logger.warning("Candidate %s is not fully funded - allocation is not exhaustive", candidate)
                 break
         if is_exhaustive:
-            logger.info("allocation is exhaustive")
+            logger.warning("allocation is exhaustive")
             break
 
         # would the next highest voters_budget work?
         updated_rounded_budget = rounded_budget + len(voters) * (
             budget / DISTRIBUTION_PARAMETER_COST
-        )  # Add DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
+        )  # Add budget/DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
 
         updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter = (
             equal_shares_fixed_budget(
@@ -78,10 +80,10 @@ def equal_shares(
             )
         )
         total_chosen_project_cost = sum(updated_winners_allocations[c] for c in updated_winners_allocations)
-        logger.info("total_chosen_project_cost=%s", total_chosen_project_cost)
+        logger.warning("total_chosen_project_cost=%s", total_chosen_project_cost)
 
         if total_chosen_project_cost > budget:
-            logger.info("total_chosen_project_cost is more than the budget %s; breaking", budget)
+            logger.warning("total_chosen_project_cost is more than the budget %s; breaking", budget)
             break
 
         # Else, keep increasing the budget
@@ -155,11 +157,11 @@ def equal_shares_fixed_budget(
     bids: dict[int, dict[int, int]],
     max_bid_for_project: dict,
 ) -> tuple[dict[int, int], dict[int, int], dict[int, dict[int, float]]]:
-    logger.info("\n  Running equal_shares_fixed_budget: budget=%s", budget)
+    logger.warning("\n  Running equal_shares_fixed_budget: budget=%s", budget)
     projects = projects_costs.keys()
 
     voters_budgets = {i: budget / len(voters) for i in voters}
-    logger.info("  Initial voters_budgets: %s", voters_budgets)
+    logger.debug("  Initial voters_budgets: %s", voters_budgets)
 
     candidates_payments_per_voter = {
         candidate: {voter: 0.0 for voter in inner_dict.keys()} for candidate, inner_dict in bids.items()
@@ -288,13 +290,14 @@ def equal_shares_fixed_budget(
         chosen_candidate_max_bid = max_bid_for_project[chosen_candidate]
         chosen_candidate_cost = updated_cost[chosen_candidate]
         chosen_candidate_bids = updated_bids[chosen_candidate]
-        logger.info(
-            "  Chosen project: %s, current cost: %s, max bid: %s, updated bids: %s",
+        logger.debug(
+            "  Chosen project: %s, current cost: %s, max bid: %s, effective vote count: %s",
             chosen_candidate,
             chosen_candidate_cost,
             chosen_candidate_max_bid,
-            chosen_candidate_bids,
+            best_effective_vote_count,
         )
+        logger.debug("  Updated bids: %s", updated_bids)
 
         if chosen_candidate_cost == CONTINUOUS_COST:
             positive_bids = {
@@ -314,9 +317,13 @@ def equal_shares_fixed_budget(
                 min(bid for voter, bid in positive_bids.items()),
                 sum(voters_budgets[voter] for voter, bid in positive_bids.items()),
             )
-            logger.info(
-                "    Chosen project is now in the continuous phase - changing the cost to %s", chosen_candidate_cost
+            logger.debug(
+                "    Chosen project is now in the continuous phase - adding %s", chosen_candidate_cost
             )
+            explanation_string_format = "  Funding %s with additional %s has %s effective vote count"
+        else:
+            explanation_string_format = "  Funding %s with the minimum amount %s has %s effective vote count"
+
 
         # Deducts from the voters_budget of each voter who chose the current
         # project the relative part for the current project
@@ -352,25 +359,24 @@ def equal_shares_fixed_budget(
             )
             # Updates the remaining list in the number of voters after updating the price of the project
             remaining_candidates[chosen_candidate] = len(updated_bids[chosen_candidate].keys())
-            logger.info(
-                (
-                    "    Candidate %s now has allocation %s. Going to continuous phase:"
-                    " setting new cost to %s, new effective vote count = %s"
-                ),
-                chosen_candidate,
-                winners_allocations[chosen_candidate],
-                updated_cost[chosen_candidate],
-                remaining_candidates[chosen_candidate],
-            )
+            explanation_string_format += ". New allocation is %s. New effective vote count is %s"
+            new_effective_vote_count = remaining_candidates[chosen_candidate]
         else:
             updated_cost[chosen_candidate] = 0
             del remaining_candidates[chosen_candidate]
-            logger.info(
-                "    Candidate %s now has the maximum possible allocation: %s. Setting new cost to %s",
-                chosen_candidate,
-                winners_allocations[chosen_candidate],
-                updated_cost[chosen_candidate],
-            )
+            explanation_string_format += "    Candidate %s now has the maximum possible allocation: %s. New effective vote count is %s"
+            new_effective_vote_count = 0
+
+        logger.info(
+            explanation_string_format,
+            chosen_candidate,
+            chosen_candidate_cost,
+            best_effective_vote_count,
+            winners_allocations[chosen_candidate],
+            new_effective_vote_count
+        )
+
+
     logger.info("  winners_allocations: %s", winners_allocations)
     logger.info("  Cost for next increase: %s", updated_cost)
     return winners_allocations, updated_cost, candidates_payments_per_voter
