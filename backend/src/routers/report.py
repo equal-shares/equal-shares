@@ -19,6 +19,8 @@ from src.config import config
 from src.database import get_db
 from src.logger import get_logger
 from src.models import Project, Settings, VoteData, get_projects, get_settings, get_votes
+from src.algorithm.mes_visualization.visualizer import run_mes_visualization
+
 
 logger = get_logger()
 
@@ -226,6 +228,9 @@ def _create_report(report: Report, db: psycopg.Connection) -> None:
     try:
         settings, projects, votes = _report_load_data(report, db)
         _report_log_info(report, "Data from the database retrieved")
+        _report_log_info(report, f'settings: {settings}')
+        _report_log_info(report, f'projects: {projects}')
+        _report_log_info(report, f'votes: {votes}')
     except Exception:
         return
 
@@ -250,6 +255,46 @@ def _create_report(report: Report, db: psycopg.Connection) -> None:
         _report_log_info(report, "Input for the algorithm saved")
     except Exception:
         _report_log_error(report, "Error while saving input for the algorithm")
+
+    # Generate MES visualization
+    _report_log_info(report, "Generating MES visualization")
+    try:
+        # Prepare data for visualization
+        voter_ids = [vote.voter.voter_id for vote in votes]
+        projects_costs = {project.project_id: project.min_points for project in projects.values()}
+        
+        # Prepare bids data
+        bids = {}
+        for project_id in projects_costs.keys():
+            bids[project_id] = {}
+            for vote in votes:
+                project_votes = [v for v in vote.projects if v.project_id == project_id]
+                if project_votes:
+                    bids[project_id][vote.voter.voter_id] = project_votes[0].points
+        
+        # Run visualization
+        viz_result = run_mes_visualization(
+            voters=voter_ids,
+            projects_costs=projects_costs,
+            budget=settings.max_total_points,
+            bids=bids,
+            output_path="temp_viz"  # Temporary location
+        )
+
+        if viz_result.status == "success":
+            # Add visualization files to report
+            import os
+            for filename in os.listdir("temp_viz"):
+                if filename.endswith(".html"):
+                    with open(os.path.join("temp_viz", filename), "r") as f:
+                        report.append_text_to_file(f"mes_visualization_{filename}", f.read())
+            
+            _report_log_info(report, "MES visualization generated successfully")
+        else:
+            _report_log_error(report, f"Error in MES visualization: {viz_result.error}")
+            
+    except Exception:
+        _report_log_error(report, "Error while generating MES visualization")
 
     _report_log_info(report, "Report creation finished")
 
