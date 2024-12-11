@@ -21,15 +21,19 @@ from pabutools.visualisation.visualisation import MESVisualiser
 
 from src.logger import get_logger, LoggerName
 
-# import logger
+# import logging
 # logger = logging.getLogger("equal_shares")
 # logger.setLevel(logging.INFO)
 # if not logger.handlers:
 #     handler = logging.StreamHandler()
-#     handler.setFormatter(...)
+#     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#     handler.setFormatter(formatter)
 #     logger.addHandler(handler)
 
 logger = get_logger(LoggerName.ALGORITHM)
+if logger.handlers:
+    for handler in logger.handlers:
+        logger.removeHandler(handler)
 
 # Validation schemas
 REQUIRED_META_FIELDS = ['num_votes', 'budget', 'num_voters', 'votes_per_project']
@@ -307,22 +311,27 @@ def run_mes_visualization(
         instance, profile = convert_to_pabutools_format(settings, projects, votes)
         
         logger.info("Running MES algorithm...")
+        
         outcome = method_of_equal_shares(
             instance=instance,
             profile=profile,
             sat_class=Cost_Sat,
             analytics=True,
-            verbose=True
+            verbose=False
         )
+
+        logger.info(f'outcome type: {type(outcome)}')
+        logger.info(f'outcome details: {dir(outcome)}')
         
+        if not hasattr(outcome, 'details') or not hasattr(outcome.details, 'iterations'):
+            logger.error("MES outcome doesn't have required details")
+            logger.error(f"outcome attributes: {dir(outcome)}")
+            if hasattr(outcome, 'details'):
+                logger.error(f"details attributes: {dir(outcome.details)}")
+            raise ValueError("Invalid MES outcome format")
+
         logger.info("Generating visualization...")
-        visualizer = MESVisualiser(
-            profile=profile,
-            instance=instance,
-            outcome=outcome,
-            verbose=True
-        )
-        
+        visualizer = MESVisualiser(profile, instance, outcome, verbose=False)
         visualizer.render(output_path)
         
         results, total_cost = process_mes_results(instance, outcome)
@@ -341,3 +350,4 @@ def run_mes_visualization(
         error_msg = f"{type(e).__name__}: {str(e)}"
         logger.error(f"Error in MES visualization: {error_msg}")
         logger.error(f"Traceback: {traceback.format_exc()}")
+        return None

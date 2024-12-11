@@ -1548,21 +1548,23 @@ files = [
 
 [[package]]
 name = "mip"
-version = "1.14.2"
+version = "1.16rc0"
 description = "Python tools for Modeling and Solving Mixed-Integer Linear Programs (MIPs)"
 optional = false
-python-versions = ">=3.7"
+python-versions = "<3.13,>=3.7"
 files = [
-    {file = "mip-1.14.2-py3-none-any.whl", hash = "sha256:ed107d97913f5b76615bd732a86d0b5aafc276155b49d2ee971a7546ddd831b0"},
-    {file = "mip-1.14.2.tar.gz", hash = "sha256:c2be205d2878e7a85e1b99ec6848b6ca8ecb32b7b635de906d39b475c0c25f59"},
+    {file = "mip-1.16rc0-py3-none-any.whl", hash = "sha256:62e04c27bce56da94d070f6b03d9e342600d10f4016984334af7dae8c0f9fd09"},
+    {file = "mip-1.16rc0.tar.gz", hash = "sha256:f250083a41f4e1f61b6885041d64ed2a88bff5ead7165c329b5b31d07c517466"},
 ]
 
 [package.dependencies]
-cffi = "1.15.0"
+cffi = ">=1.15"
 
 [package.extras]
 gurobi = ["gurobipy (>=8)"]
-numpy = ["numpy (==1.21.6)", "numpy (==1.23.1)"]
+highs = ["highspy (>=1.5.3)"]
+numpy = ["numpy (==1.21.*)", "numpy (==1.24.*)", "numpy (>=1.25)"]
+test = ["matplotlib (==3.5.3)", "matplotlib (==3.6.2)", "matplotlib (>=3.7)", "networkx (==2.6.3)", "networkx (==2.8.8)", "pytest (>=7.4)"]
 
 [[package]]
 name = "msgpack"
@@ -1825,24 +1827,24 @@ files = [
 
 [[package]]
 name = "pabutools"
-version = "1.1.7"
+version = "1.1.10"
 description = "Implementation of all the tools necessary to explore and analyse participatory budgeting elections"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "pabutools-1.1.7-py3-none-any.whl", hash = "sha256:0547bd711f61dc17675384af2b0e1f6a5cba2b464ec8f6c05d790e3d54b06b56"},
-    {file = "pabutools-1.1.7.tar.gz", hash = "sha256:b7b13ab7f90b30bd51b0c58effc4323d50812682e11e2ea4fff9bcab7f8c2e30"},
+    {file = "pabutools-1.1.10-py3-none-any.whl", hash = "sha256:b01270a0f6477857134f0df6e215f655fbfc23463753108191456d4483e9dfd3"},
+    {file = "pabutools-1.1.10.tar.gz", hash = "sha256:0fda4b4e3f14b61ad60524e6fef9fc8b6190009a27205a4704c6fa6857267d2b"},
 ]
 
 [package.dependencies]
 gmpy2 = ">=2.1.5"
-mip = "*"
+mip = ">=1.16rc0"
 natsort = "*"
 numpy = "*"
 preflibtools = "*"
 
 [package.extras]
-dev = ["Sphinx", "coverage", "enum_tools", "parameterized", "sphinx-book-theme", "sphinx-toolbox", "sphinxcontrib-napoleon", "unittest2"]
+dev = ["Sphinx", "coverage", "enum-tools", "parameterized", "sphinx-book-theme", "sphinx-toolbox", "sphinxcontrib-napoleon", "unittest2"]
 
 [[package]]
 name = "packaging"
@@ -3341,5 +3343,5 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.12"
-content-hash = "549dba56654c81764935d023a895db7bad17891bbae32ac821e1ecf9cb1b7d28"
+python-versions = ">=3.12,<3.13"
+content-hash = "a5176ae87b10486300de81994c7e68ae918daca36023a224b0e9f7ec74a69437"

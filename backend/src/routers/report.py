@@ -8,6 +8,8 @@ import zipfile
 from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
+import tempfile
+from pathlib import Path
 
 import pandas as pd
 import psycopg
@@ -228,9 +230,9 @@ def _create_report(report: Report, db: psycopg.Connection) -> None:
     try:
         settings, projects, votes = _report_load_data(report, db)
         _report_log_info(report, "Data from the database retrieved")
-        _report_log_info(report, f'settings: {settings}')
-        _report_log_info(report, f'projects: {projects}')
-        _report_log_info(report, f'votes: {votes}')
+        # _report_log_info(report, f'settings: {settings}')
+        # _report_log_info(report, f'projects: {projects}')
+        # _report_log_info(report, f'votes: {votes}')
     except Exception:
         return
 
@@ -256,43 +258,8 @@ def _create_report(report: Report, db: psycopg.Connection) -> None:
     except Exception:
         _report_log_error(report, "Error while saving input for the algorithm")
 
-    # Generate MES visualization
-    _report_log_info(report, "Generating MES visualization")
     try:
-        # Prepare data for visualization
-        voter_ids = [vote.voter.voter_id for vote in votes]
-        projects_costs = {project.project_id: project.min_points for project in projects.values()}
-        
-        # Prepare bids data
-        bids = {}
-        for project_id in projects_costs.keys():
-            bids[project_id] = {}
-            for vote in votes:
-                project_votes = [v for v in vote.projects if v.project_id == project_id]
-                if project_votes:
-                    bids[project_id][vote.voter.voter_id] = project_votes[0].points
-        
-        # Run visualization
-        viz_result = run_mes_visualization(
-            voters=voter_ids,
-            projects_costs=projects_costs,
-            budget=settings.max_total_points,
-            bids=bids,
-            output_path="temp_viz"  # Temporary location
-        )
-
-        if viz_result.status == "success":
-            # Add visualization files to report
-            import os
-            for filename in os.listdir("temp_viz"):
-                if filename.endswith(".html"):
-                    with open(os.path.join("temp_viz", filename), "r") as f:
-                        report.append_text_to_file(f"mes_visualization_{filename}", f.read())
-            
-            _report_log_info(report, "MES visualization generated successfully")
-        else:
-            _report_log_error(report, f"Error in MES visualization: {viz_result.error}")
-            
+        _report_generate_mes_visualization(report, settings, projects, votes)
     except Exception:
         _report_log_error(report, "Error while generating MES visualization")
 
@@ -431,3 +398,67 @@ def _report_save_input_for_algorithm(
     report.append_text_to_file(
         "input_for_algorithm.json", json.dumps(input_for_algorithm.model_dump(), indent=4, ensure_ascii=False)
     )
+  
+
+def _report_generate_mes_visualization(
+    report: Report,
+    settings: Settings,
+    projects: dict[int, Project],
+    votes: list[VoteData]
+) -> None:
+    """Generate MES visualization and add it to the report."""
+    _report_log_info(report, "Generating MES visualization")
+    # Log data for debugging
+    _report_log_info(report, f"Settings: {settings}")
+    _report_log_info(report, f"Number of projects: {len(projects)}")
+    # _report_log_info(report, f"projects: {projects}")
+    _report_log_info(report, f"Number of votes: {len(votes)}")
+    # _report_log_info(report, f"votes: {votes}")
+    
+    try:
+        # Create temporary directory for visualization files
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Run visualization
+            result = run_mes_visualization(
+                settings=settings,
+                projects=projects,
+                votes=votes,
+                output_path=temp_dir
+            )
+            
+            if not result:
+                raise ValueError("MES visualization returned no result")
+            
+            # Check if files exist before trying to add them
+            vis_files = list(Path(temp_dir).glob('*.html'))
+            if not vis_files:
+                _report_log_info(report, "No visualization files were generated")
+                return
+                
+            for file_path in vis_files:
+                _report_log_info(report, f"Found visualization file: {file_path.name}")
+                try:
+                    with open(file_path, 'rb') as f:
+                        report.add_binary_file(
+                            f"mes_visualization/{file_path.name}",
+                            f.read()
+                        )
+                except Exception as e:
+                    _report_log_error(report, f"Error adding file {file_path}: {str(e)}")
+
+            # Add results to report if available
+            if hasattr(result, 'results'):
+                report.append_text_to_file(
+                    "mes_visualization_results.json",
+                    json.dumps({
+                        "selected_projects": result.selected_projects,
+                        "total_cost": result.total_cost,
+                        "budget_per_voter": result.budget_per_voter,
+                        "results": result.results
+                    }, indent=4)
+                )
+                _report_log_info(report, "MES visualization completed successfully")
+
+    except Exception as e:
+        _report_log_error(report, f"Error in MES visualization: {str(e)}")
+        _report_log_error(report, traceback.format_exc())
