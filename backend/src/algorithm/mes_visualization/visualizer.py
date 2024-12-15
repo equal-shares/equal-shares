@@ -21,15 +21,6 @@ from pabutools.visualisation.visualisation import MESVisualiser
 
 from src.logger import get_logger, LoggerName
 
-# import logging
-# logger = logging.getLogger("equal_shares")
-# logger.setLevel(logging.INFO)
-# if not logger.handlers:
-#     handler = logging.StreamHandler()
-#     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-#     handler.setFormatter(formatter)
-#     logger.addHandler(handler)
-
 logger = get_logger(LoggerName.ALGORITHM)
 if logger.handlers:
     for handler in logger.handlers:
@@ -195,6 +186,10 @@ def convert_to_pabutools_format(
             - ApprovalProfile: Pabutools ApprovalProfile with all voter ballots
     """
     try:
+        print(f'settings: {settings}')
+        print(f'projects: {projects}')
+        print(f'votes: {votes}')
+
         # Extract and validate input data
         voters = extract_voters_from_votes(votes)
         budget = float(settings.max_total_points)
@@ -251,6 +246,9 @@ def convert_to_pabutools_format(
             f"Total votes: {total_votes}"
         )
         
+        print(f'instance: {instance}')
+        print(f'profile: {profile}')
+
         return instance, profile
         
     except Exception as e:
@@ -273,6 +271,7 @@ def process_mes_results(
             - Dict mapping project IDs to their allocations (cost if selected, 0 if not)
             - Total cost of all selected projects
     """
+    print(f'outcome: BudgetAllocation: {outcome}')
     results = {}
     total_cost = 0
     
