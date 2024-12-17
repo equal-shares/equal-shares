@@ -8,68 +8,134 @@ logger = logging.getLogger("equal_shares_logger")
 
 CONTINUOUS_COST = 1  # A constant that signals that the given project is in its continuous increment phase.
 DISTRIBUTION_PARAMETER_COST = 1000000  # The amount of increase in each voter's budget at each iteration is budget/DISTRIBUTION_PARAMETER_COST.
-        # If DISTRIBUTION_PARAMETER_COST is larger, then the computation is more accurate, but requires longer time.
+# If DISTRIBUTION_PARAMETER_COST is larger, then the computation is more accurate, but requires longer time.
+MAX_ROUNDS = 1000 # A constant that provides a safety net to prevent infinite loops
+BUDGET_EPSILON = 0.0001 # A constant that ensures we stop when increments become meaninglessly small
 
 
 def equal_shares(
     voters: list[int],
-    projects_costs: dict[int, int],  # min cost per project
+    projects_costs: dict[int, int],
     budget: float,
     bids: dict[int, dict[int, int]],
+    tracker_callback = None
 ) -> tuple[dict[int, int], dict[int, dict[int, float]]]:
     """
+    Implements the Method of Equal Shares (MES) algorithm for participatory budgeting.
+    The algorithm distributes a budget among projects based on voter preferences, ensuring
+    fair allocation by giving each voter an equal share of the budget initially.
 
-    :argument
-        voters (list): A list of voter names.
-        projects_costs (list): A dictionary mapping project IDs to their min cost.
-        budget (int): The total budget available for all the projects.
-        bids (dict): A dictionary mapping project IDs to the
-        list of voters who approve them and the cost the voters chose.
+    Args:
+        voters (list[int]): List of voter IDs participating in the vote.
+        projects_costs (dict[int, int]): Dictionary mapping project IDs to their minimum costs.
+        budget (float): Total available budget to be distributed.
+        bids (dict[int, dict[int, int]]): Nested dictionary where:
+            - First level key: project ID
+            - Second level key: voter ID
+            - Value: amount bid by that voter for that project
+        tracker_callback (Optional[Callable]): Optional callback function for tracking algorithm progress.
+            If provided, called with arguments (project_id, cost, effective_votes, voter_budgets).
 
-    :return
-        tuple[dict[int, int], dict[int, dict[int, float]]]:
-        first: A dictionary of the mapping the received project IDs for the maximum cost given for them
-        second: A dictionary that maps the IDs of the projects received for the cost each voter gave them
+    Returns:
+        tuple[dict[int, int], dict[int, dict[int, float]]]: A tuple containing:
+            - winners_allocations: Dictionary mapping project IDs to their allocated costs
+            - candidates_payments_per_voter: Nested dictionary showing how much each voter
+              contributed to each project (project_id -> voter_id -> payment_amount)
 
+    Examples:
+        >>> # Simple example with three voters and two projects
+        >>> voters = [1, 2, 3]
+        >>> projects_costs = {101: 100, 102: 150}  # Project costs
+        >>> budget = 300
+        >>> bids = {
+        ...     101: {1: 100, 2: 100, 3: 0},      # Voters 1 and 2 support project 101
+        ...     102: {2: 150, 3: 150, 1: 0}       # Voters 2 and 3 support project 102
+        ... }
+        >>> winners, payments = equal_shares(voters, projects_costs, budget, bids)
+        >>> winners
+        {101: 100, 102: 150}  # Both projects funded
+        >>> payments[101]  # Payments for project 101
+        {1: 50, 2: 50, 3: 0}  # Voters 1 and 2 split the cost
+
+    Notes:
+        - Each voter starts with an equal share of the budget (budget / num_voters)
+        - The algorithm iteratively tries to fund projects by:
+            1. Finding projects with the highest effective support
+            2. Distributing costs equally among supporting voters
+            3. Gradually increasing voter budgets if needed
+        - A project is funded if its supporting voters have enough remaining budget
+        - The algorithm stops when either:
+            - No more projects can be funded within budget constraints
+            - The total cost would exceed the available budget
+
+    Raises:
+        ValueError: If project costs exceed available budgets or if cost distribution fails.
     """
 
-    projects = projects_costs.keys()
-    bids = remove_invalid_bids(voters, bids)
+    projects = projects_costs.keys() # Get list of project IDs
+    bids = remove_invalid_bids(voters, bids) # Remove bids from invalid voters
     max_bid_for_project = find_max(bids)
-    rounded_budget: float = int(budget / len(voters)) * len(voters)  # start with integral per-voter voters_budget
+
+    # Round the budget to ensure equal division among voters
+    rounded_budget: float = int(budget / len(voters)) * len(voters)  
     logger.warning("\nRunning equal_shares: budget=%s, rounded to %s", budget, rounded_budget)
 
+    # Run first round with initial budget
     winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter = equal_shares_fixed_budget(
-        voters, projects_costs, rounded_budget, bids, max_bid_for_project
+        voters, projects_costs, rounded_budget, bids, max_bid_for_project, tracker_callback
     )
+
+    # Calculate total cost of chosen projects
     total_chosen_project_cost = sum(winners_allocations[c] for c in winners_allocations)
     logger.warning("total_chosen_project_cost=%s", total_chosen_project_cost)
 
+    round_count = 0
+
     while True:
+        round_count += 1
+        if round_count > MAX_ROUNDS:
+            logger.warning(
+                f"Max rounds ({MAX_ROUNDS}) reached - forcing termination. "
+                f"Consider adjusting DISTRIBUTION_PARAMETER_COST"
+            )
+            break
+            
+        budget_increment = len(voters) * (budget / DISTRIBUTION_PARAMETER_COST)
+        if budget_increment < BUDGET_EPSILON:
+            logger.info(
+                f"Budget increment ({budget_increment}) below epsilon "
+                f"({BUDGET_EPSILON}) - terminating"
+            )
+            break
+
         # Check if current outcome is exhaustive
         is_exhaustive = True
         for candidate in projects:
             candidate_cost_of_next_increase = projects_costs_of_next_increase[candidate]
-            # check if total cost of chosen project + current project  <= budget, if true have more project to chack
-            # check if total cost of chosen project + project_cost   <= budget
-            # and total project_cost + curr project_cost <= max value for curr project,
+            # Check if we can fund more projects
             if (
+                # Would stay within total budget
                 (total_chosen_project_cost + candidate_cost_of_next_increase <= budget)
+                # Would not exceed max bid for this project
                 and (winners_allocations[candidate] + candidate_cost_of_next_increase <= max_bid_for_project[candidate])
+                # Project has a positive cost for next increase
                 and (candidate_cost_of_next_increase > 0)
             ):
                 is_exhaustive = False
                 logger.warning("Candidate %s is not fully funded - allocation is not exhaustive", candidate)
                 break
+            
         if is_exhaustive:
             logger.warning("allocation is exhaustive")
+            # No more projects can be funded
             break
 
-        # would the next highest voters_budget work?
+        # Project has a positive cost for next increase
         updated_rounded_budget = rounded_budget + len(voters) * (
             budget / DISTRIBUTION_PARAMETER_COST
         )  # Add budget/DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
 
+        # Run another round with increased budget
         updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter = (
             equal_shares_fixed_budget(
                 voters,
@@ -77,16 +143,20 @@ def equal_shares(
                 updated_rounded_budget,
                 bids,
                 max_bid_for_project,
+                tracker_callback
             )
         )
+
+        # Calculate new total cost
         total_chosen_project_cost = sum(updated_winners_allocations[c] for c in updated_winners_allocations)
         logger.warning("total_chosen_project_cost=%s", total_chosen_project_cost)
 
+        # If we exceed budget, stop
         if total_chosen_project_cost > budget:
             logger.warning("total_chosen_project_cost is more than the budget %s; breaking", budget)
             break
 
-        # Else, keep increasing the budget
+        # Else, keep increasing the budget and continue
         rounded_budget = updated_rounded_budget
         winners_allocations = updated_winners_allocations
         candidates_payments_per_voter = updated_candidates_payments_per_voter
@@ -156,27 +226,76 @@ def equal_shares_fixed_budget(
     budget: float,
     bids: dict[int, dict[int, int]],
     max_bid_for_project: dict,
+    tracker_callback = None
 ) -> tuple[dict[int, int], dict[int, int], dict[int, dict[int, float]]]:
+    """
+    Core implementation of the Method of Equal Shares (MES) algorithm for a fixed budget round.
+    This function executes a single round of the MES algorithm, allocating a fixed budget
+    among projects based on voter preferences and available funds.
+
+    Args:
+        voters (list[int]): List of voter IDs participating in the vote.
+        projects_costs (dict[int, int]): Dictionary mapping project IDs to their minimum costs.
+        budget (float): Fixed budget available for this round.
+        bids (dict[int, dict[int, int]]): Nested dictionary where:
+            - First level key: project ID
+            - Second level key: voter ID
+            - Value: amount bid by that voter for that project
+        max_bid_for_project (dict[int, int]): Dictionary mapping project IDs to their maximum
+            allowable funding amounts.
+        tracker_callback (Optional[Callable]): Optional callback function for tracking algorithm progress.
+            If provided, called with arguments (project_id, cost, effective_votes, voter_budgets).
+
+    Returns:
+        tuple[dict[int, int], dict[int, int], dict[int, dict[int, float]]]: A tuple containing:
+            - winners_allocations: Dictionary mapping project IDs to their allocated costs
+            - updated_cost: Dictionary mapping project IDs to their remaining costs for next increase
+            - candidates_payments_per_voter: Nested dictionary showing how much each voter
+              contributed to each project (project_id -> voter_id -> payment_amount)
+
+    Notes:
+        - The function operates on a fixed budget, unlike equal_shares which can increase budgets
+        - Projects are selected based on their "effective vote count", which considers:
+            1. Number of supporting voters
+            2. Remaining budget of supporting voters
+            3. Project cost
+        - For each selected project:
+            1. Cost is distributed equally among supporting voters when possible
+            2. Voters with insufficient funds contribute their entire remaining budget
+            3. Other voters make up the difference equally
+        - The process continues until:
+            1. No more projects can be afforded, or
+            2. All projects have been funded
+
+    Raises:
+        ValueError: If costs cannot be distributed fairly among voters or if voter budgets
+                   are insufficient for project costs.
+    """
     logger.warning("\n  Running equal_shares_fixed_budget: budget=%s", budget)
     projects = projects_costs.keys()
 
+    # Give each voter an equal share of the budget
     voters_budgets = {i: budget / len(voters) for i in voters}
     logger.debug("  Initial voters_budgets: %s", voters_budgets)
 
+    # Track how much each voter pays for each project
     candidates_payments_per_voter = {
         candidate: {voter: 0.0 for voter in inner_dict.keys()} for candidate, inner_dict in bids.items()
     }
-    # logger.debug("Initial candidates_payments_per_voter:\n   %s", candidates_payments_per_voter)
 
+    # Track remaining candidates and their supporter counts
     remaining_candidates = {
         candidate: len(bids[candidate])
         for candidate in projects
         if projects_costs[candidate] > 0 and len(bids[candidate]) > 0
     }  # remaining candidate -> previous effective vote count
+
+    # Track how much is allocated to each project
     winners_allocations = {
         candidate: 0 for candidate in projects
     }  # Initialize amount invested in each winning projects
 
+    # Keep track of bids and costs that can change during the process
     updated_bids = copy.deepcopy(bids)
     updated_cost = copy.deepcopy(projects_costs)
 
@@ -209,7 +328,9 @@ def equal_shares_fixed_budget(
         )
         logger.debug("  Voters' budgets:\n   %s", voters_budgets)
 
+        # For each remaining project
         for candidate, previous_effective_vote_count in remaining_candidates_sorted.items():
+            # Skip if we already found better projects
             if previous_effective_vote_count < best_effective_vote_count:
                 logger.debug(
                     "  Candidate %s: Previous effective vote count (%s) < best_effective_vote_count (%s): breaking",
@@ -218,9 +339,13 @@ def equal_shares_fixed_budget(
                     best_effective_vote_count,
                 )
                 break
+
+            # Check if supporters have enough money combined
             money_behind_candidate = sum(
                 voters_budgets[i] for i in updated_bids[candidate].keys() if updated_bids[candidate][i] > 0
             )
+
+            # Skip if project can't be afforded
             if money_behind_candidate < updated_cost[candidate]:
                 # candidate is not affordable - The total amount of money is less than the candidate cost
                 logger.debug(
@@ -233,12 +358,15 @@ def equal_shares_fixed_budget(
                 # The candidate cannot be purchased, so remove him from the candidate list
                 continue
 
-            # Calculate the effective vote count of candidate:
+            # Calculate the effective vote count of candidate
+            # Sort supporters by their remaining budget (lowest to highest)
+            # This helps handle cases where some supporters can't pay their full share
             sorted_approvers = {
                 voter: voters_budgets[voter]
                 for voter in sorted(updated_bids[candidate].keys(), key=lambda i: voters_budgets[i])
             }
 
+            # Calculate how many "effective" voters support the project
             denominator = len(sorted_approvers)
             paid_so_far = 0.0
             for i, budget_of_i in sorted_approvers.items():
@@ -250,6 +378,10 @@ def equal_shares_fixed_budget(
                     denominator -= 1
                 else:
                     # i (and all later approvers) can afford the payment; stop here
+                    # Calculate effective vote count:
+                    # A measure of project support that considers both number of supporters and their ability to pay.
+                    # Formula: project_cost / equal_payment_per_voter
+                    # Higher value means stronger support.
                     effective_vote_count = updated_cost[candidate] / equal_payment
                     if effective_vote_count > best_effective_vote_count:
                         best_effective_vote_count = effective_vote_count
@@ -265,10 +397,12 @@ def equal_shares_fixed_budget(
                 effective_vote_count,
             )
         logger.debug("  best_candidates: %s", best_candidates)
+        # No more affordable projects
         if not best_candidates:
             logger.info("  No remaining candidates are affordable.")
             break  # Break out of the outer "while True" loop
 
+        # Break ties if multiple projects tied
         best_found = break_ties(updated_cost, updated_bids, best_candidates)
         logger.debug("  best_found after tie-breaking: %s", best_found)
 
@@ -299,6 +433,7 @@ def equal_shares_fixed_budget(
         )
         logger.debug("  Updated bids: %s", updated_bids)
 
+        # Calculate project cost
         if chosen_candidate_cost == CONTINUOUS_COST:
             positive_bids = {
                 voter: bid for voter, bid in chosen_candidate_bids.items() if bid > 0 and voters_budgets[voter] > 0
@@ -327,7 +462,7 @@ def equal_shares_fixed_budget(
 
         # Deducts from the voters_budget of each voter who chose the current
         # project the relative part for the current project
-        #
+        # Update voter budgets and track payments
         voters_and_budgets = [(voter, voters_budgets[voter]) for voter in chosen_candidate_bids.keys()]
         voters_and_contributions = distribute_cost_among_voters(chosen_candidate_cost, voters_and_budgets)
         for voter, voter_payment in voters_and_contributions:
@@ -349,6 +484,20 @@ def equal_shares_fixed_budget(
         # check if the curr cost + total update codt <= max value for this projec
         # logger.info(" total project price   = %s", winners_total_cost[chosen_candidate])
 
+        # Call tracker if provided
+        if tracker_callback:
+            tracker_callback(
+                project_id=chosen_candidate,
+                cost=chosen_candidate_cost,
+                effective_votes={
+                    pid: len(voters) 
+                    for pid, voters in updated_bids.items() 
+                    if pid in remaining_candidates
+                },
+                voter_budgets=voters_budgets.copy()
+            )
+
+        # Update remaining candidates
         if winners_allocations[chosen_candidate] < chosen_candidate_max_bid:
             filter_bids(
                 updated_bids,
