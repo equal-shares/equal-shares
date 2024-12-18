@@ -2,15 +2,14 @@ import copy
 import logging
 from typing import Any
 
-from src.algorithm.utils import filter_bids, find_max, remove_invalid_bids
+from src.algorithm.utils import filter_bids, find_max, remove_invalid_bids, remove_zero_bids
 
 logger = logging.getLogger("equal_shares_logger")
 
 CONTINUOUS_COST = 1  # A constant that signals that the given project is in its continuous increment phase.
-DISTRIBUTION_PARAMETER_COST = 1000000  # The amount of increase in each voter's budget at each iteration is budget/DISTRIBUTION_PARAMETER_COST.
+DISTRIBUTION_PARAMETER_COST = 100  # The amount of increase in each voter's budget at each iteration is budget/DISTRIBUTION_PARAMETER_COST.
 # If DISTRIBUTION_PARAMETER_COST is larger, then the computation is more accurate, but requires longer time.
 MAX_ROUNDS = 1000 # A constant that provides a safety net to prevent infinite loops
-BUDGET_EPSILON = 0.0001 # A constant that ensures we stop when increments become meaninglessly small
 
 
 def equal_shares(
@@ -71,8 +70,8 @@ def equal_shares(
     Raises:
         ValueError: If project costs exceed available budgets or if cost distribution fails.
     """
-
     projects = projects_costs.keys() # Get list of project IDs
+    bids = remove_zero_bids(bids)
     bids = remove_invalid_bids(voters, bids) # Remove bids from invalid voters
     max_bid_for_project = find_max(bids)
 
@@ -101,12 +100,6 @@ def equal_shares(
             break
             
         budget_increment = len(voters) * (budget / DISTRIBUTION_PARAMETER_COST)
-        if budget_increment < BUDGET_EPSILON:
-            logger.info(
-                f"Budget increment ({budget_increment}) below epsilon "
-                f"({BUDGET_EPSILON}) - terminating"
-            )
-            break
 
         # Check if current outcome is exhaustive
         is_exhaustive = True
@@ -416,7 +409,7 @@ def equal_shares_fixed_budget(
         """
         After receiving the selected project, we reduce the cost of the selected project from the Update_bids list
         and create a new project with a "factor" cost, we filter its data using the
-        filter_bids function.Then they check whether the total price of the project
+        filter_bids function. Then they check whether the total price of the project
         does not exceed the highest price they chose.
         and update "remaining" with the number of voters who chose it at the new price. and continue the while loop.
         """
@@ -489,6 +482,7 @@ def equal_shares_fixed_budget(
             tracker_callback(
                 project_id=chosen_candidate,
                 cost=chosen_candidate_cost,
+                # Calculate effective votes for remaining projects
                 effective_votes={
                     pid: len(voters) 
                     for pid, voters in updated_bids.items() 
