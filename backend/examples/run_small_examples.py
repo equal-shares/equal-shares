@@ -116,6 +116,23 @@ def example4() -> None:
     print("candidates_payments_per_voter", candidates_payments_per_voter)
 
 
+def example5() -> None:
+    print("Running example 5")
+
+    voters = [1, 2]
+    projects_costs = {11: 100, 12: 150}
+    bids = {11: {1: 100}, 12: {2: 150}}
+    budget = 300
+    winners_allocation, candidates_payments_per_voter = equal_shares(
+        voters,
+        projects_costs,
+        budget,
+        bids,
+    )
+
+    print("winners_allocation", winners_allocation)
+    print("candidates_payments_per_voter", candidates_payments_per_voter)
+
 def test_min_max_equal_shares_passed_3() -> None:
     """
     Two projects with the same amount of voters and the price difference between them is 1
@@ -151,4 +168,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    example3()
+    example5()
