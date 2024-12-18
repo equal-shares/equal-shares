@@ -7,42 +7,44 @@ from .pabutools_adapter import CustomBudgetAllocation
 
 logger = get_logger()
 
-def track_algorithm_round(
-    tracker: RoundTracker,
-    project_id: int, 
-    effective_votes: Dict[int, float],
-    voter_budgets: Dict[int, float],
-    cost: float
-) -> None:
-    """Record single round of execution for visualization"""
-    tracker.update_budget(cost)
-    tracker.add_round(
-        selected_project=project_id,
-        effective_votes=effective_votes,
-        voter_budgets=voter_budgets
-    )
-
 def run_algorithm_with_tracking(
     voters: List[int],
     projects_costs: Dict[int, int],
     budget: float,
     bids: Dict[int, Dict[int, int]]
 ) -> Tuple[Dict[int, int], RoundTracker]:
-    """Run algorithm while collecting visualization data"""
-    logger.info("Running algorithm with visualization tracking")
+    """Run algorithm with visualization tracking"""
+    logger.info("Running algorithm with tracking")
+    
+    # Initialize tracker
     tracker = RoundTracker(budget)
     
-    winners = equal_shares(
+    # Create callback for tracking rounds
+    def track_round(project_id: int, cost: float, 
+                   effective_votes: Dict[int, float],
+                   voter_budgets: Dict[int, float]) -> None:
+        tracker.add_round(
+            selected_project=project_id,
+            effective_votes=effective_votes,
+            voter_budgets=voter_budgets
+        )
+        tracker.update_budget(cost)
+        
+        logger.debug(
+            f"Tracked round: Project {project_id} selected, "
+            f"cost {cost}, remaining {tracker.remaining_budget}"
+        )
+    
+    # Run algorithm with tracking
+    winners, _ = equal_shares(
         voters=voters,
         projects_costs=projects_costs,
         budget=budget,
         bids=bids,
-        round_callback=lambda pid, votes, budgets, cost: track_algorithm_round(
-            tracker, pid, votes, budgets, cost
-        )
+        tracker_callback=track_round
     )
     
-    logger.info(f"Algorithm completed: {len(winners)} winners in {len(tracker.rounds)} rounds")
+    logger.info(f"Tracking complete: {len(tracker.rounds)} rounds recorded")
     return winners, tracker
 
 def create_visualization_output(
@@ -51,9 +53,13 @@ def create_visualization_output(
     projects_meta: Dict[int, Any]
 ) -> CustomBudgetAllocation:
     """Convert algorithm results to pabutools format"""
-    from .pabutools_adapter import CustomBudgetAllocation
+    
+    # Create voter preferences from bids
+    voter_preferences = {1: [1], 2: [2]}
+    
     return CustomBudgetAllocation(
         selected_projects=winners,
         round_tracker=tracker,
-        projects_meta=projects_meta
+        projects_meta=projects_meta,
+        voter_preferences=voter_preferences
     )

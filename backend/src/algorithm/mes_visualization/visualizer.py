@@ -21,6 +21,7 @@ from pabutools.visualisation.visualisation import MESVisualiser
 
 from src.logger import get_logger, LoggerName
 
+
 logger = get_logger(LoggerName.ALGORITHM)
 if logger.handlers:
     for handler in logger.handlers:

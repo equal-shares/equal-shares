@@ -4,7 +4,7 @@ This file demonstrates how to use the visualizer with sample data.
 """
 
 import datetime
-from backend.src.algorithm.mes_visualization.visualizer import run_mes_visualization
+from src.algorithm.mes_visualization.visualizer import run_mes_visualization
 
 
 def create_sample_data():
