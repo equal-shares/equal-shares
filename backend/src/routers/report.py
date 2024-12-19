@@ -21,7 +21,7 @@ from src.config import config
 from src.database import get_db
 from src.logger import get_logger
 from src.models import Project, Settings, VoteData, get_projects, get_settings, get_votes
-from src.algorithm.mes_visualization.visualizer import run_mes_visualization
+from src.algorithm.mes_visualization.mes_visualizer import run_mes_visualization
 
 
 logger = get_logger()

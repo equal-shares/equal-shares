@@ -4,7 +4,7 @@ This file demonstrates how to use the visualizer with sample data.
 """
 
 import datetime
-from src.algorithm.mes_visualization.visualizer import run_mes_visualization
+from src.algorithm.mes_visualization.mes_visualizer import run_mes_visualization, MESImplementation
 
 
 def create_sample_data():
@@ -159,7 +159,8 @@ def run_example():
             settings=settings,
             projects=projects,
             votes=votes,
-            output_path="./output"
+            output_path="./output",
+            implementation=MESImplementation.CUSTOM
         )
         
         # Print results
