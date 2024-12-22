@@ -1,9 +1,11 @@
 """
 Example usage of the MES Visualizer module.
-This file demonstrates how to use the visualizer with sample data.
+This file demonstrates how to use the visualizer with both custom and pabutools implementations.
 """
 
 import datetime
+import os
+from pathlib import Path
 from src.algorithm.mes_visualization.mes_visualizer import run_mes_visualization, MESImplementation
 
 
@@ -142,44 +144,83 @@ def create_sample_data():
     
     return settings, projects, votes
 
+def run_implementation_test(
+    settings, 
+    projects, 
+    votes, 
+    implementation: MESImplementation,
+    output_dir: Path
+) -> None:
+    """Run MES visualization with specified implementation."""
+    print(f"\nTesting {implementation.value} implementation")
+    print("-" * 40)
+    
+    # Create implementation-specific output directory
+    output_path = output_dir / implementation.value
+    
+    # Run MES visualization
+    result = run_mes_visualization(
+        settings=settings,
+        projects=projects,
+        votes=votes,
+        output_path=str(output_path),
+        implementation=implementation
+    )
+    
+    # Print results
+    if result and result.status == "success":
+        print("\nVisualization generated successfully!")
+        print("\nProject allocations:")
+        for project_id, amount in result.results.items():
+            if amount > 0:
+                project = projects[project_id]
+                print(f"- {project.name}: {amount} points")
+        
+        print(f"\nTotal cost: {result.total_cost}")
+        print(f"Budget per voter: {result.budget_per_voter}")
+        print(f"Visualization saved to: {result.visualization_path}")
+    else:
+        print(f"\nError occurred: {result.error if result else 'Unknown error'}")
+        if result and result.traceback:
+            print(f"Traceback: {result.traceback}")
+
 def run_example():
-    """Run example usage of the MES visualizer."""
+    """Run example usage of the MES visualizer with both implementations."""
     try:
         # Create sample data
         settings, projects, votes = create_sample_data()
         
-        print("\nRunning MES Visualization Example")
-        print("-" * 40)
+        print("\nRunning MES Visualization Comparison")
+        print("=" * 40)
         print(f"Number of projects: {len(projects)}")
         print(f"Number of voters: {len(votes)}")
         print(f"Total budget: {settings.max_total_points}")
         
-        # Run MES visualization
-        result = run_mes_visualization(
-            settings=settings,
-            projects=projects,
-            votes=votes,
-            output_path="./output",
-            implementation=MESImplementation.CUSTOM
+        # Setup output directory
+        output_dir = Path(__file__).parent / "output"
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Test custom implementation
+        run_implementation_test(
+            settings, 
+            projects, 
+            votes, 
+            MESImplementation.CUSTOM,
+            output_dir
         )
         
-        # Print results
-        if result.status == "success":
-            print("\nVisualization generated successfully!")
-            print("\nProject allocations:")
-            for project_id, amount in result.results.items():
-                if amount > 0:
-                    project = projects[project_id]
-                    print(f"- {project.name}: {amount} points")
-            
-            print(f"\nTotal cost: {result.total_cost}")
-            print(f"Budget per voter: {result.budget_per_voter}")
-            print(f"Visualization saved to: {result.visualization_path}")
-        else:
-            print(f"\nError occurred: {result.error}")
-            if result.traceback:
-                print(f"Traceback: {result.traceback}")
-                
+        # Test pabutools implementation
+        run_implementation_test(
+            settings, 
+            projects, 
+            votes, 
+            MESImplementation.PABUTOOLS,
+            output_dir
+        )
+        
+        print("\nComparison complete!")
+        print(f"Results saved in: {output_dir}")
+        
     except Exception as e:
         print(f"Error in example: {str(e)}")
         import traceback
