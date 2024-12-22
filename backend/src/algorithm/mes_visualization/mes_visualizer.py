@@ -67,20 +67,6 @@ def create_bids_from_votes(votes: List[Any]) -> Dict[int, Dict[int, int]]:
     
     return bids
 
-# def create_custom_bids_from_votes(votes: List[Any]) -> Dict[int, Dict[int, int]]:
-#     """Convert vote data to bids format (with the user's allocated points as the value)."""
-#     bids: Dict[int, Dict[int, int]] = {}
-    
-#     for vote in votes:
-#         voter_id = vote.voter.voter_id
-#         for project_vote in vote.projects:
-#             project_id = project_vote.project_id
-#             if project_id not in bids:
-#                 bids[project_id] = {}
-#             bids[project_id][voter_id] = project_vote.points if project_vote.points > 0 else 0
-    
-#     return bids
-
 def validate_input_data(
     voters: List[int],
     projects: Dict[int, Any],
@@ -147,6 +133,10 @@ def calculate_voting_statistics(
             - Dictionary mapping project IDs to vote counts
             - Total number of votes
     """
+    # Count the number of voters
+    unique_voters = len({vote.voter.voter_id for vote in votes})
+    
+    # Count votes per project
     votes_per_project = {}
     for project_id in projects:
         votes_count = sum(
@@ -156,7 +146,8 @@ def calculate_voting_statistics(
         )
         votes_per_project[str(project_id)] = votes_count
     
-    return votes_per_project, sum(votes_per_project.values())
+    return votes_per_project, unique_voters
+
 
 def create_instance_metadata(
     settings: Any,
@@ -167,20 +158,32 @@ def create_instance_metadata(
     budget: float
 ) -> Dict[str, Any]:
     """Create metadata for pabutools Instance."""
-    project_costs = [mpq(str(p.min_points)) for p in projects.values()]
+    # Only count projects that received votes
+    active_projects = {
+        pid: proj for pid, proj in projects.items()
+        if votes_per_project.get(str(pid), 0) > 0
+    }
+    
+    # Calculate total allocations for selected projects
+    selected_project_costs = [
+        mpq(str(p.min_points)) for p in active_projects.values()
+    ]
+    total_allocated = float(sum(selected_project_costs))
+
     return {
         "poll_id": settings.poll_id,
         "budget": float(budget),
-        "num_voters": len(voters),
+        "num_voters": total_votes,
         "num_votes": total_votes,
         "votes_per_project": votes_per_project,
-        "total_cost": float(sum(project_costs)),
-        "avg_project_cost": float(sum(project_costs)) / len(projects),
-        "max_project_cost": float(max(p.max_points for p in projects.values())),
-        "min_project_cost": float(min(p.min_points for p in projects.values())),
+        "num_projects": len(active_projects),
+        "total_cost": total_allocated,
+        "avg_project_cost": float(sum(selected_project_costs)) / len(active_projects) if active_projects else 0,
+        "max_project_cost": float(max((p.max_points for p in active_projects.values()), default=0)),
+        "min_project_cost": float(min((p.min_points for p in active_projects.values()), default=0)),
         "description": "Participatory Budgeting Poll",
         "currency": "points",
-        "budget_per_voter": float(budget) / len(voters) if voters else 0,
+        "budget_per_voter": float(budget) / total_votes if total_votes > 0 else 0,
         "open_for_voting": settings.open_for_voting
     }
 
