@@ -67,6 +67,20 @@ def create_bids_from_votes(votes: List[Any]) -> Dict[int, Dict[int, int]]:
     
     return bids
 
+# def create_custom_bids_from_votes(votes: List[Any]) -> Dict[int, Dict[int, int]]:
+#     """Convert vote data to bids format (with the user's allocated points as the value)."""
+#     bids: Dict[int, Dict[int, int]] = {}
+    
+#     for vote in votes:
+#         voter_id = vote.voter.voter_id
+#         for project_vote in vote.projects:
+#             project_id = project_vote.project_id
+#             if project_id not in bids:
+#                 bids[project_id] = {}
+#             bids[project_id][voter_id] = project_vote.points if project_vote.points > 0 else 0
+    
+#     return bids
+
 def validate_input_data(
     voters: List[int],
     projects: Dict[int, Any],
@@ -189,9 +203,8 @@ def convert_to_pabutools_format(
             - ApprovalProfile: Pabutools ApprovalProfile with all voter ballots
     """
     try:
-        print(f'settings: {settings}')
-        print(f'projects: {projects}')
-        print(f'votes: {votes}')
+        # for vote in votes:
+        #     print(f'$vote: {vote}')
 
         # Extract and validate input data
         voters = extract_voters_from_votes(votes)
@@ -228,6 +241,8 @@ def convert_to_pabutools_format(
         
         # Create approval profile
         profile = ApprovalProfile()
+        # Store original votes for reference
+        setattr(profile, '_original_votes', votes)  
         for vote_data in votes:
             approved_projects = [
                 projects_map[pv.project_id]
@@ -309,11 +324,6 @@ def run_mes_visualization(
     output_path: str,
     implementation: MESImplementation = MESImplementation.CUSTOM
 ) -> MESResult:
-    print(f'mes_votes:\n')
-    for vote in votes:
-        print('*' * 10)
-        print(vote)
-    print('$' * 10)
     """
     Run MES algorithm and generate visualization.
     
@@ -331,6 +341,9 @@ def run_mes_visualization(
         Path(output_path).mkdir(parents=True, exist_ok=True)
         
         instance, profile = convert_to_pabutools_format(settings, projects, votes)
+
+        print(f'mes_instance: {instance}')
+        print(f'mes_profile: {profile}')
         
         logger.info(f"Running MES algorithm using {implementation.value} implementation...")
         

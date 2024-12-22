@@ -224,14 +224,14 @@ def run_example():
             output_dir
         )
         
-        # # Test pabutools implementation
-        # run_implementation_test(
-        #     settings, 
-        #     projects, 
-        #     votes, 
-        #     MESImplementation.PABUTOOLS,
-        #     output_dir
-        # )
+        # Test pabutools implementation
+        run_implementation_test(
+            settings, 
+            projects, 
+            votes, 
+            MESImplementation.PABUTOOLS,
+            output_dir
+        )
         
         print("\nComparison complete!")
         print(f"Results saved in: {output_dir}")
