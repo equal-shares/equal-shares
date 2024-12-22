@@ -309,6 +309,11 @@ def run_mes_visualization(
     output_path: str,
     implementation: MESImplementation = MESImplementation.CUSTOM
 ) -> MESResult:
+    print(f'mes_votes:\n')
+    for vote in votes:
+        print('*' * 10)
+        print(vote)
+    print('$' * 10)
     """
     Run MES algorithm and generate visualization.
     

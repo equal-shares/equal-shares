@@ -21,7 +21,7 @@ from src.config import config
 from src.database import get_db
 from src.logger import get_logger
 from src.models import Project, Settings, VoteData, get_projects, get_settings, get_votes
-from src.algorithm.mes_visualization.mes_visualizer import run_mes_visualization
+from src.algorithm.mes_visualization.mes_visualizer import MESImplementation, run_mes_visualization
 
 
 logger = get_logger()
@@ -408,12 +408,10 @@ def _report_generate_mes_visualization(
 ) -> None:
     """Generate MES visualization and add it to the report."""
     _report_log_info(report, "Generating MES visualization")
-    # Log data for debugging
-    _report_log_info(report, f"Settings: {settings}")
-    _report_log_info(report, f"Number of projects: {len(projects)}")
-    # _report_log_info(report, f"projects: {projects}")
-    _report_log_info(report, f"Number of votes: {len(votes)}")
-    # _report_log_info(report, f"votes: {votes}")
+    # # Log data for debugging
+    # _report_log_info(report, f"Settings: {settings}")
+    # _report_log_info(report, f"Number of projects: {len(projects)}")
+    # _report_log_info(report, f"Number of votes: {len(votes)}")
     
     try:
         # Create temporary directory for visualization files
@@ -423,6 +421,7 @@ def _report_generate_mes_visualization(
                 settings=settings,
                 projects=projects,
                 votes=votes,
+                implementation=MESImplementation.CUSTOM,
                 output_path=temp_dir
             )
             

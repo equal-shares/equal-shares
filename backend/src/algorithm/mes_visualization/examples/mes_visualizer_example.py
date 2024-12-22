@@ -8,47 +8,62 @@ import os
 from pathlib import Path
 from src.algorithm.mes_visualization.mes_visualizer import run_mes_visualization, MESImplementation
 
+class ProjectVote:
+    """Represents a single vote for a project."""
+    def __init__(self, poll_id, voter_id, project_id, points, rank):
+        self.poll_id = poll_id
+        self.voter_id = voter_id
+        self.project_id = project_id
+        self.points = points
+        self.rank = rank
+        
+    def __str__(self):
+        return (f"ProjectVote(project_id={self.project_id}, "
+                f"points={self.points}, rank={self.rank})")
+
+class Voter:
+    """Represents a voter."""
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+            
+    def __str__(self):
+        return (f"Voter(voter_id={self.voter_id}, "
+                f"email='{self.email}', note='{self.note}')")
+
+class VoteData:
+    """Contains vote information."""
+    def __init__(self, poll_id, voter, projects):
+        self.poll_id = poll_id
+        self.voter = voter
+        self.projects = projects
+        
+    def __str__(self):
+        projects_str = '\n    '.join(str(p) for p in self.projects)
+        return (f"VoteData(\n  poll_id={self.poll_id},\n"
+                f"  voter={self.voter},\n"
+                f"  projects=[\n    {projects_str}\n  ])")
+
+class Settings:
+    """Holds poll configuration."""
+    def __init__(self):
+        self.poll_id = 1
+        self.max_total_points = 1000
+        self.points_step = 100
+        self.open_for_voting = True
+        self.results = None
+
+class Project:
+    """Represents a project that can be voted on."""
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+    
+    def __str__(self):
+        return f"Project(id={self.project_id}, name='{self.name}', min_points={self.min_points})"
 
 def create_sample_data():
     """Create sample data structures for testing."""
-    
-    # Create sample classes to mimic the actual data structures
-    class Settings:
-        """Holds poll configuration."""
-        def __init__(self):
-            self.poll_id = 1
-            self.max_total_points = 1000
-            self.points_step = 100
-            self.open_for_voting = True
-            self.results = None
-    
-    class Project:
-        """Represents a project that can be voted on."""
-        def __init__(self, **kwargs):
-            for key, value in kwargs.items():
-                setattr(self, key, value)
-    
-    class Voter:
-        """Represents a voter."""
-        def __init__(self, **kwargs):
-            for key, value in kwargs.items():
-                setattr(self, key, value)
-    
-    class VoteData:
-        """Contains vote information."""
-        def __init__(self, poll_id, voter, projects):
-            self.poll_id = poll_id
-            self.voter = voter
-            self.projects = projects
-    
-    class ProjectVote:
-        """Represents a single vote for a project."""
-        def __init__(self, poll_id, voter_id, project_id, points, rank):
-            self.poll_id = poll_id
-            self.voter_id = voter_id
-            self.project_id = project_id
-            self.points = points
-            self.rank = rank
     
     # Create sample settings
     settings = Settings()
@@ -209,14 +224,14 @@ def run_example():
             output_dir
         )
         
-        # Test pabutools implementation
-        run_implementation_test(
-            settings, 
-            projects, 
-            votes, 
-            MESImplementation.PABUTOOLS,
-            output_dir
-        )
+        # # Test pabutools implementation
+        # run_implementation_test(
+        #     settings, 
+        #     projects, 
+        #     votes, 
+        #     MESImplementation.PABUTOOLS,
+        #     output_dir
+        # )
         
         print("\nComparison complete!")
         print(f"Results saved in: {output_dir}")

@@ -84,6 +84,8 @@ def validate_input_data(
     Raises:
         ValidationError: If validation fails
     """
+    
+
     if not voters:
         raise ValidationError("Voters list cannot be empty")
     if not projects:
