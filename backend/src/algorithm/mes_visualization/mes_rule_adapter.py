@@ -72,6 +72,10 @@ def convert_pabutools_input(
 
 def create_mes_iteration(round_info, project, instance, profile) -> MESIteration:
     """Create MES iteration details for visualization."""
+    # Skip if this is a budget update round or has no actual cost
+    if round_info.is_budget_update or round_info.cost == 0:
+        return None
+
     iteration = MESIteration()
     
     # Find the project from instance
@@ -152,7 +156,8 @@ def method_of_equal_shares(
                    effective_votes: Dict[int, float],
                    voter_budgets: Dict[int, float]) -> None:
         if tracker:
-            tracker.add_round(
+            print(f"DEBUG - Tracking round - Project: {project_id}, Cost: {cost}")
+            round_info = tracker.add_round(
                 selected_project=project_id,
                 effective_votes=effective_votes,
                 voter_budgets=voter_budgets
@@ -168,23 +173,43 @@ def method_of_equal_shares(
         tracker_callback=track_round if analytics else None
     )
 
+    print(f"DEBUG - Algorithm winners: {winners}")
+
     if analytics and tracker:
         # Create MES details with iterations
         details = MESAllocationDetails([1] * len(input_data.voters))
-        for round_info in tracker.rounds:
-            iteration = create_mes_iteration(round_info, winners, instance, profile)
-            details.iterations.append(iteration)
         
+        print(f"DEBUG - All rounds: {len(tracker.rounds)}")
+        print(f"DEBUG - Project rounds: {len(tracker.project_rounds)}")
+        print(f"DEBUG - Winners map: {tracker.winners}")
+        print(f"DEBUG - Running totals: {tracker.running_totals}")
+        
+        print(f"DEBUG - Tracker rounds with projects:")
+        for round in tracker.project_rounds:
+            print(f"  Project: {round.selected_project}, Cost: {round.cost} "
+                  f"(Total: {tracker.running_totals.get(round.selected_project, 0)})")
+
+        # Only create iterations for actual winning projects
+        project_iterations = []
+        for round_info in tracker.project_rounds:
+            iteration = create_mes_iteration(round_info, winners, instance, profile)
+            if iteration:
+                project_iterations.append(iteration)
+        
+        details.iterations = project_iterations
+        print(f"DEBUG - Created iterations: {len(details.iterations)}")
+
         # Create allocation with details
         allocation = BudgetAllocation()
         allocation.details = details
         
-        # Add selected projects
-        for project_id, cost in winners.items():
+        # Add only projects with actual costs from winners map
+        for project_id, cost in tracker.winners.items():
             if cost > 0:
                 project = next(p for p in instance if int(p.name) == project_id)
                 allocation.append(project)
                 
+        print(f"DEBUG - Final allocation count: {len(allocation)}")
         return allocation
     else:
         # Return simple budget allocation without analytics

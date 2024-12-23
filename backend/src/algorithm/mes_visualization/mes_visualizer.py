@@ -158,27 +158,24 @@ def create_instance_metadata(
     budget: float
 ) -> Dict[str, Any]:
     """Create metadata for pabutools Instance."""
-    # Only count projects that received votes
+    # Only count active projects (those that received votes)
     active_projects = {
         pid: proj for pid, proj in projects.items()
         if votes_per_project.get(str(pid), 0) > 0
     }
     
-    # Calculate total allocations for selected projects
-    selected_project_costs = [
-        mpq(str(p.min_points)) for p in active_projects.values()
-    ]
-    total_allocated = float(sum(selected_project_costs))
-
-    return {
+    project_costs = [mpq(str(p.min_points)) for p in active_projects.values()]
+    
+    metadata = {
         "poll_id": settings.poll_id,
         "budget": float(budget),
         "num_voters": total_votes,
         "num_votes": total_votes,
         "votes_per_project": votes_per_project,
-        "num_projects": len(active_projects),
-        "total_cost": total_allocated,
-        "avg_project_cost": float(sum(selected_project_costs)) / len(active_projects) if active_projects else 0,
+        "total_projects": len(projects),
+        "active_projects": len([p for p in projects.values() if p.min_points > 0]),
+        "total_cost": float(sum(project_costs)),
+        "avg_project_cost": float(sum(project_costs)) / len(active_projects) if active_projects else 0,
         "max_project_cost": float(max((p.max_points for p in active_projects.values()), default=0)),
         "min_project_cost": float(min((p.min_points for p in active_projects.values()), default=0)),
         "description": "Participatory Budgeting Poll",
@@ -186,6 +183,9 @@ def create_instance_metadata(
         "budget_per_voter": float(budget) / total_votes if total_votes > 0 else 0,
         "open_for_voting": settings.open_for_voting
     }
+    
+    print(f"Debug - Metadata: {metadata}")
+    return metadata
 
 def convert_to_pabutools_format(
     settings: Any,
@@ -292,18 +292,22 @@ def process_mes_results(
             - Dict mapping project IDs to their allocations (cost if selected, 0 if not)
             - Total cost of all selected projects
     """
-    print(f'outcome: BudgetAllocation: {outcome}')
     results = {}
     total_cost = 0
     
+    # Get actual allocated costs for each project
     for project in instance:
         project_id = int(project.name)
         if project in outcome:
+            # Use the actual allocated cost from the algorithm
             cost = float(project.cost)
             results[project_id] = cost
             total_cost += cost
         else:
             results[project_id] = 0
+            
+    print(f"Selected projects and costs: {results}")
+    print(f"Total allocated cost: {total_cost}")
             
     return results, total_cost
 
@@ -344,10 +348,11 @@ def run_mes_visualization(
         Path(output_path).mkdir(parents=True, exist_ok=True)
         
         instance, profile = convert_to_pabutools_format(settings, projects, votes)
-
-        print(f'mes_instance: {instance}')
-        print(f'mes_profile: {profile}')
         
+        # debug logging
+        print(f"DEBUG - Before MES - Instance projects: {len(instance)}")
+        print(f"DEBUG - Before MES - Profile ballots: {len(profile)}")
+
         logger.info(f"Running MES algorithm using {implementation.value} implementation...")
         
         # Get appropriate MES implementation
@@ -361,6 +366,9 @@ def run_mes_visualization(
             verbose=False
         )
 
+        print(f"DEBUG - After MES - Outcome projects: {len(outcome)}")
+        print(f"DEBUG - Selected projects: {[p.name for p in outcome]}")
+
         logger.info(f'outcome type: {type(outcome)}')
         logger.info(f'outcome details: {dir(outcome)}')
         
@@ -373,10 +381,21 @@ def run_mes_visualization(
 
         logger.info("Generating visualization...")
         visualizer = MESVisualiser(profile, instance, outcome, verbose=False)
+
+        # Ensure we're only counting actual project selections
+        if hasattr(outcome.details, 'iterations'):
+            print(f"DEBUG - Before filter iterations count: {len(outcome.details.iterations)}")
+
         visualizer.render(output_path)
         
         results, total_cost = process_mes_results(instance, outcome)
-        logger.info(f"Total cost of selected projects: {total_cost}")
+        logger.info(f"Projects count: {len(projects)}")
+        logger.info(f"Active projects: {len([p for p in results.values() if p > 0])}")
+        logger.info(f"Total allocated cost: {total_cost}")
+
+        print(f"Projects count: {len(projects)}")
+        print(f"Active projects: {len([p for p in results.values() if p > 0])}")
+        print(f"Total allocated cost: {total_cost}")
         
         return MESResult(
             status="success",
