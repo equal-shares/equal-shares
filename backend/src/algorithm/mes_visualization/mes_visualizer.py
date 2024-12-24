@@ -376,6 +376,7 @@ def run_mes_visualization(
         )
 
         print(f"DEBUG - After MES - Outcome projects: {len(outcome)}")
+        print(f"DEBUG - After MES - Outcome: {outcome}")
         print(f"DEBUG - Selected projects: {[p.name for p in outcome]}")
 
         logger.info(f'outcome type: {type(outcome)}')

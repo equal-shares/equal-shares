@@ -405,6 +405,7 @@ def equal_shares_fixed_budget(
                 f"Tie-breaking failed: tie between projects {best_found} "
                 + "could not be resolved. Another tie-breaking needs to be added."
             )
+        
         chosen_candidate = best_found[0]
 
         """
@@ -478,8 +479,27 @@ def equal_shares_fixed_budget(
         # check if the curr cost + total update codt <= max value for this projec
         # logger.info(" total project price   = %s", winners_total_cost[chosen_candidate])
 
+        # print(f"\nDEBUG - About to call tracker:")
+        # print(f"  - Chosen project: {chosen_candidate}")
+        # print(f"  - Cost: {chosen_candidate_cost}")
+        # print(f"  - Tracker exists: {tracker_callback is not None}")
+        # if tracker_callback:
+        #     effective_votes = {
+        #         pid: len(voters) 
+        #         for pid, voters in updated_bids.items() 
+        #         if pid in remaining_candidates
+        #     }
+        #     print(f"  - Effective votes: {effective_votes}")
+        #     print(f"  - Voter budgets: {voters_budgets}")
+        #     tracker_callback(
+        #         project_id=chosen_candidate,
+        #         cost=chosen_candidate_cost,
+        #         effective_votes=effective_votes,
+        #         voter_budgets=voters_budgets
+        #     )
+
         # Call tracker if provided
-        if tracker_callback:
+        if tracker_callback is not None:
             tracker_callback(
                 project_id=chosen_candidate,
                 cost=chosen_candidate_cost,
