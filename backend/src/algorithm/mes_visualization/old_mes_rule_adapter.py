@@ -5,14 +5,14 @@ pabutools interface with our implementation.
 
 from typing import Optional, Dict, List, Any
 from dataclasses import dataclass
-from gmpy2 import mpq
 
 from pabutools.election import Instance, AbstractProfile, Cost_Sat
 from pabutools.rules import BudgetAllocation
 from pabutools.rules.mes.mes_details import MESAllocationDetails, MESIteration, MESProjectDetails
 
 from src.algorithm.equal_shares import equal_shares
-
+from src.algorithm.mes_visualization.round_tracker import RoundTracker
+from src.algorithm.mes_visualization.pabutools_adapter import CustomBudgetAllocation
 
 @dataclass
 class MESInput:
@@ -23,24 +23,26 @@ class MESInput:
     bids: Dict[int, Dict[int, int]]
     projects_meta: Dict[int, Any]
 
-
-def convert_pabutools_input(instance: Instance, profile: AbstractProfile) -> MESInput:
-    """Convert pabutools input format to algorithm format."""
+def convert_pabutools_input(
+    instance: Instance,
+    profile: AbstractProfile
+) -> MESInput:
+    """Convert pabutools input format to our algorithm format."""
     # Extract voters
     voters = list(range(profile.num_ballots()))
     
-    # Extract project costs using max_points
-    projects_costs = {}
-    for project in instance:
-        project_id = int(project.name)
-        meta = instance.project_meta.get(str(project_id), {})
-        # Use max_points if available, otherwise use cost
-        projects_costs[project_id] = meta.get('max_points', float(project.cost))
+    # Extract project costs
+    projects_costs = {
+        int(project.name): float(project.cost)
+        for project in instance
+    }
     
-    # Extract bids from original votes
+    # Extract bids using original vote points
     bids = {}
     original_votes = getattr(profile, '_original_votes', None)
+    
     if original_votes:
+        # Use original vote points
         for vote_data in original_votes:
             voter_id = vote_data.voter.voter_id
             for project_vote in vote_data.projects:
@@ -49,19 +51,23 @@ def convert_pabutools_input(instance: Instance, profile: AbstractProfile) -> MES
                     bids[project_id] = {}
                 bids[project_id][voter_id] = project_vote.points if project_vote.points > 0 else 0
     else:
-        # Fallback to binary approval if no original votes
+        # Fallback to binary approval if original votes not available
         for project in instance:
             project_id = int(project.name)
             bids[project_id] = {}
             for voter_idx, ballot in enumerate(profile):
                 bids[project_id][voter_idx] = 1 if project in ballot else 0
 
+    print(f'bids: {bids}')
+
     return MESInput(
         voters=voters,
         projects_costs=projects_costs,
         budget=float(instance.budget_limit),
         bids=bids,
-        projects_meta={int(p.name): p for p in instance}
+        projects_meta={
+            int(p.name): p for p in instance
+        }
     )
 
 def create_mes_iteration(round_info, project, instance, profile) -> MESIteration:
@@ -136,80 +142,80 @@ def method_of_equal_shares(
     verbose: bool = False,
     **kwargs
 ) -> BudgetAllocation:
+    """
+    Custom implementation of Method of Equal Shares that integrates with pabutools.
+    """
     # Convert input
     input_data = convert_pabutools_input(instance, profile)
     
-    # Run algorithm and get winners
-    winners, payments = equal_shares(
+    # Initialize tracker if analytics enabled
+    tracker = RoundTracker(input_data.budget) if analytics else None
+    
+    # Create tracking callback
+    def track_round(project_id: int, cost: float, 
+                   effective_votes: Dict[int, float],
+                   voter_budgets: Dict[int, float]) -> None:
+        if tracker:
+            print(f"DEBUG - Tracking round - Project: {project_id}, Cost: {cost}")
+            round_info = tracker.add_round(
+                selected_project=project_id,
+                effective_votes=effective_votes,
+                voter_budgets=voter_budgets
+            )
+            tracker.update_budget(cost)
+            
+    # Run algorithm
+    winners, _ = equal_shares(
         voters=input_data.voters,
         projects_costs=input_data.projects_costs,
         budget=input_data.budget,
         bids=input_data.bids,
-        tracker_callback=None
+        tracker_callback=track_round if analytics else None
     )
 
-    print(f"DEBUG - Winners and their allocations: {winners}")
+    print(f"DEBUG - Algorithm winners: {winners}")
 
-    # Create allocation with the allocated amounts
-    allocation = BudgetAllocation()
-    
-    if analytics:
+    if analytics and tracker:
+        # Create MES details with iterations
         details = MESAllocationDetails([1] * len(input_data.voters))
+        
+        print(f"DEBUG - All rounds: {len(tracker.rounds)}")
+        print(f"DEBUG - Project rounds: {len(tracker.project_rounds)}")
+        print(f"DEBUG - Winners map: {tracker.winners}")
+        print(f"DEBUG - Running totals: {tracker.running_totals}")
+        
+        print(f"DEBUG - Tracker rounds with projects:")
+        for round in tracker.project_rounds:
+            print(f"  Project: {round.selected_project}, Cost: {round.cost} "
+                  f"(Total: {tracker.running_totals.get(round.selected_project, 0)})")
+
+        # Only create iterations for actual winning projects
         project_iterations = []
-        
-        # Calculate initial voter budgets
-        initial_budget_per_voter = input_data.budget / len(input_data.voters)
-        remaining_budgets = {voter: initial_budget_per_voter for voter in input_data.voters}
-        
-        # Create iterations for winning projects
-        for project_id, allocated_cost in winners.items():
-            if allocated_cost > 0:
-                project = next(p for p in instance if int(p.name) == project_id)
-                
-                # Update the project's cost to reflect actual allocation
-                project.cost = mpq(str(allocated_cost))
-                
-                iteration = MESIteration()
-                
-                # Get supporter indices
-                voter_indices = []
-                for voter_idx, ballot in enumerate(profile):
-                    if project in ballot:
-                        voter_indices.append(voter_idx)
-                        # Update remaining budget
-                        voter_id = input_data.voters[voter_idx]
-                        payment = payments.get(project_id, {}).get(voter_id, 0)
-                        remaining_budgets[voter_id] -= payment
-                
-                # Set required properties
-                project.supporter_indices = voter_indices
-                project.affordability = allocated_cost / (len(voter_indices) if voter_indices else 1)
-                project.effective_vote_count = len(voter_indices)
-                
-                # Create project details with actual allocation
-                project_details = MESProjectDetails(project, iteration)
-                project_details.allocation = allocated_cost
-                project_details.affordability = project.affordability
-                project_details.effective_vote_count = project.effective_vote_count
-                
-                # Set iteration details
-                iteration.selected_project = project
-                iteration.voters_budget = list(remaining_budgets.values())
-                iteration.voters_budget_after_selection = list(remaining_budgets.values())
-                
-                iteration.append(project_details)
+        for round_info in tracker.project_rounds:
+            iteration = create_mes_iteration(round_info, winners, instance, profile)
+            if iteration:
                 project_iterations.append(iteration)
-                allocation.append(project)
         
         details.iterations = project_iterations
-        details.allocations = winners
-        allocation.details = details
-    else:
-        # Simple allocation without analytics
-        for project_id, allocated_cost in winners.items():
-            if allocated_cost > 0:
-                project = next(p for p in instance if int(p.name) == project_id)
-                project.cost = mpq(str(allocated_cost))
-                allocation.append(project)
+        print(f"DEBUG - Created iterations: {len(details.iterations)}")
 
-    return allocation
+        # Create allocation with details
+        allocation = BudgetAllocation()
+        allocation.details = details
+        
+        # Add only projects with actual costs from winners map
+        for project_id, cost in tracker.winners.items():
+            if cost > 0:
+                project = next(p for p in instance if int(p.name) == project_id)
+                allocation.append(project)
+                
+        print(f"DEBUG - Final allocation count: {len(allocation)}")
+        return allocation
+    else:
+        # Return simple budget allocation without analytics
+        allocation = BudgetAllocation()
+        for project_id, cost in winners.items():
+            if cost > 0:
+                project = next(p for p in instance if int(p.name) == project_id)
+                allocation.append(project)
+        return allocation

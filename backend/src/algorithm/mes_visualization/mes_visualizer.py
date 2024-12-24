@@ -295,20 +295,29 @@ def process_mes_results(
     results = {}
     total_cost = 0
     
-    # Get actual allocated costs for each project
+    # Get actual allocations from details if available
+    actual_allocations = {}
+    if hasattr(outcome, 'details') and hasattr(outcome.details, 'allocations'):
+        actual_allocations = outcome.details.allocations
+    
+    # Process each project
     for project in instance:
         project_id = int(project.name)
         if project in outcome:
-            # Use the actual allocated cost from the algorithm
-            cost = float(project.cost)
+            # Use the actual allocated amount if available
+            if project_id in actual_allocations:
+                cost = float(actual_allocations[project_id])
+            else:
+                # Fallback to project cost if no allocation found
+                cost = float(project.cost)
             results[project_id] = cost
             total_cost += cost
         else:
             results[project_id] = 0
             
-    print(f"Selected projects and costs: {results}")
-    print(f"Total allocated cost: {total_cost}")
-            
+    print(f"Processing results with actual allocations: {actual_allocations}")
+    print(f"Final results: {results}")
+    
     return results, total_cost
 
 class MESImplementation(Enum):

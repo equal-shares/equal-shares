@@ -70,6 +70,7 @@ def equal_shares(
     Raises:
         ValueError: If project costs exceed available budgets or if cost distribution fails.
     """
+    print(f'euqal_shares input bids: {bids}')
     projects = projects_costs.keys() # Get list of project IDs
     bids = remove_zero_bids(bids)
     bids = remove_invalid_bids(voters, bids) # Remove bids from invalid voters
