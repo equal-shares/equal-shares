@@ -31,50 +31,42 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
     try:
         # Create map of project names to the ORIGINAL pabutools Project instances
         project_map = {p.name: p for p in instance}
-        # print(f'project_map: {project_map}')
         
         # Set supporter indices using original instances
-        for proj in instance:  # Use pabutools' instances directly
-            # print(f'- proj: {proj}')
+        for proj in instance:
             vote_indices = [i for i, ballot in enumerate(profile) if proj in ballot]
             proj.supporter_indices = vote_indices
-            # print(f'proj.supporter_indices: {proj.supporter_indices}')
-        
-        # Create effective votes mapping using original Project instances
-        effective_votes_map = {}
-        for proj_id, votes in round_info.effective_votes.items():
-            # print(f'proj_id: votes - {proj_id}: {votes}')
-            proj = project_map[str(proj_id)]  # Use string name to lookup original instance
-            effective_votes_map[proj] = votes
-            proj.effective_vote_count = votes
-            proj.affordability = 1.0 / votes if votes > 0 else float('inf') # Higher votes = lower affordability
-            
-            proj_details = MESProjectDetails(proj, iteration)
-            proj_details.affordability = proj.affordability
-            proj_details.effective_vote_count = votes
-            iteration.append(proj_details)
-        # print(f'effective_votes_map: {effective_votes_map}')
 
+            # Create project details for each project and add to iteration
+            proj_details = MESProjectDetails(proj, iteration)
+            iteration.append(proj_details)
+            
+            # Initialize essential visualization attributes for ALL projects
+            # Set to defaults if not in current round's effective votes
+            proj_name = proj.name
+            votes = round_info.effective_votes.get(proj_name, 0.0)
+            
+            # Set on both Project and ProjectDetails
+            for target in [proj, proj_details]:
+                # These attributes must exist even if zero
+                target.effective_vote_count = votes
+                target.affordability = 1.0 / votes if votes > 0 else float('inf')
+        
         # Set selected project using original instance
         selected_proj = project_map[str(round_info.selected_project)]
         iteration.selected_project = selected_proj
         
-        # Set iteration properties
-        iteration.effective_vote_count = effective_votes_map
-        # print(f'iteration.effective_vote_count: {effective_votes_map}')
-        # TODO: voters_budget and voters_budget_after_selection get the same value, have to fix that?
+        # Set budget information
         iteration.voters_budget = list(round_info.voter_budgets.values())
-        # print(f'iteration.voters_budget: {list(round_info.voter_budgets.values())}')
         iteration.voters_budget_after_selection = list(round_info.voter_budgets.values())
-        # print(f'iteration.voters_budget_after_selection: {list(round_info.voter_budgets.values())}')
 
-        # Debug verification with memory addresses
         print(f"\nIteration details:")
         print(f"  Selected project: {id(iteration.selected_project)}")
-        for proj, votes in effective_votes_map.items():
-            print(f"  Project {proj.name}: id={id(proj)}, votes={votes}")
-
-        print(f'- returned iteration: {iteration}')
+        for proj_details in iteration:
+            print(f"  Project {proj_details.project.name}: "
+                  f"id={id(proj_details.project)}, "
+                  f"votes={getattr(proj_details.project, 'effective_vote_count', None)}, "
+                  f"affordability={getattr(proj_details.project, 'affordability', None)}")
 
         return iteration
         

@@ -329,15 +329,20 @@
 
             <!-- Heading before table is displayed-->
             <h2>Results</h2>
-            <p>The budget of 1,000 points was allocated across 1 projects:<br>
+            <p>The budget of 1,000 points was allocated across 2 projects:<br>
                Hover your mouse cursor over the bars to identify each project that got selected and how much was removed from the overall budget.</p>
             <div class='budget-chart-container'>
                 <div class="center"><span><b>Budget allocation across selected projects.</b></span></div>
                 <div class='chart-budget'>
                     
                         <div class='bar bar-blue bar-border'
+                            style='width: 64.299999999999997&#37;;'
+                            data-tippy-content="Project 1: <q>Student Lounge Update</q> was voted in round 1, costing 643 points. This is 64&#37; of the budget.">
+                        </div>
+                    
+                        <div class='bar bar-blue bar-border'
                             style='width: 34.300000000000004&#37;;'
-                            data-tippy-content="Project 2: <q>Research Lab Equipment</q> was voted in round 1, costing 343 points. This is 34&#37; of the budget.">
+                            data-tippy-content="Project 2: <q>Research Lab Equipment</q> was voted in round 2, costing 343 points. This is 34&#37; of the budget.">
                         </div>
                     
                 </div>
@@ -372,8 +377,83 @@
                 </thead>
                 <tbody>
                     
+                        <tr class='clickable-row winner' id='project-1' onclick="showHiddenRow('1');">
+                        <td class='num' sorttable_customkey='1'><div class="split-cell"><span id="expand-symbol-1">&#8250;</span><span>1</span></div></td>
+                        <td class='num' style='text-align:right' sorttable_customkey='1'>1</td>
+                        <td>Student Lounge Update</td>
+                        <td class='num' style='text-align:right' sorttable_customkey='643'>643</td>
+                        <td class='num' style='text-align:right' sorttable_customkey='3'>3</td>
+                        <td style='text-align:right' sorttable_customkey='0.0'>0</td>
+                        <td>
+                            <div class='chart-container'>
+                                <div class='cost-locator-container'>
+                                    <div class='cost-locator' 
+                                        style='left: calc(64.299999999999997&#37; - 9px);'
+                                        data-tippy-content='Project Cost: 643 points.'>
+                                            <b>
+                                                &darr; 643
+                                            </b>
+                                    </div>
+                                </div>
+
+                                <div class='chart'>
+                                    <div class='bar bar-blue'
+                                        style='width: 42.9&#37;;'
+                                        data-tippy-content='&#10004; Supporters of the project have 429 points, which is enough to cover the cost 643 points.'>
+                                    </div>
+                                    <div class='bar bar-light'
+                                        
+                                        onmouseover='highlight_project([])'
+                                        onmouseout='unhighlight_project([])'
+                                        style='width: 57.099999999999994&#37;;'
+                                        data-tippy-content='<html lang=\"en\"><body">From the initial total funding, <b> 571.00 points </b> was spent on previously selected projects. </br> Most of the funding was spent on:<br><br><ul></ul>'allowHTML: true>
+                                    </div>
+                                </div>
+
+                                <div class='cost-locator-container'>
+                                    <div class='cost-locator'
+                                        style='left: calc(100.0&#37; - 9px);'
+                                        data-tippy-content='Project initially has a funding of 1,000.00 points.'>
+                                        <b>
+                                            &uarr;
+                                        </b>
+                                        1,000.00
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        </tr>
+                        <tr class='hidden-row' id='hidden-1'>
+                            <td colspan=7>
+                                <div style='text-align: left'>
+                                    <b>Round Analysis:</b><a href='_round_analysis.html?projectId=1'> Click Me!</a> <br>
+                                    <b>Description:</b> Renovate the main student lounge with new furniture and study areas <br>
+                                    <b>Categories:</b> <br>
+                                    
+                                    <b>Other Details:</b><br>
+                                    <br>
+                                    <!-- Sample expalanations -->
+                                    <div>
+                                        <h4>Why was this project selected?</h4>
+                                        
+                                            This project was accepted because its supporters were able to pay for the project's cost - <b>643</b> points -
+                                            using the total funding available to them at the start of round 1 (<b>429.00</b> points). <br><br>
+                                            Note that the supporters of this project initially had more funding available to them (<b>1,000.00 </b> points). However, this funding
+                                            was lost as these supporters had also funded projects in the previous rounds, decreasing the total funding available to them, but not to the point where the project cost exceedes the combined funds of the supporters.
+                                            As a result, this project could still be afforded.<br><br>
+                                            These projects and the specific funding lost can be seen below.
+                                        
+                                    </div>
+                                    <br>
+                                    <h4>Funding spent in previous rounds.</h4>From the initial total funding, <b> 571.00 points </b> was spent on previously selected projects. <br> The funding was spent on:<ul></ul>
+                                    
+                                </div>
+                            </td>
+                        </tr>
+                        
+                    
                         <tr class='clickable-row winner' id='project-2' onclick="showHiddenRow('2');">
-                        <td class='num' sorttable_customkey='1'><div class="split-cell"><span id="expand-symbol-2">&#8250;</span><span>1</span></div></td>
+                        <td class='num' sorttable_customkey='2'><div class="split-cell"><span id="expand-symbol-2">&#8250;</span><span>2</span></div></td>
                         <td class='num' style='text-align:right' sorttable_customkey='2'>2</td>
                         <td>Research Lab Equipment</td>
                         <td class='num' style='text-align:right' sorttable_customkey='343'>343</td>
@@ -393,15 +473,15 @@
 
                                 <div class='chart'>
                                     <div class='bar bar-blue'
-                                        style='width: 53.6&#37;;'
-                                        data-tippy-content='&#10004; Supporters of the project have 536 points, which is enough to cover the cost 343 points.'>
+                                        style='width: 55.60000000000001&#37;;'
+                                        data-tippy-content='&#10004; Supporters of the project have 556 points, which is enough to cover the cost 343 points.'>
                                     </div>
                                     <div class='bar bar-light'
                                         
-                                        onmouseover='highlight_project([])'
-                                        onmouseout='unhighlight_project([])'
-                                        style='width: 46.400000000000006&#37;;'
-                                        data-tippy-content='<html lang=\"en\"><body">From the initial total funding, <b> 464.00 points </b> was spent on previously selected projects. </br> Most of the funding was spent on:<br><br><ul></ul>'allowHTML: true>
+                                        onmouseover='highlight_project(["project-1",])'
+                                        onmouseout='unhighlight_project(["project-1",])'
+                                        style='width: 44.4&#37;;'
+                                        data-tippy-content='<html lang=\"en\"><body">From the initial total funding, <b> 444.00 points </b> was spent on previously selected projects. </br> Most of the funding was spent on:<br><br><ul><li><b>Project 1 - Student Lounge Update:</b> -127.00 points<hr style="width: -28.603603603603606&#37;;height: 10px;color: #f6c8c8;background-color: #f6c8c8;text-align: left;margin: 3px 5px 7px 0"></hr></li></ul>'allowHTML: true>
                                     </div>
                                 </div>
 
@@ -432,7 +512,7 @@
                                         <h4>Why was this project selected?</h4>
                                         
                                             This project was accepted because its supporters were able to pay for the project's cost - <b>343</b> points -
-                                            using the total funding available to them at the start of round 1 (<b>536.00</b> points). <br><br>
+                                            using the total funding available to them at the start of round 2 (<b>556.00</b> points). <br><br>
                                             Note that the supporters of this project initially had more funding available to them (<b>1,000.00 </b> points). However, this funding
                                             was lost as these supporters had also funded projects in the previous rounds, decreasing the total funding available to them, but not to the point where the project cost exceedes the combined funds of the supporters.
                                             As a result, this project could still be afforded.<br><br>
@@ -440,7 +520,7 @@
                                         
                                     </div>
                                     <br>
-                                    <h4>Funding spent in previous rounds.</h4>From the initial total funding, <b> 464.00 points </b> was spent on previously selected projects. <br> The funding was spent on:<ul></ul>
+                                    <h4>Funding spent in previous rounds.</h4>From the initial total funding, <b> 444.00 points </b> was spent on previously selected projects. <br> The funding was spent on:<ul><li><b>Project 1 - Student Lounge Update:</b> -127.00 points<hr style="width: -28.603603603603606&#37;;height: 10px;color: #f6c8c8;background-color: #f6c8c8;text-align: left;margin: 3px 5px 7px 0"></li></ul>
                                     
                                 </div>
                             </td>
