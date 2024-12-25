@@ -31,19 +31,19 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
     try:
         # Create map of project names to the ORIGINAL pabutools Project instances
         project_map = {p.name: p for p in instance}
-        print(f'project_map: {project_map}')
+        # print(f'project_map: {project_map}')
         
         # Set supporter indices using original instances
         for proj in instance:  # Use pabutools' instances directly
-            print(f'- proj: {proj}')
+            # print(f'- proj: {proj}')
             vote_indices = [i for i, ballot in enumerate(profile) if proj in ballot]
             proj.supporter_indices = vote_indices
-            print(f'proj.supporter_indices: {proj.supporter_indices}')
+            # print(f'proj.supporter_indices: {proj.supporter_indices}')
         
         # Create effective votes mapping using original Project instances
         effective_votes_map = {}
         for proj_id, votes in round_info.effective_votes.items():
-            print(f'proj_id: votes - {proj_id}: {votes}')
+            # print(f'proj_id: votes - {proj_id}: {votes}')
             proj = project_map[str(proj_id)]  # Use string name to lookup original instance
             effective_votes_map[proj] = votes
             proj.effective_vote_count = votes
@@ -53,7 +53,7 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
             proj_details.affordability = proj.affordability
             proj_details.effective_vote_count = votes
             iteration.append(proj_details)
-        print(f'effective_votes_map: {effective_votes_map}')
+        # print(f'effective_votes_map: {effective_votes_map}')
 
         # Set selected project using original instance
         selected_proj = project_map[str(round_info.selected_project)]
@@ -61,12 +61,12 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
         
         # Set iteration properties
         iteration.effective_vote_count = effective_votes_map
-        print(f'iteration.effective_vote_count: {effective_votes_map}')
+        # print(f'iteration.effective_vote_count: {effective_votes_map}')
         # TODO: voters_budget and voters_budget_after_selection get the same value, have to fix that?
         iteration.voters_budget = list(round_info.voter_budgets.values())
-        print(f'iteration.voters_budget: {list(round_info.voter_budgets.values())}')
+        # print(f'iteration.voters_budget: {list(round_info.voter_budgets.values())}')
         iteration.voters_budget_after_selection = list(round_info.voter_budgets.values())
-        print(f'iteration.voters_budget_after_selection: {list(round_info.voter_budgets.values())}')
+        # print(f'iteration.voters_budget_after_selection: {list(round_info.voter_budgets.values())}')
 
         # Debug verification with memory addresses
         print(f"\nIteration details:")
