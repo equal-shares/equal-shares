@@ -78,7 +78,7 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
 def convert_pabutools_input(instance: Instance, profile: AbstractProfile) -> MESInput:
     """Convert pabutools input format to algorithm format."""
     # Extract voters
-    voters = list(range(len(profile)))
+    voters = getattr(profile, '_voters', None)
     
     # Extract project costs
     projects_costs = {

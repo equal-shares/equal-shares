@@ -246,6 +246,8 @@ def convert_to_pabutools_format(
         profile = ApprovalProfile()
         # Store original votes for reference
         setattr(profile, '_original_votes', votes)  
+        # Store voters for reference
+        setattr(profile, '_voters', voters)  
         for vote_data in votes:
             approved_projects = [
                 projects_map[pv.project_id]
@@ -358,7 +360,6 @@ def run_mes_visualization(
         
         instance, profile = convert_to_pabutools_format(settings, projects, votes)
         
-        # debug logging
         print(f"DEBUG - Before MES - Instance projects: {len(instance)}")
         print(f"DEBUG - Before MES - Profile ballots: {len(profile)}")
 
