@@ -57,6 +57,7 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
         iteration.selected_project = selected_proj
         
         # Set budget information
+        # TODO: same budget
         iteration.voters_budget = list(round_info.voter_budgets.values())
         iteration.voters_budget_after_selection = list(round_info.voter_budgets.values())
 

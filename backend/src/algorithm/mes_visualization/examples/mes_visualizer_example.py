@@ -70,9 +70,9 @@ def create_sample_data():
     
     # Create sample projects
     projects = {
-        1: Project(
+        11: Project(
             poll_id=1,
-            project_id=1,
+            project_id=11,
             name='Student Lounge Update',
             min_points=100,
             max_points=800,
@@ -82,9 +82,9 @@ def create_sample_data():
             order_number=1,
             created_at=datetime.datetime(2024, 12, 11, 12, 41, 55, 596092)
         ),
-        2: Project(
+        12: Project(
             poll_id=1,
-            project_id=2,
+            project_id=12,
             name='Research Lab Equipment',
             min_points=100,
             max_points=600,
@@ -94,9 +94,9 @@ def create_sample_data():
             order_number=2,
             created_at=datetime.datetime(2024, 12, 11, 12, 41, 55, 616323)
         ),
-        3: Project(
+        13: Project(
             poll_id=1,
-            project_id=3,
+            project_id=13,
             name='Campus Garden',
             min_points=100,
             max_points=1000,
@@ -120,9 +120,9 @@ def create_sample_data():
                 created_at=datetime.datetime(2024, 12, 11, 12, 42, 36, 824080)
             ),
             projects=[
-                ProjectVote(poll_id=1, voter_id=1, project_id=1, points=600, rank=1),
-                ProjectVote(poll_id=1, voter_id=1, project_id=2, points=400, rank=2),
-                ProjectVote(poll_id=1, voter_id=1, project_id=3, points=0, rank=3)
+                ProjectVote(poll_id=1, voter_id=1, project_id=11, points=600, rank=1),
+                ProjectVote(poll_id=1, voter_id=1, project_id=12, points=400, rank=2),
+                ProjectVote(poll_id=1, voter_id=1, project_id=13, points=0, rank=3)
             ]
         ),
         VoteData(
@@ -135,9 +135,9 @@ def create_sample_data():
                 created_at=datetime.datetime(2024, 12, 11, 12, 43, 2, 113128)
             ),
             projects=[
-                ProjectVote(poll_id=1, voter_id=2, project_id=1, points=700, rank=1),
-                ProjectVote(poll_id=1, voter_id=2, project_id=2, points=300, rank=2),
-                ProjectVote(poll_id=1, voter_id=2, project_id=3, points=0, rank=3)
+                ProjectVote(poll_id=1, voter_id=2, project_id=11, points=700, rank=1),
+                ProjectVote(poll_id=1, voter_id=2, project_id=12, points=300, rank=2),
+                ProjectVote(poll_id=1, voter_id=2, project_id=13, points=0, rank=3)
             ]
         ),
         VoteData(
@@ -150,9 +150,9 @@ def create_sample_data():
                 created_at=datetime.datetime(2024, 12, 11, 12, 43, 2, 113128)
             ),
             projects=[
-                ProjectVote(poll_id=1, voter_id=3, project_id=1, points=400, rank=2),
-                ProjectVote(poll_id=1, voter_id=3, project_id=2, points=600, rank=1),
-                ProjectVote(poll_id=1, voter_id=3, project_id=3, points=0, rank=3)
+                ProjectVote(poll_id=1, voter_id=3, project_id=11, points=400, rank=2),
+                ProjectVote(poll_id=1, voter_id=3, project_id=12, points=600, rank=1),
+                ProjectVote(poll_id=1, voter_id=3, project_id=13, points=0, rank=3)
             ]
         )
     ]

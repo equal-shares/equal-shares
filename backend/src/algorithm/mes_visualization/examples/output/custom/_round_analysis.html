@@ -233,9 +233,9 @@
                 </button>
                     <div class="dropdown-menu" aria-labelledby="projectDropdown">
                     
-                        <a id="dropdown-item-1" class="dropdown-item active" item="1" onclick="renderRound(1, this)">Round 1: 'Student Lounge Update'</a>
+                        <a id="dropdown-item-11" class="dropdown-item active" item="11" onclick="renderRound(11, this)">Round 1: 'Student Lounge Update'</a>
                     
-                        <a id="dropdown-item-2" class="dropdown-item " item="2" onclick="renderRound(2, this)">Round 2: 'Research Lab Equipment'</a>
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 2: 'Research Lab Equipment'</a>
                     
     
                     </div>
@@ -537,7 +537,7 @@
         
         var rounds_data = {
             
-                "1": {
+                "11": {
                     "effective_vote_count_bar_chart": {"x_labels": ['Research Lab','Student Lounge','Campus Garden',], "values": [1.0, 0.0, 0.0] },
                     "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 0.0, 0.0, 1.0,], "reduced_values": [0.0, 0.0, 0.0] },
                     "pie_chart_triplets": [[{"project_name": "Research Lab Equipment","round_name": "Student Lounge Update","title":  "'Research Lab' Voters'","values_1": [3],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":0.0 },], ],
@@ -547,7 +547,7 @@
                     "roundNum": 0,
                 },
             
-                "2": {
+                "12": {
                     "effective_vote_count_bar_chart": {"x_labels": ['Research Lab','Student Lounge','Campus Garden',], "values": [1.0, 0.0, 0.0] },
                     "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 0.0, 0.0, 1.0,], "reduced_values": [0, 0, 0] },
                     "pie_chart_triplets": [],
@@ -923,7 +923,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             projectId = urlParams.get('projectId');
             if (projectId === null) {
-                projectId = "1";
+                projectId = "11";
             }
             await google.charts.load('current', {
                 'packages': ['sankey']

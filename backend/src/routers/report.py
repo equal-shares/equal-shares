@@ -258,11 +258,6 @@ def _create_report(report: Report, db: psycopg.Connection) -> None:
     except Exception:
         _report_log_error(report, "Error while saving input for the algorithm")
 
-    try:
-        _report_generate_mes_visualization(report, settings, projects, votes)
-    except Exception:
-        _report_log_error(report, "Error while generating MES visualization")
-
     _report_log_info(report, "Report creation finished")
 
 
@@ -399,65 +394,57 @@ def _report_save_input_for_algorithm(
         "input_for_algorithm.json", json.dumps(input_for_algorithm.model_dump(), indent=4, ensure_ascii=False)
     )
   
+@router.get("/visualization")
+def get_visualization_route(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+) -> Response:
+    """Get the MES visualization HTML files."""
+    # Check authentication
+    if config.admin_key != admin_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Unauthorized"
+        )
 
-def _report_generate_mes_visualization(
-    report: Report,
-    settings: Settings,
-    projects: dict[int, Project],
-    votes: list[VoteData]
-) -> None:
-    """Generate MES visualization and add it to the report."""
-    _report_log_info(report, "Generating MES visualization")
-    # # Log data for debugging
-    # _report_log_info(report, f"Settings: {settings}")
-    # _report_log_info(report, f"Number of projects: {len(projects)}")
-    # _report_log_info(report, f"Number of votes: {len(votes)}")
-    
-    try:
-        # Create temporary directory for visualization files
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Run visualization
-            result = run_mes_visualization(
-                settings=settings,
-                projects=projects,
-                votes=votes,
-                implementation=MESImplementation.CUSTOM,
-                output_path=temp_dir
+    # Get current data using existing helper function
+    with get_db() as db:
+        try:
+            settings, projects, votes = _report_load_data(Report(), db)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error retrieving data"
             )
-            
-            if not result:
-                raise ValueError("MES visualization returned no result")
-            
-            # Check if files exist before trying to add them
-            vis_files = list(Path(temp_dir).glob('*.html'))
-            if not vis_files:
-                _report_log_info(report, "No visualization files were generated")
-                return
-                
-            for file_path in vis_files:
-                _report_log_info(report, f"Found visualization file: {file_path.name}")
-                try:
-                    with open(file_path, 'rb') as f:
-                        report.add_binary_file(
-                            f"mes_visualization/{file_path.name}",
-                            f.read()
-                        )
-                except Exception as e:
-                    _report_log_error(report, f"Error adding file {file_path}: {str(e)}")
 
-            # Add results to report if available
-            if hasattr(result, 'results'):
-                report.append_text_to_file(
-                    "mes_visualization_results.json",
-                    json.dumps({
-                        "selected_projects": result.selected_projects,
-                        "total_cost": result.total_cost,
-                        "budget_per_voter": result.budget_per_voter,
-                        "results": result.results
-                    }, indent=4)
-                )
-                _report_log_info(report, "MES visualization completed successfully")
+    # Create zip file in memory
+    zip_file = InMemoryZip()
+    
+    # Generate visualization files
+    with tempfile.TemporaryDirectory() as temp_dir:
+        result = run_mes_visualization(
+            settings=settings,
+            projects=projects,
+            votes=votes,
+            implementation=MESImplementation.CUSTOM,
+            output_path=temp_dir
+        )
+        
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate visualization"
+            )
 
-    except Exception as e:
-        _report_log_error(report, f"Error in MES visualization: {str(e)}")
-        _report_log_error(report, traceback.format_exc())
+        # Add visualization files to zip
+        vis_files = Path(temp_dir).glob('*.html')
+        for file_path in Path(temp_dir).glob('*.html'):
+            with open(file_path, 'rb') as f:
+                zip_file.add_file(file_path.name, f.read())
+
+    return Response(
+        content=zip_file.get_content(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": "attachment; filename=visualization.zip"
+        }
+    )
