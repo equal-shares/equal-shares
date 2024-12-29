@@ -229,11 +229,13 @@
                 <div class="spacer-1"></div>
                 <div class="dropdown">
                     <button class="btn btn-primary dropdown-toggle" type="button" id="projectDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Round 1: Research Lab Equipment
+                    Round 1: Student Lounge Update
                 </button>
                     <div class="dropdown-menu" aria-labelledby="projectDropdown">
                     
-                        <a id="dropdown-item-12" class="dropdown-item active" item="12" onclick="renderRound(12, this)">Round 1: 'Research Lab Equipment'</a>
+                        <a id="dropdown-item-11" class="dropdown-item active" item="11" onclick="renderRound(11, this)">Round 1: 'Student Lounge Update'</a>
+                    
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 2: 'Research Lab Equipment'</a>
                     
     
                     </div>
@@ -531,18 +533,28 @@
     </script>
     <!-- Rounds data -->
     <script>
-        var numProjects = 1;
+        var numProjects = 2;
         
         var rounds_data = {
             
-                "12": {
-                    "effective_vote_count_bar_chart": {"x_labels": ['Campus Garden','Student Lounge','Research Lab',], "values": [0.0, 0.0, 0.0] },
-                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Campus Garden','Student Lounge','Research Lab',], "initial_values": [ 0.0, 0.0, 0.0,], "reduced_values": [0, 0, 0] },
-                    "pie_chart_triplets": [[{"project_name": "Student Lounge Update","round_name": "Research Lab Equipment","title":  "'Student Lounge' Voters'","values_1": [3],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":300.11 },], ],
-                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 0],]},
-                    "chord_chart": {"series": [    {        "values":[0,0,3,],        "text": "Student Lounge"    },    {        "values":[0,0,0,],        "text": "Campus Garden"    },    {        "values":[3,0,0,0,],        "text": "Research Lab"    },]},
-                    "intro": {"project_name": "Research Lab Equipment", "round_number": "1", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "600", "effective_vote_count" : "0.0", "project_votes" : "" },
+                "11": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Research Lab','Student Lounge','Campus Garden',], "values": [3.0, 0.0, 0.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "initial_values": [ 0.0, 3.0, 0.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Research Lab Equipment","round_name": "Student Lounge Update","title":  "'Research Lab' Voters'","values_1": [3],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":0.0 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 0],]},
+                    "chord_chart": {"series": [    {        "values":[0,3,0,],        "text": "Research Lab"    },    {        "values":[3,0,0,0,],        "text": "Student Lounge"    },    {        "values":[0,0,0,],        "text": "Campus Garden"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "1", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "401", "effective_vote_count" : "0.0", "project_votes" : "" },
                     "roundNum": 0,
+                },
+            
+                "12": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Research Lab','Student Lounge','Campus Garden',], "values": [3.0, 0.0, 0.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "initial_values": [ 0.0, 3.0, 0.0,], "reduced_values": [0, 0, 0] },
+                    "pie_chart_triplets": [],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 0],]},
+                    "chord_chart": {"series": [    {        "values":[0,3,0,],        "text": "Student Lounge"    },    {        "values":[3,0,0,0,],        "text": "Research Lab"    },    {        "values":[0,0,0,],        "text": "Campus Garden"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "2", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "1", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 1,
                 },
             }
 
@@ -911,7 +923,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             projectId = urlParams.get('projectId');
             if (projectId === null) {
-                projectId = "12";
+                projectId = "11";
             }
             await google.charts.load('current', {
                 'packages': ['sankey']

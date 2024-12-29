@@ -21,6 +21,7 @@ class MESTracker:
     def __init__(self):
         self.rounds: list[RoundInfo] = []
         self.total_allocations: Dict[int, float] = {}
+        self.current_voter_budgets: Dict[int, float] = {}
 
     def __call__(self, 
                  project_id: int, 
@@ -38,16 +39,19 @@ class MESTracker:
         # Update total allocations
         if project_id not in self.total_allocations:
             self.total_allocations[project_id] = 0
-        self.total_allocations[project_id] += cost
+        self.total_allocations[project_id] = cost
 
-        # Create round info with cumulative data
+        # Update current voter budgets
+        self.current_voter_budgets = voter_budgets.copy()
+        
+        # Create round info
         round_info = RoundInfo(
             selected_project=project_id,
-            cost=self.total_allocations[project_id],  # Use cumulative cost
+            cost=cost,
             effective_votes=effective_votes,
-            voter_budgets=voter_budgets.copy(),
+            voter_budgets=self.current_voter_budgets.copy(),
             previous_allocations=self.total_allocations.copy(),
-            is_budget_update = (cost == 0)
+            is_budget_update=False
         )
         
         self.rounds.append(round_info)

@@ -75,9 +75,6 @@ def equal_shares(
     bids = remove_invalid_bids(voters, bids) # Remove bids from invalid voters
     max_bid_for_project = find_max(bids)
 
-    # Store the final round for each project
-    final_rounds = {}
-
     # Round the budget to ensure equal division among voters
     rounded_budget: float = int(budget / len(voters)) * len(voters)  
     logger.warning("\nRunning equal_shares: budget=%s, rounded to %s", budget, rounded_budget)
@@ -86,26 +83,6 @@ def equal_shares(
     winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter, round_info = equal_shares_fixed_budget(
         voters, projects_costs, rounded_budget, bids, max_bid_for_project
     )
-
-    # Calculate initial effective votes for tracking
-    if tracker_callback is not None and round_info['project_id'] is not None:
-        effective_votes = {}
-        for project_id in projects:
-            if project_id in round_info['effective_votes']:
-                effective_votes[str(project_id)] = round_info['effective_votes'][str(project_id)]
-            else:
-                effective_votes[str(project_id)] = 0.0
-                
-        tracker_callback(
-            project_id=round_info['project_id'],
-            cost=winners_allocations[round_info['project_id']],
-            effective_votes=effective_votes,
-            voter_budgets=round_info['voter_budgets'].copy()
-        )
-
-    # Update final rounds with first round results
-    if round_info['project_id'] is not None:
-        final_rounds[round_info['project_id']] = round_info
 
     # Calculate total cost of chosen projects
     total_chosen_project_cost = sum(winners_allocations[c] for c in winners_allocations)
@@ -161,26 +138,6 @@ def equal_shares(
             )
         )
 
-        # Track the round if a project was selected
-        if tracker_callback is not None and new_round['project_id'] is not None:
-            effective_votes = {}
-            for project_id in projects:
-                if project_id in new_round['effective_votes']:
-                    effective_votes[str(project_id)] = new_round['effective_votes'][str(project_id)]
-                else:
-                    effective_votes[str(project_id)] = 0.0
-                    
-            tracker_callback(
-                project_id=new_round['project_id'],
-                cost=updated_winners_allocations[new_round['project_id']],
-                effective_votes=effective_votes,
-                voter_budgets=new_round['voter_budgets'].copy()
-            )
-
-        # Update final rounds with latest project state
-        if new_round['project_id'] is not None:
-            final_rounds[new_round['project_id']] = new_round
-
         # Calculate new total cost
         total_chosen_project_cost = sum(updated_winners_allocations[c] for c in updated_winners_allocations)
         logger.warning("total_chosen_project_cost=%s", total_chosen_project_cost)
@@ -196,6 +153,34 @@ def equal_shares(
         candidates_payments_per_voter = updated_candidates_payments_per_voter
 
     print(f'es_winners_allocations: {winners_allocations}')
+    
+    if tracker_callback is not None:
+        # Get only funded projects sorted by allocation amount
+        funded_projects = [(pid, amount) for pid, amount in winners_allocations.items() 
+                          if amount > 0]
+        funded_projects.sort(key=lambda x: x[1], reverse=True)
+        
+        # Track each funded project for visualization
+        remaining_budget = budget
+        voter_budgets = {v: budget/len(voters) for v in voters}
+        
+        for _round_num, (project_id, allocation) in enumerate(funded_projects, 1):
+            # Calculate effective votes only for the current project
+            effective_votes = {}
+            str_project_id = str(project_id)
+            supporters = len([v for v, bid in bids[project_id].items() if bid > 0])
+            effective_votes[str_project_id] = float(supporters)
+                
+            print(f'calling tracker_callback with:\n project_id: {project_id}, ')
+
+            tracker_callback(
+                project_id=project_id,
+                cost=allocation,
+                effective_votes=effective_votes,
+                voter_budgets=voter_budgets
+            )
+            remaining_budget -= allocation
+
     return winners_allocations, candidates_payments_per_voter
 
 
