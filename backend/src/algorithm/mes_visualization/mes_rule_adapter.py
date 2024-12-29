@@ -11,6 +11,9 @@ from pabutools.rules.mes.mes_details import MESAllocationDetails, MESIteration, 
 
 from src.algorithm.equal_shares import equal_shares
 from src.algorithm.mes_visualization.tracker import RoundInfo, MESTracker
+from src.logger import get_logger, LoggerName
+
+logger = get_logger(LoggerName.ALGORITHM)
 
 @dataclass
 class MESInput:
@@ -88,20 +91,20 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
             iteration.voters_budget_after_selection.append(remaining)
 
         # Debug logging
-        print(f"\nIteration details for project {round_info.selected_project}:")
-        print(f"  Selected project: {selected_proj.name}")
-        print(f"  Initial voter budget: {initial_voter_budget}")
-        print(f"  Total voters: {voters_count}")
-        print(f"  Effective votes by project:")
+        logger.debug(f"\nIteration details for project {round_info.selected_project}:")
+        logger.debug(f"  Selected project: {selected_proj.name}")
+        logger.debug(f"  Initial voter budget: {initial_voter_budget}")
+        logger.debug(f"  Total voters: {voters_count}")
+        logger.debug("  Effective votes by project:")
         for proj in instance:
-            print(f"    Project {proj.name}: "
-                  f"votes={getattr(proj, 'effective_vote_count', 0)}, "
-                  f"affordability={getattr(proj, 'affordability', 'N/A')}")
+            logger.debug(f"    Project {proj.name}: "
+                      f"votes={getattr(proj, 'effective_vote_count', 0)}, "
+                      f"affordability={getattr(proj, 'affordability', 'N/A')}")
 
         return iteration
         
     except Exception as e:
-        print(f"Error creating MES iteration: {str(e)}")
+        logger.error(f"Error creating MES iteration: {str(e)}")
         raise
 
 def convert_pabutools_input(instance: Instance, profile: AbstractProfile) -> MESInput:
@@ -157,10 +160,10 @@ def method_of_equal_shares(
     
     # Create tracker to collect round information
     tracker = MESTracker()
-    print("\nDEBUG - Created tracker")
+    logger.debug("Created tracker")
 
     # Run algorithm and get final winners
-    print("DEBUG - About to run equal_shares with tracker")
+    logger.debug("About to run equal_shares with tracker")
     winners, payments = equal_shares(
         voters=input_data.voters,
         projects_costs=input_data.projects_costs,
@@ -169,8 +172,8 @@ def method_of_equal_shares(
         tracker_callback=tracker
     )
 
-    print(f"DEBUG - Winners and their allocations: {winners}")
-    print(f"DEBUG - Total rounds tracked: {len(tracker)}")
+    logger.debug(f"Winners and their allocations: {winners}")
+    logger.debug(f"Total rounds tracked: {len(tracker)}")
 
     # Create allocation with the allocated amounts
     allocation = BudgetAllocation()
@@ -181,18 +184,18 @@ def method_of_equal_shares(
         # Create iterations from tracker rounds
         project_iterations = []
         for round_info in tracker.rounds:
-            print(f'round_info: {round_info}')
+            logger.debug(f'round_info: {round_info}')
             iteration = create_mes_iteration(round_info, instance, profile)
             if iteration is not None:
                 project_iterations.append(iteration)
         
-        print(f'- details: {details}')
+        logger.debug(f'details: {details}')
 
         details.iterations = project_iterations
         details.allocations = winners
         allocation.details = details
         
-        print(f"DEBUG - Created {len(project_iterations)} iterations for visualization")
+        logger.debug(f"Created {len(project_iterations)} iterations for visualization")
     
     # Add winning projects to allocation
     for project_id, allocated_cost in winners.items():

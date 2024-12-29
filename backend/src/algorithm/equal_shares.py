@@ -3,8 +3,9 @@ import logging
 from typing import Any
 
 from src.algorithm.utils import filter_bids, find_max, remove_invalid_bids, remove_zero_bids
+from src.logger import get_logger, LoggerName
 
-logger = logging.getLogger("equal_shares_logger")
+logger = get_logger(LoggerName.ALGORITHM)
 
 CONTINUOUS_COST = 1  # A constant that signals that the given project is in its continuous increment phase.
 DISTRIBUTION_PARAMETER_COST = 100  # The amount of increase in each voter's budget at each iteration is budget/DISTRIBUTION_PARAMETER_COST.
@@ -69,7 +70,7 @@ def equal_shares(
     Raises:
         ValueError: If project costs exceed available budgets or if cost distribution fails.
     """
-    print(f'euqal_shares input: {voters} \n {projects_costs} \n {budget} \n {bids}')
+    logger.debug(f'euqal_shares input:\n voters: {voters} \n projects_costs: {projects_costs} \n budget: {budget} \n bids: {bids}')
     projects = projects_costs.keys() # Get list of project IDs
     bids = remove_zero_bids(bids)
     bids = remove_invalid_bids(voters, bids) # Remove bids from invalid voters
@@ -80,7 +81,7 @@ def equal_shares(
     logger.warning("\nRunning equal_shares: budget=%s, rounded to %s", budget, rounded_budget)
 
     # Run first round with initial budget
-    winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter, round_info = equal_shares_fixed_budget(
+    winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter = equal_shares_fixed_budget(
         voters, projects_costs, rounded_budget, bids, max_bid_for_project
     )
 
@@ -92,7 +93,7 @@ def equal_shares(
 
     while True:
         round_count += 1
-        print(f'round_count: {round_count}')
+        logger.debug(f'round_count: {round_count}')
         if round_count > MAX_ROUNDS:
             logger.warning(
                 f"Max rounds ({MAX_ROUNDS}) reached - forcing termination. "
@@ -151,8 +152,6 @@ def equal_shares(
         rounded_budget = updated_rounded_budget
         winners_allocations = updated_winners_allocations
         candidates_payments_per_voter = updated_candidates_payments_per_voter
-
-    print(f'es_winners_allocations: {winners_allocations}')
     
     if tracker_callback is not None:
         # Get only funded projects sorted by allocation amount
@@ -171,7 +170,7 @@ def equal_shares(
             supporters = len([v for v, bid in bids[project_id].items() if bid > 0])
             effective_votes[str_project_id] = float(supporters)
                 
-            print(f'calling tracker_callback with:\n project_id: {project_id}, ')
+            logger.debug(f'calling tracker_callback with:\n project_id: {project_id}, ')
 
             tracker_callback(
                 project_id=project_id,
@@ -181,6 +180,7 @@ def equal_shares(
             )
             remaining_budget -= allocation
 
+    logger.debug(f'equal_shares output:\n winners_allocations: {winners_allocations} \n candidates_payments_per_voter: {candidates_payments_per_voter}')
     return winners_allocations, candidates_payments_per_voter
 
 
@@ -315,14 +315,6 @@ def equal_shares_fixed_budget(
     # Keep track of bids and costs that can change during the process
     updated_bids = copy.deepcopy(bids)
     updated_cost = copy.deepcopy(projects_costs)
-
-    # Initialize round info with no project selected
-    round_info = {
-        'project_id': None,
-        'cost': 0,
-        'effective_votes': {},
-        'voter_budgets': {}
-    }
 
     def debug_totals() -> None:
         total_allocation = sum(winners_allocations.values())
@@ -463,14 +455,6 @@ def equal_shares_fixed_budget(
         )
         logger.debug("  Updated bids: %s", updated_bids)
 
-        # Update round info for the selected project
-        round_info = {
-            'project_id': chosen_candidate,
-            'cost': winners_allocations[chosen_candidate] + chosen_candidate_cost,  # Total allocation
-            'effective_votes': current_round_effective_votes,  # Store all projects' effective votes
-            'voter_budgets': voters_budgets.copy()
-        }
-
         # Calculate project cost
         if chosen_candidate_cost == CONTINUOUS_COST:
             positive_bids = {
@@ -553,4 +537,4 @@ def equal_shares_fixed_budget(
 
     logger.info("  winners_allocations: %s", winners_allocations)
     logger.info("  Cost for next increase: %s", updated_cost)
-    return winners_allocations, updated_cost, candidates_payments_per_voter, round_info
+    return winners_allocations, updated_cost, candidates_payments_per_voter

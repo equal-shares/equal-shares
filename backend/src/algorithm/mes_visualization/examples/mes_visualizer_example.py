@@ -7,6 +7,10 @@ import datetime
 import os
 from pathlib import Path
 from src.algorithm.mes_visualization.mes_visualizer import run_mes_visualization, MESImplementation
+from src.logger import get_logger, LoggerName, init_loggers
+
+init_loggers()
+logger = get_logger(LoggerName.ALGORITHM)
 
 class ProjectVote:
     """Represents a single vote for a project."""
@@ -167,8 +171,8 @@ def run_implementation_test(
     output_dir: Path
 ) -> None:
     """Run MES visualization with specified implementation."""
-    print(f"\nTesting {implementation.value} implementation")
-    print("-" * 40)
+    logger.info(f"\nTesting {implementation.value} implementation")
+    logger.info("-" * 40)
     
     # Create implementation-specific output directory
     output_path = output_dir / implementation.value
@@ -184,20 +188,20 @@ def run_implementation_test(
     
     # Print results
     if result and result.status == "success":
-        print("\nVisualization generated successfully!")
-        print("\nProject allocations:")
+        logger.info("\nVisualization generated successfully!")
+        logger.info("\nProject allocations:")
         for project_id, amount in result.results.items():
             if amount > 0:
                 project = projects[project_id]
-                print(f"- {project.name}: {amount} points")
+                logger.info(f"- {project.name}: {amount} points")
         
-        print(f"\nTotal cost: {result.total_cost}")
-        print(f"Budget per voter: {result.budget_per_voter}")
-        print(f"Visualization saved to: {result.visualization_path}")
+        logger.info(f"\nTotal cost: {result.total_cost}")
+        logger.info(f"Budget per voter: {result.budget_per_voter}")
+        logger.info(f"Visualization saved to: {result.visualization_path}")
     else:
-        print(f"\nError occurred: {result.error if result else 'Unknown error'}")
+        logger.error(f"\nError occurred: {result.error if result else 'Unknown error'}")
         if result and result.traceback:
-            print(f"Traceback: {result.traceback}")
+            logger.error(f"Traceback: {result.traceback}")
 
 def run_example():
     """Run example usage of the MES visualizer with both implementations."""
@@ -205,11 +209,11 @@ def run_example():
         # Create sample data
         settings, projects, votes = create_sample_data()
         
-        print("\nRunning MES Visualization Comparison")
-        print("=" * 40)
-        print(f"Number of projects: {len(projects)}")
-        print(f"Number of voters: {len(votes)}")
-        print(f"Total budget: {settings.max_total_points}")
+        logger.info("\nRunning MES Visualization Comparison")
+        logger.info("=" * 40)
+        logger.info(f"Number of projects: {len(projects)}")
+        logger.info(f"Number of voters: {len(votes)}")
+        logger.info(f"Total budget: {settings.max_total_points}")
         
         # Setup output directory
         output_dir = Path(__file__).parent / "output"
@@ -233,13 +237,13 @@ def run_example():
         #     output_dir
         # )
         
-        print("\nComparison complete!")
-        print(f"Results saved in: {output_dir}")
+        logger.info("\nComparison complete!")
+        logger.info(f"Results saved in: {output_dir}")
         
     except Exception as e:
-        print(f"Error in example: {str(e)}")
+        logger.error(f"Error in example: {str(e)}")
         import traceback
-        print(f"Traceback: {traceback.format_exc()}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
 
 if __name__ == "__main__":
     run_example()

@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from typing import Dict, Optional
+from src.logger import get_logger, LoggerName
+
+logger = get_logger(LoggerName.ALGORITHM)
 
 @dataclass
 class RoundInfo:
@@ -22,6 +25,7 @@ class MESTracker:
         self.rounds: list[RoundInfo] = []
         self.total_allocations: Dict[int, float] = {}
         self.current_voter_budgets: Dict[int, float] = {}
+        logger.debug("Initialized MESTracker")
 
     def __call__(self, 
                  project_id: int, 
@@ -36,6 +40,12 @@ class MESTracker:
             effective_votes: Dict mapping project IDs to their effective votes
             voter_budgets: Dict mapping voter IDs to their remaining budgets
         """
+        logger.debug("MESTracker receiving round:")
+        logger.debug(f"Project ID: {project_id}")
+        logger.debug(f"Cost: {cost}")
+        logger.debug(f"Effective votes: {effective_votes}")
+        logger.debug(f"Current rounds count: {len(self.rounds)}")
+
         # Update total allocations
         if project_id not in self.total_allocations:
             self.total_allocations[project_id] = 0
@@ -55,6 +65,7 @@ class MESTracker:
         )
         
         self.rounds.append(round_info)
+        logger.debug(f"Total rounds after append: {len(self.rounds)}")
     
     def __len__(self) -> int:
         return len(self.rounds)
