@@ -22,57 +22,86 @@ class MESInput:
     projects_meta: Dict[int, Any]
 
 def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: AbstractProfile) -> Optional[MESIteration]:
-    """Create MES iteration details for visualization."""
-    if round_info.is_budget_update or round_info.cost == 0:
+    """
+    Create MES iteration details for visualization.
+    Maps data from our custom implementation to pabutools' expected format.
+
+    Args:
+        round_info: Single round information from our custom MES implementation
+        instance: PabuTools instance containing project information
+        profile: PabuTools profile containing voter preferences
+
+    Returns:
+        Optional[MESIteration]: Pabutools iteration object or None if round should be skipped
+    """
+    if round_info.is_budget_update:
         return None
 
     iteration = MESIteration()
     
     try:
-        # Create map of project names to the ORIGINAL pabutools Project instances
+        # Calculate correct budget information
+        total_budget = float(instance.budget_limit)
+        voters_count = len(profile)
+        initial_voter_budget = total_budget / voters_count
+        
+        # Create map of project IDs to actual Project instances
         project_map = {p.name: p for p in instance}
         
-        # Set supporter indices using original instances
+        # Set supporter indices and project details for ALL projects
         for proj in instance:
+            # Get original voter indices who supported this project
             vote_indices = [i for i, ballot in enumerate(profile) if proj in ballot]
             proj.supporter_indices = vote_indices
 
-            # Create project details for each project and add to iteration
+            # Create project details and add to iteration
             proj_details = MESProjectDetails(proj, iteration)
             iteration.append(proj_details)
             
-            # Initialize essential visualization attributes for ALL projects
-            # Set to defaults if not in current round's effective votes
-            proj_name = proj.name
-            votes = round_info.effective_votes.get(proj_name, 0.0)
+            # Set effective votes and affordability for all projects
+            proj_name = str(proj.name)  # Ensure string key
+            effective_votes = round_info.effective_votes.get(proj_name, 0.0)
             
-            # Set on both Project and ProjectDetails
+            # Apply to both Project and ProjectDetails objects
             for target in [proj, proj_details]:
-                # These attributes must exist even if zero
-                target.effective_vote_count = votes
-                target.affordability = 1.0 / votes if votes > 0 else float('inf')
+                target.effective_vote_count = effective_votes
+                target.affordability = 1.0 / effective_votes if effective_votes > 0 else float('inf')
+                target.discarded = False  # Initialize as not discarded
+            
+            # Mark projects as discarded if they weren't selected in this round
+            if int(proj.name) != round_info.selected_project:
+                proj_details.discarded = True
         
-        # Set selected project using original instance
+        # Set the selected project for this round
         selected_proj = project_map[str(round_info.selected_project)]
         iteration.selected_project = selected_proj
         
         # Set budget information
-        # TODO: same budget
-        iteration.voters_budget = list(round_info.voter_budgets.values())
-        iteration.voters_budget_after_selection = list(round_info.voter_budgets.values())
+        # Initial budgets (equal distribution)
+        iteration.voters_budget = [initial_voter_budget for _ in range(voters_count)]
+        
+        # Remaining budgets after selection
+        iteration.voters_budget_after_selection = []
+        for voter_idx in range(voters_count):
+            # Get remaining budget from round_info or use initial if not found
+            remaining = round_info.voter_budgets.get(voter_idx + 1, initial_voter_budget)
+            iteration.voters_budget_after_selection.append(remaining)
 
-        print(f"\nIteration details:")
-        print(f"  Selected project: {id(iteration.selected_project)}")
-        for proj_details in iteration:
-            print(f"  Project {proj_details.project.name}: "
-                  f"id={id(proj_details.project)}, "
-                  f"votes={getattr(proj_details.project, 'effective_vote_count', None)}, "
-                  f"affordability={getattr(proj_details.project, 'affordability', None)}")
+        # Debug logging
+        print(f"\nIteration details for project {round_info.selected_project}:")
+        print(f"  Selected project: {selected_proj.name}")
+        print(f"  Initial voter budget: {initial_voter_budget}")
+        print(f"  Total voters: {voters_count}")
+        print(f"  Effective votes by project:")
+        for proj in instance:
+            print(f"    Project {proj.name}: "
+                  f"votes={getattr(proj, 'effective_vote_count', 0)}, "
+                  f"affordability={getattr(proj, 'affordability', 'N/A')}")
 
         return iteration
         
     except Exception as e:
-        print(f"Error in create_mes_iteration: {str(e)}")
+        print(f"Error creating MES iteration: {str(e)}")
         raise
 
 def convert_pabutools_input(instance: Instance, profile: AbstractProfile) -> MESInput:
@@ -156,7 +185,6 @@ def method_of_equal_shares(
             iteration = create_mes_iteration(round_info, instance, profile)
             if iteration is not None:
                 project_iterations.append(iteration)
-                # print(f"Added iteration for project {round_info.selected_project}")
         
         print(f'- details: {details}')
 

@@ -32,8 +32,7 @@ def equal_shares(
             - First level key: project ID
             - Second level key: voter ID
             - Value: amount bid by that voter for that project
-        tracker_callback (Optional[Callable]): Optional callback function for tracking algorithm progress.
-            If provided, called with arguments (project_id, cost, effective_votes, voter_budgets).
+        tracker_callback (Optional[Callable]): Callback function for tracking algorithm progress.
 
     Returns:
         tuple[dict[int, int], dict[int, dict[int, float]]]: A tuple containing:
@@ -75,6 +74,7 @@ def equal_shares(
     bids = remove_zero_bids(bids)
     bids = remove_invalid_bids(voters, bids) # Remove bids from invalid voters
     max_bid_for_project = find_max(bids)
+
     # Store the final round for each project
     final_rounds = {}
 
@@ -86,6 +86,22 @@ def equal_shares(
     winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter, round_info = equal_shares_fixed_budget(
         voters, projects_costs, rounded_budget, bids, max_bid_for_project
     )
+
+    # Calculate initial effective votes for tracking
+    if tracker_callback is not None and round_info['project_id'] is not None:
+        effective_votes = {}
+        for project_id in projects:
+            if project_id in round_info['effective_votes']:
+                effective_votes[str(project_id)] = round_info['effective_votes'][str(project_id)]
+            else:
+                effective_votes[str(project_id)] = 0.0
+                
+        tracker_callback(
+            project_id=round_info['project_id'],
+            cost=winners_allocations[round_info['project_id']],
+            effective_votes=effective_votes,
+            voter_budgets=round_info['voter_budgets'].copy()
+        )
 
     # Update final rounds with first round results
     if round_info['project_id'] is not None:
@@ -99,6 +115,7 @@ def equal_shares(
 
     while True:
         round_count += 1
+        print(f'round_count: {round_count}')
         if round_count > MAX_ROUNDS:
             logger.warning(
                 f"Max rounds ({MAX_ROUNDS}) reached - forcing termination. "
@@ -128,10 +145,10 @@ def equal_shares(
             # No more projects can be funded
             break
 
-        # Project has a positive cost for next increase
+        # Update budget for next round
         updated_rounded_budget = rounded_budget + len(voters) * (
             budget / DISTRIBUTION_PARAMETER_COST
-        )  # Add budget/DISTRIBUTION_PARAMETER_COST to each voter's voters_budget
+        )
 
         # Run another round with increased budget
         updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter, new_round = (
@@ -143,6 +160,22 @@ def equal_shares(
                 max_bid_for_project,
             )
         )
+
+        # Track the round if a project was selected
+        if tracker_callback is not None and new_round['project_id'] is not None:
+            effective_votes = {}
+            for project_id in projects:
+                if project_id in new_round['effective_votes']:
+                    effective_votes[str(project_id)] = new_round['effective_votes'][str(project_id)]
+                else:
+                    effective_votes[str(project_id)] = 0.0
+                    
+            tracker_callback(
+                project_id=new_round['project_id'],
+                cost=updated_winners_allocations[new_round['project_id']],
+                effective_votes=effective_votes,
+                voter_budgets=new_round['voter_budgets'].copy()
+            )
 
         # Update final rounds with latest project state
         if new_round['project_id'] is not None:
@@ -161,17 +194,6 @@ def equal_shares(
         rounded_budget = updated_rounded_budget
         winners_allocations = updated_winners_allocations
         candidates_payments_per_voter = updated_candidates_payments_per_voter
-        final_round_info = new_round  # Update with the latest round info
-
-    # Call tracker callback for each project's final state
-    if tracker_callback is not None:
-        for round_info in final_rounds.values():
-            tracker_callback(
-                project_id=round_info['project_id'],
-                cost=round_info['cost'],
-                effective_votes=round_info['effective_votes'],
-                voter_budgets=round_info['voter_budgets']
-            )
 
     print(f'es_winners_allocations: {winners_allocations}')
     return winners_allocations, candidates_payments_per_voter

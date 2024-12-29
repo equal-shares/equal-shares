@@ -6,8 +6,9 @@ class RoundInfo:
     """Information about a single round of the MES algorithm."""
     selected_project: int
     cost: float
-    effective_votes: Dict[int, float]
+    effective_votes: Dict[str, float]
     voter_budgets: Dict[int, float]
+    previous_allocations: Dict[int, float]
     is_budget_update: bool = False
 
     def __str__(self) -> str:
@@ -19,7 +20,8 @@ class MESTracker:
     
     def __init__(self):
         self.rounds: list[RoundInfo] = []
-        
+        self.total_allocations: Dict[int, float] = {}
+
     def __call__(self, 
                  project_id: int, 
                  cost: float, 
@@ -33,13 +35,22 @@ class MESTracker:
             effective_votes: Dict mapping project IDs to their effective votes
             voter_budgets: Dict mapping voter IDs to their remaining budgets
         """
-        self.rounds.append(RoundInfo(
+        # Update total allocations
+        if project_id not in self.total_allocations:
+            self.total_allocations[project_id] = 0
+        self.total_allocations[project_id] += cost
+
+        # Create round info with cumulative data
+        round_info = RoundInfo(
             selected_project=project_id,
-            cost=cost,
-            effective_votes=effective_votes,  # Using project IDs as keys
-            voter_budgets=voter_budgets.copy(),  # Make a copy to prevent reference issues
-            is_budget_update=cost == 0
-        ))
+            cost=self.total_allocations[project_id],  # Use cumulative cost
+            effective_votes=effective_votes,
+            voter_budgets=voter_budgets.copy(),
+            previous_allocations=self.total_allocations.copy(),
+            is_budget_update = (cost == 0)
+        )
+        
+        self.rounds.append(round_info)
     
     def __len__(self) -> int:
         return len(self.rounds)
