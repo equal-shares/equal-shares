@@ -3,13 +3,12 @@ Example usage of the MES Visualizer module.
 This file demonstrates how to use the visualizer with both custom and pabutools implementations.
 """
 
+import sys
 import datetime
-import os
 from pathlib import Path
 from src.algorithm.mes_visualization.mes_visualizer import run_mes_visualization, MESImplementation
 from src.logger import get_logger, LoggerName, init_loggers
 
-init_loggers()
 logger = get_logger(LoggerName.ALGORITHM)
 
 class ProjectVote:
@@ -219,6 +218,7 @@ def run_example():
         output_dir = Path(__file__).parent / "output"
         output_dir.mkdir(parents=True, exist_ok=True)
         
+        logger.info("*Running Test custom implementation*")
         # Test custom implementation
         run_implementation_test(
             settings, 
@@ -227,15 +227,16 @@ def run_example():
             MESImplementation.CUSTOM,
             output_dir
         )
-        
+
+        logger.info("*Running Test pabutools implementation*")
         # Test pabutools implementation
-        # run_implementation_test(
-        #     settings, 
-        #     projects, 
-        #     votes, 
-        #     MESImplementation.PABUTOOLS,
-        #     output_dir
-        # )
+        run_implementation_test(
+            settings, 
+            projects, 
+            votes, 
+            MESImplementation.PABUTOOLS,
+            output_dir
+        )
         
         logger.info("\nComparison complete!")
         logger.info(f"Results saved in: {output_dir}")

@@ -376,6 +376,12 @@ def run_mes_visualization(
             logger.debug(f"Selected project: {iteration.selected_project.name if iteration.selected_project else 'None'}")
             logger.debug(f"Discarded projects: {[p.project.name for p in iteration if p.discarded]}")
 
+
+        logger.debug("\nMESVisualiser Input:\n")
+        logger.debug(f'profile: {profile}\n')
+        logger.debug(f'instance: {instance}\n')
+        logger.debug(f'outcome: {outcome}\n')
+
         visualizer = MESVisualiser(profile, instance, outcome, verbose=False)
         
         logger.debug("\nVisualization Data Structure:")
