@@ -228,15 +228,15 @@ def run_example():
             output_dir
         )
 
-        logger.info("*Running Test pabutools implementation*")
-        # Test pabutools implementation
-        run_implementation_test(
-            settings, 
-            projects, 
-            votes, 
-            MESImplementation.PABUTOOLS,
-            output_dir
-        )
+        # logger.info("*Running Test pabutools implementation*")
+        # # Test pabutools implementation
+        # run_implementation_test(
+        #     settings, 
+        #     projects, 
+        #     votes, 
+        #     MESImplementation.PABUTOOLS,
+        #     output_dir
+        # )
         
         logger.info("\nComparison complete!")
         logger.info(f"Results saved in: {output_dir}")

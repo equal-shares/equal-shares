@@ -377,10 +377,10 @@ def run_mes_visualization(
             logger.debug(f"Discarded projects: {[p.project.name for p in iteration if p.discarded]}")
 
 
-        logger.debug("\nMESVisualiser Input:\n")
-        logger.debug(f'profile: {profile}\n')
-        logger.debug(f'instance: {instance}\n')
-        logger.debug(f'outcome: {outcome}\n')
+        logger.debug("MESVisualiser Input:\n")
+        logger.debug(f'profile: {profile}')
+        logger.debug(f'instance: {instance}')
+        logger.debug(f'outcome: {outcome}')
 
         visualizer = MESVisualiser(profile, instance, outcome, verbose=False)
         

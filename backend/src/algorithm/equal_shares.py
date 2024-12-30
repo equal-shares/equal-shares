@@ -162,22 +162,43 @@ def equal_shares(
         # Track each funded project for visualization
         remaining_budget = budget
         voter_budgets = {v: budget/len(voters) for v in voters}
+        previous_allocations = {v: budget/len(voters) for v in voters}
         
-        for _round_num, (project_id, allocation) in enumerate(funded_projects, 1):
+        for project_id, allocation in funded_projects:
             # Calculate effective votes only for the current project
             effective_votes = {}
             str_project_id = str(project_id)
             supporters = len([v for v, bid in bids[project_id].items() if bid > 0])
             effective_votes[str_project_id] = float(supporters)
-                
+    
+            # Get the payments each voter made for this project
+            project_payments = candidates_payments_per_voter[project_id]
+
+            # Update voter budgets for tracking
+            for voter_id in voter_budgets:
+                voter_payment = project_payments.get(voter_id, 0)
+                voter_budgets[voter_id] -= voter_payment
+
             logger.debug(f'calling tracker_callback with:\n project_id: {project_id}, ')
+            logger.debug(f"\nDEBUG equal_shares before tracker:")
+            logger.debug(f"project_id: {project_id}")
+            logger.debug(f"voter_budgets: {voter_budgets}")
+            logger.debug(f"previous_allocations: {previous_allocations}")
+            logger.debug(f"project_payments: {project_payments}")
 
             tracker_callback(
                 project_id=project_id,
                 cost=allocation,
                 effective_votes=effective_votes,
-                voter_budgets=voter_budgets
+                voter_budgets=voter_budgets,
+                previous_allocations=previous_allocations.copy(),
+                payments_per_voter=project_payments
             )
+
+            # Update previous allocations for next round
+            for voter_id in previous_allocations:
+                previous_allocations[voter_id] = voter_budgets[voter_id]
+            
             remaining_budget -= allocation
 
     logger.debug(f'equal_shares output:\n winners_allocations: {winners_allocations} \n candidates_payments_per_voter: {candidates_payments_per_voter}')

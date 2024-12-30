@@ -37,11 +37,13 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
     Returns:
         Optional[MESIteration]: Pabutools iteration object or None if round should be skipped
     """
-    if round_info.is_budget_update:
-        return None
-
     iteration = MESIteration()
     
+    logger.debug(f"\nDEBUG create_mes_iteration:")
+    logger.debug(f"round_info voter_budgets: {round_info.voter_budgets}")
+    logger.debug(f"round_info previous_allocations: {round_info.previous_allocations}")
+    logger.debug(f"round_info payments_per_voter: {round_info.payments_per_voter}")
+
     try:
         # Calculate correct budget information
         total_budget = float(instance.budget_limit)
@@ -62,7 +64,7 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
             iteration.append(proj_details)
             
             # Set effective votes and affordability for all projects
-            proj_name = str(proj.name)  # Ensure string key
+            proj_name = str(proj.name)
             effective_votes = round_info.effective_votes.get(proj_name, 0.0)
             
             # Apply to both Project and ProjectDetails objects
@@ -80,17 +82,19 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
         iteration.selected_project = selected_proj
         
         # Set budget information
-        # Initial budgets (equal distribution)
-        iteration.voters_budget = [initial_voter_budget for _ in range(voters_count)]
+        iteration.voters_budget = []
+        for voter_idx in range(voters_count):
+            voter_id = voter_idx + 1
+            budget = round_info.previous_allocations.get(voter_id, initial_voter_budget)
+            iteration.voters_budget.append(budget)
         
-        # Remaining budgets after selection
+        # After selection state - use voter_budgets from round_info
         iteration.voters_budget_after_selection = []
         for voter_idx in range(voters_count):
-            # Get remaining budget from round_info or use initial if not found
-            remaining = round_info.voter_budgets.get(voter_idx + 1, initial_voter_budget)
-            iteration.voters_budget_after_selection.append(remaining)
+            voter_id = voter_idx + 1
+            budget = round_info.voter_budgets.get(voter_id, 0)
+            iteration.voters_budget_after_selection.append(budget)
 
-        # Debug logging
         logger.debug(f"\nIteration details for project {round_info.selected_project}:")
         logger.debug(f"  Selected project: {selected_proj.name}")
         logger.debug(f"  Initial voter budget: {initial_voter_budget}")
