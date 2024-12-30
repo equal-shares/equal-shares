@@ -88,7 +88,7 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
             budget = round_info.previous_allocations.get(voter_id, initial_voter_budget)
             iteration.voters_budget.append(budget)
         
-        # After selection state - use voter_budgets from round_info
+        # After selection state
         iteration.voters_budget_after_selection = []
         for voter_idx in range(voters_count):
             voter_id = voter_idx + 1

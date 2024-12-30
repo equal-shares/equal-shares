@@ -165,11 +165,11 @@ def equal_shares(
         previous_allocations = {v: budget/len(voters) for v in voters}
         
         for project_id, allocation in funded_projects:
-            # Calculate effective votes only for the current project
+            # Calculate effective votes for ALL projects
             effective_votes = {}
-            str_project_id = str(project_id)
-            supporters = len([v for v, bid in bids[project_id].items() if bid > 0])
-            effective_votes[str_project_id] = float(supporters)
+            for pid in projects_costs.keys():
+                pid_supporters = len([v for v, bid in bids[pid].items() if bid > 0])
+                effective_votes[str(pid)] = float(pid_supporters)
     
             # Get the payments each voter made for this project
             project_payments = candidates_payments_per_voter[project_id]
