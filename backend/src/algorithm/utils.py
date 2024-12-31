@@ -1,13 +1,13 @@
 import copy
 import logging
 
-import matplotlib.pyplot as plt
 import numpy as np
 
 logger = logging.getLogger("equal_shares_logger")
 
 
 def find_max(bids: dict[int, dict[int, int]]) -> dict[int, int]:
+    """Find maximum bid for each project"""
     max_result = {key: 0 for key in bids}
 
     for project_id in bids:
@@ -238,6 +238,7 @@ def plot_bid_data(
     average_bids: dict[int, float],
     winners_allocations: dict[int, int],
 ) -> None:
+    import matplotlib.pyplot as plt
     # Extracting project IDs
     project_ids = list(bids.keys())
 
