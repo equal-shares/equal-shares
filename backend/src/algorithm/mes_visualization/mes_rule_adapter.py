@@ -39,13 +39,13 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
     """
     iteration = MESIteration()
     
-    logger.debug(f"\nDEBUG create_mes_iteration:")
-    logger.debug(f"round_info voter_budgets: {round_info.voter_budgets}")
-    logger.debug(f"round_info previous_allocations: {round_info.previous_allocations}")
-    logger.debug(f"round_info payments_per_voter: {round_info.payments_per_voter}")
+    # logger.debug(f"\nDEBUG create_mes_iteration:")
+    # logger.debug(f"round_info voter_budgets: {round_info.voter_budgets}")
+    # logger.debug(f"round_info previous_allocations: {round_info.previous_allocations}")
+    # logger.debug(f"round_info payments_per_voter: {round_info.payments_per_voter}")
 
     try:
-        # Calculate correct budget information
+        # Calculate budget information
         total_budget = float(instance.budget_limit)
         voters_count = len(profile)
         initial_voter_budget = total_budget / voters_count
@@ -76,10 +76,16 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
             # Mark projects as discarded if they weren't selected in this round
             if int(proj.name) != round_info.selected_project:
                 proj_details.discarded = True
-        
+
         # Set the selected project for this round
         selected_proj = project_map[str(round_info.selected_project)]
         iteration.selected_project = selected_proj
+        
+        # Instead of setting just the project cost, create a new Project instance 
+        # with just the delta cost for this round
+        delta_project = Project(selected_proj.name, mpq(str(round_info.cost)))
+        delta_project.supporter_indices = selected_proj.supporter_indices
+        iteration.selected_project = delta_project
         
         # Set budget information
         iteration.voters_budget = []
@@ -94,16 +100,6 @@ def create_mes_iteration(round_info: RoundInfo, instance: Instance, profile: Abs
             voter_id = voter_idx + 1
             budget = round_info.voter_budgets.get(voter_id, 0)
             iteration.voters_budget_after_selection.append(budget)
-
-        logger.debug(f"\nIteration details for project {round_info.selected_project}:")
-        logger.debug(f"  Selected project: {selected_proj.name}")
-        logger.debug(f"  Initial voter budget: {initial_voter_budget}")
-        logger.debug(f"  Total voters: {voters_count}")
-        logger.debug("  Effective votes by project:")
-        for proj in instance:
-            logger.debug(f"    Project {proj.name}: "
-                      f"votes={getattr(proj, 'effective_vote_count', 0)}, "
-                      f"affordability={getattr(proj, 'affordability', 'N/A')}")
 
         return iteration
         
@@ -164,10 +160,10 @@ def method_of_equal_shares(
     
     # Create tracker to collect round information
     tracker = MESTracker()
-    logger.debug("Created tracker")
+    # logger.debug("Created tracker")
 
     # Run algorithm and get final winners
-    logger.debug("About to run equal_shares with tracker")
+    # logger.debug("About to run equal_shares with tracker")
     winners, payments = equal_shares(
         voters=input_data.voters,
         projects_costs=input_data.projects_costs,
@@ -176,8 +172,8 @@ def method_of_equal_shares(
         tracker_callback=tracker
     )
 
-    logger.debug(f"Winners and their allocations: {winners}")
-    logger.debug(f"Total rounds tracked: {len(tracker)}")
+    # logger.debug(f"Winners and their allocations: {winners}")
+    # logger.debug(f"Total rounds tracked: {len(tracker)}")
 
     # Create allocation with the allocated amounts
     allocation = BudgetAllocation()
@@ -188,18 +184,18 @@ def method_of_equal_shares(
         # Create iterations from tracker rounds
         project_iterations = []
         for round_info in tracker.rounds:
-            logger.debug(f'round_info: {round_info}')
             iteration = create_mes_iteration(round_info, instance, profile)
             if iteration is not None:
                 project_iterations.append(iteration)
         
-        logger.debug(f'details: {details}')
+        # logger.debug(f'details: {details}')
 
         details.iterations = project_iterations
         details.allocations = winners
+        logger.debug(f'details.allocations: {winners}')
         allocation.details = details
         
-        logger.debug(f"Created {len(project_iterations)} iterations for visualization")
+        # logger.debug(f"Created {len(project_iterations)} iterations for visualization")
     
     # Add winning projects to allocation
     for project_id, allocated_cost in winners.items():

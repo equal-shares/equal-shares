@@ -3,7 +3,6 @@ Example usage of the MES Visualizer module.
 This file demonstrates how to use the visualizer with both custom and pabutools implementations.
 """
 
-import sys
 import datetime
 from pathlib import Path
 from src.algorithm.mes_visualization.mes_visualizer import run_mes_visualization, MESImplementation
@@ -101,7 +100,7 @@ def create_sample_data():
             poll_id=1,
             project_id=13,
             name='Campus Garden',
-            min_points=100,
+            min_points=400,
             max_points=1000,
             description_1='Create a sustainable garden on campus',
             description_2='-',
@@ -123,9 +122,9 @@ def create_sample_data():
                 created_at=datetime.datetime(2024, 12, 11, 12, 42, 36, 824080)
             ),
             projects=[
-                ProjectVote(poll_id=1, voter_id=1, project_id=11, points=600, rank=1),
-                ProjectVote(poll_id=1, voter_id=1, project_id=12, points=400, rank=2),
-                ProjectVote(poll_id=1, voter_id=1, project_id=13, points=0, rank=3)
+                ProjectVote(poll_id=1, voter_id=1, project_id=11, points=400, rank=1),
+                ProjectVote(poll_id=1, voter_id=1, project_id=12, points=200, rank=2),
+                ProjectVote(poll_id=1, voter_id=1, project_id=13, points=400, rank=3)
             ]
         ),
         VoteData(
@@ -228,15 +227,15 @@ def run_example():
             output_dir
         )
 
-        # logger.info("*Running Test pabutools implementation*")
-        # # Test pabutools implementation
-        # run_implementation_test(
-        #     settings, 
-        #     projects, 
-        #     votes, 
-        #     MESImplementation.PABUTOOLS,
-        #     output_dir
-        # )
+        logger.info("*Running Test pabutools implementation*")
+        # Test pabutools implementation
+        run_implementation_test(
+            settings, 
+            projects, 
+            votes, 
+            MESImplementation.PABUTOOLS,
+            output_dir
+        )
         
         logger.info("\nComparison complete!")
         logger.info(f"Results saved in: {output_dir}")

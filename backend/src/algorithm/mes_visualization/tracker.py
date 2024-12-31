@@ -26,7 +26,7 @@ class MESTracker:
         self.total_allocations: Dict[int, float] = {}
         self.current_voter_budgets: Dict[int, float] = {}
         self.previous_allocations: Dict[int, float] = {}  # Track previous state
-        logger.debug("Initialized MESTracker")
+        # logger.debug("Initialized MESTracker")
 
     def __call__(self, 
                  project_id: int, 
@@ -45,12 +45,12 @@ class MESTracker:
             payments_per_voter: Dict mapping voter IDs to their payments for this project
             previous_allocations: Optional dict of voter budgets before this round
         """
-        logger.debug(f"MESTracker receiving round:")
-        logger.debug(f"Project ID: {project_id}")
-        logger.debug(f"Cost: {cost}")
-        logger.debug(f"Effective votes: {effective_votes}")
-        logger.debug(f"Payments per voter: {payments_per_voter}")
-        logger.debug(f"Current rounds count: {len(self.rounds)}")
+        # logger.debug(f"MESTracker receiving round:")
+        # logger.debug(f"Project ID: {project_id}")
+        # logger.debug(f"Cost: {cost}")
+        # logger.debug(f"Effective votes: {effective_votes}")
+        # logger.debug(f"Payments per voter: {payments_per_voter}")
+        # logger.debug(f"Current rounds count: {len(self.rounds)}")
 
         # Update total allocations
         if project_id not in self.total_allocations:
@@ -79,7 +79,7 @@ class MESTracker:
         # Update previous allocations for next round
         self.previous_allocations = voter_budgets.copy()
         
-        logger.debug(f"Total rounds after append: {len(self.rounds)}")
+        # logger.debug(f"Total rounds after append: {len(self.rounds)}")
     
     def __len__(self) -> int:
         return len(self.rounds)

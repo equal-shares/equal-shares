@@ -180,7 +180,7 @@ def create_instance_metadata(
         "open_for_voting": settings.open_for_voting
     }
     
-    logger.debug(f"Generated metadata: {metadata}")
+    # logger.debug(f"Generated metadata: {metadata}")
     return metadata
 
 def convert_to_pabutools_format(
@@ -256,14 +256,14 @@ def convert_to_pabutools_format(
             votes_per_project, total_votes, budget
         )
         
-        logger.info(
-            f"Data conversion complete - Poll: {settings.poll_id}, "
-            f"Voters: {len(profile)}, Projects: {len(instance)}, "
-            f"Total votes: {total_votes}"
-        )
+        # logger.info(
+        #     f"Data conversion complete - Poll: {settings.poll_id}, "
+        #     f"Voters: {len(profile)}, Projects: {len(instance)}, "
+        #     f"Total votes: {total_votes}"
+        # )
         
-        logger.debug(f'Pabutools instance created: {instance}')
-        logger.debug(f'Profile created with {len(profile)} ballots')
+        # logger.debug(f'Pabutools instance created: {instance}')
+        # logger.debug(f'Profile created with {len(profile)} ballots')
 
         return instance, profile
         
@@ -310,8 +310,8 @@ def process_mes_results(
         else:
             results[project_id] = 0
             
-    logger.debug(f"Processing results with actual allocations: {actual_allocations}")
-    logger.debug(f"Final results: {results}")
+    # logger.debug(f"Processing results with actual allocations: {actual_allocations}")
+    # logger.debug(f"Final results: {results}")
     
     return results, total_cost
 
@@ -353,8 +353,8 @@ def run_mes_visualization(
         
         instance, profile = convert_to_pabutools_format(settings, projects, votes)
         
-        logger.debug(f"Before MES - Instance projects: {len(instance)}")
-        logger.debug(f"Before MES - Profile ballots: {len(profile)}")
+        # logger.debug(f"Before MES - Instance projects: {len(instance)}")
+        # logger.debug(f"Before MES - Profile ballots: {len(profile)}")
         
         mes_implementation = get_mes_implementation(implementation)
         
@@ -366,41 +366,41 @@ def run_mes_visualization(
             verbose=False
         )
 
-        logger.debug("\nOutcome Analysis:")
-        logger.debug(f"Selected projects: {[p.name for p in outcome]}")
-        logger.debug(f"Number of iterations: {len(outcome.details.iterations)}")
+        # logger.debug("\nOutcome Analysis:")
+        # logger.debug(f"Selected projects: {[p.name for p in outcome]}")
+        # logger.debug(f"Number of iterations: {len(outcome.details.iterations)}")
         
-        logger.debug("\nIterations Details:")
-        for i, iteration in enumerate(outcome.details.iterations):
-            logger.debug(f"\nIteration {i+1}:")
-            logger.debug(f"Selected project: {iteration.selected_project.name if iteration.selected_project else 'None'}")
-            logger.debug(f"Discarded projects: {[p.project.name for p in iteration if p.discarded]}")
+        # logger.debug("\nIterations Details:")
+        # for i, iteration in enumerate(outcome.details.iterations):
+        #     logger.debug(f"\nIteration {i+1}:")
+        #     logger.debug(f"Selected project: {iteration.selected_project.name if iteration.selected_project else 'None'}")
+        #     logger.debug(f"Discarded projects: {[p.project.name for p in iteration if p.discarded]}")
 
 
-        logger.debug("MESVisualiser Input:\n")
-        logger.debug(f'profile: {profile}')
-        logger.debug(f'instance: {instance}')
-        logger.debug(f'outcome: {outcome}')
+        # logger.debug("MESVisualiser Input:\n")
+        # logger.debug(f'profile: {profile}')
+        # logger.debug(f'instance: {instance}')
+        # logger.debug(f'outcome: {outcome}')
 
         visualizer = MESVisualiser(profile, instance, outcome, verbose=False)
         
-        logger.debug("\nVisualization Data Structure:")
-        for round_num, round_data in enumerate(visualizer.rounds, 1):
-            logger.debug(f"\nRound {round_num}:")
-            logger.debug(f"Selected Project: {round_data['name']}")
-            logger.debug(f"Cost: {round_data['cost']}")
-            logger.debug(f"Dropped projects: {[p['id'] for p in round_data.get('dropped_projects', [])]}")
-            logger.debug(f"Effective votes: {round_data['effective_vote_count']}")
+        # logger.debug("\nVisualization Data Structure:")
+        # for round_num, round_data in enumerate(visualizer.rounds, 1):
+        #     logger.debug(f"\nRound {round_num}:")
+        #     logger.debug(f"Selected Project: {round_data['name']}")
+        #     logger.debug(f"Cost: {round_data['cost']}")
+        #     logger.debug(f"Dropped projects: {[p['id'] for p in round_data.get('dropped_projects', [])]}")
+        #     logger.debug(f"Effective votes: {round_data['effective_vote_count']}")
 
         visualizer.render(output_path)
         
         results, total_cost = process_mes_results(instance, outcome)
         
-        logger.debug("\nFinal Results:")
-        logger.debug(f"Projects count: {len(projects)}")
-        logger.debug(f"Active projects: {len([p for p in results.values() if p > 0])}")
-        logger.debug(f"Total allocated cost: {total_cost}")
-        logger.debug(f"Final allocations: {results}")
+        # logger.debug("\nFinal Results:")
+        # logger.debug(f"Projects count: {len(projects)}")
+        # logger.debug(f"Active projects: {len([p for p in results.values() if p > 0])}")
+        # logger.debug(f"Total allocated cost: {total_cost}")
+        # logger.debug(f"Final allocations: {results}")
         
         return MESResult(
             status="success",

@@ -237,6 +237,34 @@
                     
                         <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 2: 'Research Lab Equipment'</a>
                     
+                        <a id="dropdown-item-11" class="dropdown-item " item="11" onclick="renderRound(11, this)">Round 3: 'Student Lounge Update'</a>
+                    
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 4: 'Research Lab Equipment'</a>
+                    
+                        <a id="dropdown-item-11" class="dropdown-item " item="11" onclick="renderRound(11, this)">Round 5: 'Student Lounge Update'</a>
+                    
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 6: 'Research Lab Equipment'</a>
+                    
+                        <a id="dropdown-item-11" class="dropdown-item " item="11" onclick="renderRound(11, this)">Round 7: 'Student Lounge Update'</a>
+                    
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 8: 'Research Lab Equipment'</a>
+                    
+                        <a id="dropdown-item-11" class="dropdown-item " item="11" onclick="renderRound(11, this)">Round 9: 'Student Lounge Update'</a>
+                    
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 10: 'Research Lab Equipment'</a>
+                    
+                        <a id="dropdown-item-11" class="dropdown-item " item="11" onclick="renderRound(11, this)">Round 11: 'Student Lounge Update'</a>
+                    
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 12: 'Research Lab Equipment'</a>
+                    
+                        <a id="dropdown-item-11" class="dropdown-item " item="11" onclick="renderRound(11, this)">Round 13: 'Student Lounge Update'</a>
+                    
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 14: 'Research Lab Equipment'</a>
+                    
+                        <a id="dropdown-item-11" class="dropdown-item " item="11" onclick="renderRound(11, this)">Round 15: 'Student Lounge Update'</a>
+                    
+                        <a id="dropdown-item-12" class="dropdown-item " item="12" onclick="renderRound(12, this)">Round 16: 'Research Lab Equipment'</a>
+                    
     
                     </div>
                 </div>
@@ -533,28 +561,168 @@
     </script>
     <!-- Rounds data -->
     <script>
-        var numProjects = 2;
+        var numProjects = 16;
         
         var rounds_data = {
             
                 "11": {
-                    "effective_vote_count_bar_chart": {"x_labels": ['Research Lab','Student Lounge','Campus Garden',], "values": [3.0, 3.0, 0.0] },
-                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Research Lab','Campus Garden','Student Lounge',], "initial_values": [ 3.0, 0.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
-                    "pie_chart_triplets": [[{"project_name": "Research Lab Equipment","round_name": "Student Lounge Update","title":  "'Research Lab' Voters'","values_1": [3],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":199.78 },], ],
-                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 0],]},
-                    "chord_chart": {"series": [    {        "values":[0,0,3,],        "text": "Research Lab"    },    {        "values":[0,0,0,],        "text": "Campus Garden"    },    {        "values":[3,0,0,0,],        "text": "Student Lounge"    },]},
-                    "intro": {"project_name": "Student Lounge Update", "round_number": "1", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "401", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Research Lab Equipment","round_name": "Student Lounge Update","title":  "'Research Lab' Voters'","values_1": [3],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":161.0 },{"project_name": "Campus Garden","round_name": "Student Lounge Update","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":133.33 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Research Lab"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Student Lounge"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "1", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "517", "effective_vote_count" : "3.0", "project_votes" : "" },
                     "roundNum": 0,
                 },
             
                 "12": {
-                    "effective_vote_count_bar_chart": {"x_labels": ['Research Lab','Student Lounge','Campus Garden',], "values": [3.0, 3.0, 0.0] },
-                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Research Lab','Campus Garden','Student Lounge',], "initial_values": [ 3.0, 0.0, 3.0,], "reduced_values": [0, 0, 0] },
-                    "pie_chart_triplets": [],
-                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 0],]},
-                    "chord_chart": {"series": [    {        "values":[0,3,0,],        "text": "Student Lounge"    },    {        "values":[3,0,0,0,],        "text": "Research Lab"    },    {        "values":[0,0,0,],        "text": "Campus Garden"    },]},
-                    "intro": {"project_name": "Research Lab Equipment", "round_number": "2", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "1", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Research Lab Equipment","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":66.67 },], ],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Student Lounge"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Research Lab"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "2", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "134", "effective_vote_count" : "3.0", "project_votes" : "" },
                     "roundNum": 1,
+                },
+            
+                "11": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Student Lounge Update","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":133.33 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Research Lab"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Student Lounge"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "3", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "124", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 2,
+                },
+            
+                "12": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Research Lab Equipment","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":66.67 },], ],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Student Lounge"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Research Lab"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "4", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "114", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 3,
+                },
+            
+                "11": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Student Lounge Update","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":133.33 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Research Lab"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Student Lounge"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "5", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "104", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 4,
+                },
+            
+                "12": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Research Lab Equipment","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":66.67 },], ],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Student Lounge"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Research Lab"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "6", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "94", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 5,
+                },
+            
+                "11": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Student Lounge Update","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":133.33 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Research Lab"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Student Lounge"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "7", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "84", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 6,
+                },
+            
+                "12": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Research Lab Equipment","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":66.67 },], ],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Student Lounge"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Research Lab"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "8", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "74", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 7,
+                },
+            
+                "11": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Student Lounge Update","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":133.33 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Research Lab"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Student Lounge"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "9", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "64", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 8,
+                },
+            
+                "12": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Research Lab Equipment","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":66.67 },], ],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Student Lounge"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Research Lab"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "10", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "54", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 9,
+                },
+            
+                "11": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Student Lounge Update","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":133.33 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Research Lab"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Student Lounge"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "11", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "44", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 10,
+                },
+            
+                "12": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Research Lab Equipment","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":66.67 },], ],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Student Lounge"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Research Lab"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "12", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "34", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 11,
+                },
+            
+                "11": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Student Lounge Update","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":133.33 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Research Lab"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Student Lounge"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "13", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "24", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 12,
+                },
+            
+                "12": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Research Lab Equipment","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":66.67 },], ],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Student Lounge"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Research Lab"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "14", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "14", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 13,
+                },
+            
+                "11": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0.0, 0.0, 0.0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Student Lounge Update","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Student Lounge' Voters","values_2": [0] ,"text_2": "Non 'Student Lounge' Voters", "reduction":133.33 },], ],
+                    "sankey_chart": {"rows": [['Student Lounge', 'Research Lab', 3],['Student Lounge', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Research Lab"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Student Lounge"    },]},
+                    "intro": {"project_name": "Student Lounge Update", "round_number": "15", "description": "Renovate the main student lounge with new furniture and study areas", "project_cost" : "100", "budget_remaining" : "4", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 14,
+                },
+            
+                "12": {
+                    "effective_vote_count_bar_chart": {"x_labels": ['Student Lounge','Research Lab','Campus Garden',], "values": [3.0, 3.0, 1.0] },
+                    "effective_vote_count_stacked_bar_chart": {"x_labels": ['Student Lounge','Campus Garden','Research Lab',], "initial_values": [ 3.0, 1.0, 3.0,], "reduced_values": [0, 0, 0] },
+                    "pie_chart_triplets": [[{"project_name": "Campus Garden","round_name": "Research Lab Equipment","title":  "'Campus Garden' Voters'","values_1": [1],"text_1":  "'Research Lab' Voters","values_2": [0] ,"text_2": "Non 'Research Lab' Voters", "reduction":66.67 },], ],
+                    "sankey_chart": {"rows": [['Research Lab', 'Student Lounge', 3],['Research Lab', 'Campus Garden', 1],]},
+                    "chord_chart": {"series": [    {        "values":[0,1,3,],        "text": "Student Lounge"    },    {        "values":[1,0,1,],        "text": "Campus Garden"    },    {        "values":[3,1,0,0,],        "text": "Research Lab"    },]},
+                    "intro": {"project_name": "Research Lab Equipment", "round_number": "16", "description": "Purchase new microscopes and lab equipment for biology research", "project_cost" : "100", "budget_remaining" : "-6", "effective_vote_count" : "3.0", "project_votes" : "" },
+                    "roundNum": 15,
                 },
             }
 

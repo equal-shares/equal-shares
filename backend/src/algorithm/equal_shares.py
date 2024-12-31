@@ -70,19 +70,23 @@ def equal_shares(
     Raises:
         ValueError: If project costs exceed available budgets or if cost distribution fails.
     """
-    logger.debug(f'euqal_shares input:\n voters: {voters} \n projects_costs: {projects_costs} \n budget: {budget} \n bids: {bids}')
+    logger.debug(f'ES input:\n voters: {voters} \n projects_costs: {projects_costs} \n budget: {budget} \n bids: {bids}')
     projects = projects_costs.keys() # Get list of project IDs
     bids = remove_zero_bids(bids)
     bids = remove_invalid_bids(voters, bids) # Remove bids from invalid voters
     max_bid_for_project = find_max(bids)
+
+    # Initialize a dict to track previous allocations
+    previous_allocations = {pid: 0 for pid in projects}
 
     # Round the budget to ensure equal division among voters
     rounded_budget: float = int(budget / len(voters)) * len(voters)  
     logger.warning("\nRunning equal_shares: budget=%s, rounded to %s", budget, rounded_budget)
 
     # Run first round with initial budget
+    logger.debug("Calling ESFB for the first time")
     winners_allocations, projects_costs_of_next_increase, candidates_payments_per_voter = equal_shares_fixed_budget(
-        voters, projects_costs, rounded_budget, bids, max_bid_for_project
+        voters, projects_costs, rounded_budget, bids, max_bid_for_project, previous_allocations, tracker_callback
     )
 
     # Calculate total cost of chosen projects
@@ -129,13 +133,15 @@ def equal_shares(
         )
 
         # Run another round with increased budget
-        updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter, new_round = (
+        updated_winners_allocations, projects_costs_of_next_increase, updated_candidates_payments_per_voter = (
             equal_shares_fixed_budget(
                 voters,
                 projects_costs,
                 updated_rounded_budget,
                 bids,
                 max_bid_for_project,
+                previous_allocations,
+                tracker_callback
             )
         )
 
@@ -153,55 +159,55 @@ def equal_shares(
         winners_allocations = updated_winners_allocations
         candidates_payments_per_voter = updated_candidates_payments_per_voter
     
-    if tracker_callback is not None:
-        # Get only funded projects sorted by allocation amount
-        funded_projects = [(pid, amount) for pid, amount in winners_allocations.items() 
-                          if amount > 0]
-        funded_projects.sort(key=lambda x: x[1], reverse=True)
+    # if tracker_callback is not None:
+    #     # Get only funded projects sorted by allocation amount
+    #     funded_projects = [(pid, amount) for pid, amount in winners_allocations.items() 
+    #                       if amount > 0]
+    #     funded_projects.sort(key=lambda x: x[1], reverse=True)
         
-        # Track each funded project for visualization
-        remaining_budget = budget
-        voter_budgets = {v: budget/len(voters) for v in voters}
-        previous_allocations = {v: budget/len(voters) for v in voters}
+    #     # Track each funded project for visualization
+    #     remaining_budget = budget
+    #     voter_budgets = {v: budget/len(voters) for v in voters}
+    #     previous_allocations = {v: budget/len(voters) for v in voters}
         
-        for project_id, allocation in funded_projects:
-            # Calculate effective votes for ALL projects
-            effective_votes = {}
-            for pid in projects_costs.keys():
-                pid_supporters = len([v for v, bid in bids[pid].items() if bid > 0])
-                effective_votes[str(pid)] = float(pid_supporters)
+    #     for project_id, allocation in funded_projects:
+    #         # Calculate effective votes for ALL projects
+    #         effective_votes = {}
+    #         for pid in projects_costs.keys():
+    #             pid_supporters = len([v for v, bid in bids[pid].items() if bid > 0])
+    #             effective_votes[str(pid)] = float(pid_supporters)
     
-            # Get the payments each voter made for this project
-            project_payments = candidates_payments_per_voter[project_id]
+    #         # Get the payments each voter made for this project
+    #         project_payments = candidates_payments_per_voter[project_id]
 
-            # Update voter budgets for tracking
-            for voter_id in voter_budgets:
-                voter_payment = project_payments.get(voter_id, 0)
-                voter_budgets[voter_id] -= voter_payment
+    #         # Update voter budgets for tracking
+    #         for voter_id in voter_budgets:
+    #             voter_payment = project_payments.get(voter_id, 0)
+    #             voter_budgets[voter_id] -= voter_payment
 
-            logger.debug(f'calling tracker_callback with:\n project_id: {project_id}, ')
-            logger.debug(f"\nDEBUG equal_shares before tracker:")
-            logger.debug(f"project_id: {project_id}")
-            logger.debug(f"voter_budgets: {voter_budgets}")
-            logger.debug(f"previous_allocations: {previous_allocations}")
-            logger.debug(f"project_payments: {project_payments}")
+    #         logger.debug(f'calling tracker_callback with:\n project_id: {project_id}, ')
+    #         logger.debug(f"\nDEBUG equal_shares before tracker:")
+    #         logger.debug(f"project_id: {project_id}")
+    #         logger.debug(f"voter_budgets: {voter_budgets}")
+    #         logger.debug(f"previous_allocations: {previous_allocations}")
+    #         logger.debug(f"project_payments: {project_payments}")
 
-            tracker_callback(
-                project_id=project_id,
-                cost=allocation,
-                effective_votes=effective_votes,
-                voter_budgets=voter_budgets,
-                previous_allocations=previous_allocations.copy(),
-                payments_per_voter=project_payments
-            )
+    #         tracker_callback(
+    #             project_id=project_id,
+    #             cost=allocation,
+    #             effective_votes=effective_votes,
+    #             voter_budgets=voter_budgets,
+    #             previous_allocations=previous_allocations.copy(),
+    #             payments_per_voter=project_payments
+    #         )
 
-            # Update previous allocations for next round
-            for voter_id in previous_allocations:
-                previous_allocations[voter_id] = voter_budgets[voter_id]
+    #         # Update previous allocations for next round
+    #         for voter_id in previous_allocations:
+    #             previous_allocations[voter_id] = voter_budgets[voter_id]
             
-            remaining_budget -= allocation
+    #         remaining_budget -= allocation
 
-    logger.debug(f'equal_shares output:\n winners_allocations: {winners_allocations} \n candidates_payments_per_voter: {candidates_payments_per_voter}')
+    logger.debug(f'ES output:\n winners_allocations: {winners_allocations} \n candidates_payments_per_voter: {candidates_payments_per_voter}')
     return winners_allocations, candidates_payments_per_voter
 
 
@@ -267,6 +273,8 @@ def equal_shares_fixed_budget(
     budget: float,
     bids: dict[int, dict[int, int]],
     max_bid_for_project: dict,
+    previous_allocations: dict[int, float],
+    tracker_callback
 ) -> tuple[dict[int, int], dict[int, int], dict[int, dict[int, float]]]:
     """
     Core implementation of the Method of Equal Shares (MES) algorithm for a fixed budget round.
@@ -309,12 +317,12 @@ def equal_shares_fixed_budget(
         ValueError: If costs cannot be distributed fairly among voters or if voter budgets
                    are insufficient for project costs.
     """
-    logger.warning("\n  Running equal_shares_fixed_budget: budget=%s", budget)
+    logger.warning("\n  Running ESFB: budget=%s", budget)
     projects = projects_costs.keys()
 
     # Give each voter an equal share of the budget
     voters_budgets = {i: budget / len(voters) for i in voters}
-    logger.debug("  Initial voters_budgets: %s", voters_budgets)
+    # logger.debug("  Initial voters_budgets: %s", voters_budgets)
 
     # Track how much each voter pays for each project
     candidates_payments_per_voter = {
@@ -337,16 +345,6 @@ def equal_shares_fixed_budget(
     updated_bids = copy.deepcopy(bids)
     updated_cost = copy.deepcopy(projects_costs)
 
-    def debug_totals() -> None:
-        total_allocation = sum(winners_allocations.values())
-        total_budget = sum(voters_budgets.values())
-        logger.info(
-            "  *** total_allocation: %s, total_budget: %s, total_total: %s",
-            total_allocation,
-            total_budget,
-            total_allocation + total_budget,
-        )
-
     while True:
         # Track current round's effective votes for all projects
         current_round_effective_votes = {}
@@ -362,22 +360,22 @@ def equal_shares_fixed_budget(
             )
         }
 
-        logger.debug(
-            "\n  Remaining candidates sorted by decreasing previous effective vote count:\n   %s",
-            remaining_candidates_sorted,
-        )
-        logger.debug("  Voters' budgets:\n   %s", voters_budgets)
+        # logger.debug(
+        #     "Remaining candidates sorted by decreasing previous effective vote count:\n   %s",
+        #     remaining_candidates_sorted,
+        # )
+        # logger.debug("Voters' budgets:\n   %s", voters_budgets)
 
         # Calculate effective votes for all remaining candidates
         for candidate, previous_effective_vote_count in remaining_candidates_sorted.items():
             # Skip if we already found better projects
             if previous_effective_vote_count < best_effective_vote_count:
-                logger.debug(
-                    "  Candidate %s: Previous effective vote count (%s) < best_effective_vote_count (%s): breaking",
-                    candidate,
-                    previous_effective_vote_count,
-                    best_effective_vote_count,
-                )
+                # logger.debug(
+                #     "Candidate %s: Previous effective vote count (%s) < best_effective_vote_count (%s): breaking",
+                #     candidate,
+                #     previous_effective_vote_count,
+                #     best_effective_vote_count,
+                # )
                 break
 
             # Check if supporters have enough money combined
@@ -388,12 +386,12 @@ def equal_shares_fixed_budget(
             # Skip if project can't be afforded
             if money_behind_candidate < updated_cost[candidate]:
                 # candidate is not affordable - The total amount of money is less than the candidate cost
-                logger.debug(
-                    "  Candidate %s not affordable: supporters have %s but updated_cost = %s",
-                    candidate,
-                    money_behind_candidate,
-                    updated_cost[candidate],
-                )
+                # logger.debug(
+                #     "Candidate %s not affordable: supporters have %s but updated_cost = %s",
+                #     candidate,
+                #     money_behind_candidate,
+                #     updated_cost[candidate],
+                # )
                 del remaining_candidates[candidate]
                 # The candidate cannot be purchased, so remove him from the candidate list
                 continue
@@ -431,22 +429,22 @@ def equal_shares_fixed_budget(
                     elif effective_vote_count == best_effective_vote_count:
                         best_candidates.append(candidate)
                     break
-            logger.debug(
-                "  Candidate %s: cost %s; approvers and budgets=%s; effective_vote_count=%s",
-                candidate,
-                updated_cost[candidate],
-                sorted_approvers,
-                effective_vote_count,
-            )
-        logger.debug("  best_candidates: %s", best_candidates)
+            # logger.debug(
+            #     "Candidate %s: cost %s; approvers and budgets=%s; effective_vote_count=%s",
+            #     candidate,
+            #     updated_cost[candidate],
+            #     sorted_approvers,
+            #     effective_vote_count,
+            # )
+        # logger.debug("best_candidates: %s", best_candidates)
         # No more affordable projects
         if not best_candidates:
-            logger.info("  No remaining candidates are affordable.")
+            # logger.info("No remaining candidates are affordable.")
             break  # Break out of the outer "while True" loop
 
         # Break ties if multiple projects tied
         best_found = break_ties(updated_cost, updated_bids, best_candidates)
-        logger.debug("  best_found after tie-breaking: %s", best_found)
+        # logger.debug("best_found after tie-breaking: %s", best_found)
 
         if len(best_found) > 1:
             raise Exception(
@@ -467,14 +465,14 @@ def equal_shares_fixed_budget(
         chosen_candidate_max_bid = max_bid_for_project[chosen_candidate]
         chosen_candidate_cost = updated_cost[chosen_candidate]
         chosen_candidate_bids = updated_bids[chosen_candidate]
-        logger.debug(
-            "  Chosen project: %s, current cost: %s, max bid: %s, effective vote count: %s",
-            chosen_candidate,
-            chosen_candidate_cost,
-            chosen_candidate_max_bid,
-            best_effective_vote_count,
-        )
-        logger.debug("  Updated bids: %s", updated_bids)
+        # logger.debug(
+        #     "Chosen project: %s, current cost: %s, max bid: %s, effective vote count: %s",
+        #     chosen_candidate,
+        #     chosen_candidate_cost,
+        #     chosen_candidate_max_bid,
+        #     best_effective_vote_count,
+        # )
+        # logger.debug("Updated bids: %s", updated_bids)
 
         # Calculate project cost
         if chosen_candidate_cost == CONTINUOUS_COST:
@@ -495,12 +493,12 @@ def equal_shares_fixed_budget(
                 min(bid for voter, bid in positive_bids.items()),
                 sum(voters_budgets[voter] for voter, bid in positive_bids.items()),
             )
-            logger.debug(
-                "    Chosen project is now in the continuous phase - adding %s", chosen_candidate_cost
-            )
-            explanation_string_format = "  Funding %s with additional %s has %s effective vote count"
+            # logger.debug(
+            #     "Chosen project is now in the continuous phase - adding %s", chosen_candidate_cost
+            # )
+            explanation_string_format = "Funding %s with additional %s has %s effective vote count"
         else:
-            explanation_string_format = "  Funding %s with the minimum amount %s has %s effective vote count"
+            explanation_string_format = "Funding %s with the minimum amount %s has %s effective vote count"
 
 
         # Deducts from the voters_budget of each voter who chose the current
@@ -509,17 +507,7 @@ def equal_shares_fixed_budget(
         voters_and_budgets = [(voter, voters_budgets[voter]) for voter in chosen_candidate_bids.keys()]
         voters_and_contributions = distribute_cost_among_voters(chosen_candidate_cost, voters_and_budgets)
         for voter, voter_payment in voters_and_contributions:
-            # best_max_payment = chosen_candidate_cost / best_effective_vote_count
-            # for i in chosen_candidate_bids.keys():
-            #     if voters_budgets[i] > best_max_payment:
-            #         voter_payment = best_max_payment
-            #         if chosen_candidate==61:
-            #             logger.info("   Voter %s pays his relative part %s", i, voter_payment)
-            #     else:
-            #         voter_payment = voters_budgets[i]
-            #         if chosen_candidate==61:
-            #             logger.info("   Voter %s pays his entire remaining budget %s", i, voter_payment)
-            logger.debug("   Voter %s contributes %s", voter, voter_payment)
+            # logger.debug("Voter %s contributes %s", voter, voter_payment)
             voters_budgets[voter] -= voter_payment
             candidates_payments_per_voter[chosen_candidate][voter] += voter_payment
         winners_allocations[chosen_candidate] += chosen_candidate_cost
@@ -546,16 +534,66 @@ def equal_shares_fixed_budget(
             explanation_string_format += "    Candidate %s now has the maximum possible allocation: %s. New effective vote count is %s"
             new_effective_vote_count = 0
 
-        logger.info(
-            explanation_string_format,
-            chosen_candidate,
-            chosen_candidate_cost,
-            best_effective_vote_count,
-            winners_allocations[chosen_candidate],
-            new_effective_vote_count
-        )
+        # logger.info(
+        #     explanation_string_format,
+        #     chosen_candidate,
+        #     chosen_candidate_cost,
+        #     best_effective_vote_count,
+        #     winners_allocations[chosen_candidate],
+        #     new_effective_vote_count
+        # )
 
+    if tracker_callback is not None:
+        # Get only funded projects sorted by allocation amount
+        funded_projects = [(pid, amount) for pid, amount in winners_allocations.items() 
+                          if amount > 0]
+        funded_projects.sort(key=lambda x: x[1], reverse=True)
+        
+        # Track each funded project for visualization
+        remaining_budget = budget
+        voter_budgets = {v: budget/len(voters) for v in voters}
+        previous_voter_budgets = {v: budget/len(voters) for v in voters}
+        
+        for project_id, total_allocation in funded_projects:
+            # Calculate the delta between current and previous allocation
+            delta_allocation = total_allocation - previous_allocations[project_id]
+            previous_allocations[project_id] = total_allocation  # Update for next time
 
-    logger.info("  winners_allocations: %s", winners_allocations)
-    logger.info("  Cost for next increase: %s", updated_cost)
+            # Calculate effective votes for ALL projects
+            effective_votes = {}
+            for pid in projects_costs.keys():
+                pid_supporters = len([v for v, bid in bids[pid].items() if bid > 0])
+                effective_votes[str(pid)] = float(pid_supporters)
+
+            # Get the payments each voter made for this project
+            project_payments = candidates_payments_per_voter[project_id]
+
+            # Update voter budgets for tracking
+            for voter_id in voter_budgets:
+                voter_payment = project_payments.get(voter_id, 0)
+                voter_budgets[voter_id] -= voter_payment
+
+            # logger.debug(f'calling tracker_callback with:')
+            # logger.debug(f"project_id: {project_id}")
+            # logger.debug(f"delta_allocation: {delta_allocation}")
+            # logger.debug(f"effective_votes: {effective_votes}")
+            # logger.debug(f"voter_budgets: {voter_budgets}")
+            # logger.debug(f"previous_voter_budgets: {previous_voter_budgets}")
+            # logger.debug(f"project_payments: {project_payments}")
+
+            tracker_callback(
+                project_id=project_id,
+                cost=delta_allocation,
+                effective_votes=effective_votes,
+                voter_budgets=voter_budgets,
+                previous_allocations=previous_voter_budgets.copy(),
+                payments_per_voter=project_payments
+            )
+
+            # Update previous budgets for next round
+            previous_voter_budgets = voter_budgets.copy()
+            remaining_budget -= delta_allocation
+
+    logger.info("ESFB | winners_allocations: %s", winners_allocations)
+    logger.info("ESFB | Cost for next increase: %s", updated_cost)
     return winners_allocations, updated_cost, candidates_payments_per_voter
