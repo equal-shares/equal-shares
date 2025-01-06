@@ -7,7 +7,7 @@ from src.algorithm.utils import filter_bids, find_max, remove_invalid_bids
 logger = logging.getLogger("equal_shares_logger")
 
 CONTINUOUS_COST = 1  # A constant that signals that the given project is in its continuous increment phase.
-DISTRIBUTION_PARAMETER_COST = 1000000  # The amount of increase in each voter's budget at each iteration is budget/DISTRIBUTION_PARAMETER_COST.
+DISTRIBUTION_PARAMETER_COST = 100  # The amount of increase in each voter's budget at each iteration is budget/DISTRIBUTION_PARAMETER_COST.
         # If DISTRIBUTION_PARAMETER_COST is larger, then the computation is more accurate, but requires longer time.
 
 
@@ -364,7 +364,7 @@ def equal_shares_fixed_budget(
         else:
             updated_cost[chosen_candidate] = 0
             del remaining_candidates[chosen_candidate]
-            explanation_string_format += "    Candidate %s now has the maximum possible allocation: %s. New effective vote count is %s"
+            explanation_string_format += "    Candidate now has the maximum possible allocation: %s. New effective vote count is %s"
             new_effective_vote_count = 0
 
         logger.info(

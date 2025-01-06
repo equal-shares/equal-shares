@@ -4,7 +4,7 @@ from src.algorithm.public import PublicEqualSharesInput
 from src.algorithm.equal_shares import logger as equal_shares_logger
 
 from src.algorithm.computation import min_max_equal_shares
-from src.algorithm.equal_shares import equal_shares_fixed_budget
+from src.algorithm.equal_shares import equal_shares, equal_shares_fixed_budget
 from src.algorithm.average_first import average_first
 from src.algorithm.utils import find_max, remove_invalid_bids, calculate_average_bids, get_project_min_costs, get_project_max_costs, remove_zero_bids, normalize_bids
 
@@ -58,8 +58,8 @@ def run_json_example(input_json_path: str) -> None:
     map_project_to_supporter_count = count_supporters(data.bids)
     num_voters = len(data.voters)
 
-    project_min_costs = get_project_min_costs(data.cost_min_max)
-    project_max_costs = get_project_max_costs(data.cost_min_max)
+    projects_min_costs = get_project_min_costs(data.cost_min_max)
+    projects_max_costs = get_project_max_costs(data.cost_min_max)
 
     averages = calculate_average_bids(normalized_bids, data.voters)
     total_allocation = sum([allocation for project, allocation in averages.items()])
@@ -67,44 +67,59 @@ def run_json_example(input_json_path: str) -> None:
 
     print("\n\n=== min_max_equal_shares ===\n")
     equal_shares_logger.setLevel(logging.WARNING)
-    # mes_winners, candidates_payments_per_voter = min_max_equal_shares(
-    #     data.voters, data.cost_min_max, data.budget, normalized_bids, use_plt=False
-    # )
+    mes_winners, candidates_payments_per_voter = equal_shares(data.voters, projects_min_costs, data.budget, normalized_bids)
 
-    equal_shares_logger.setLevel(logging.INFO)
-    equal_shares_logger.addHandler(logging.FileHandler("real-2024-12-05.log", mode="w"))
-    bids = remove_invalid_bids(data.voters, data.bids)
-    max_bid_for_project = find_max(bids)
-    projects_min_costs = get_project_min_costs(data.cost_min_max)
-    mes_winners, _, _ = equal_shares_fixed_budget(
-        data.voters, projects_min_costs, 3106376, bids, max_bid_for_project
-    )
+    if False:  # Create a log of the most recent equal_shares_fixed_budget
+        last_budget = 3106376
+        equal_shares_logger.setLevel(logging.INFO)
+        equal_shares_logger.addHandler(logging.FileHandler("real-2024-12-05.log", mode="w"))
+        bids = remove_invalid_bids(data.voters, data.bids)
+        max_bid_for_project = find_max(bids)
+        projects_min_costs = get_project_min_costs(data.cost_min_max)
+        mes_winners, _, _ = equal_shares_fixed_budget(
+            data.voters, projects_min_costs, last_budget, bids, max_bid_for_project
+        )
 
     total_allocation = sum([allocation for project, allocation in mes_winners.items()])
     print(f"\nmin_max_equal_shares: \nwinners_allocations={mes_winners}\ntotal_allocation={total_allocation}")
-    equal_shares_logger.setLevel(logging.WARNING)
-    return
+    
+    if True: # Run an alternative algorithm:
+        equal_shares_logger.setLevel(logging.WARNING)
 
-    print("\n\n=== average_first ===\n")
-    equal_shares_logger.setLevel(logging.ERROR)
-    averagefirst_winners, candidates_payments_per_voter = average_first(
-        data.voters, data.cost_min_max, data.budget, normalized_bids, use_plt=False
-    )
-    total_allocation = sum([allocation for project, allocation in averagefirst_winners.items()])
-    print(f"\naverage_first: \nwinners_allocations={averagefirst_winners}\ntotal_allocation={total_allocation}")
-    TAB=","
-    print(f"Project{TAB}Minimum{TAB}Average{TAB}Support{TAB}AverageThenMES{TAB}MES{TAB}Maximum")
-    for project, avg in averages.items():
-        min_cost = project_min_costs[project]
-        max_cost = project_max_costs[project]
-        average = averages[project]
-        support_count = map_project_to_supporter_count[project]
-        support_percent = (100*support_count)/num_voters
-        support_budget = (data.budget*support_count)/num_voters
-        support = f"{support_count} ({support_percent}%, {support_budget} ILS)"
-        mes_win = mes_winners[project]
-        avgmes_win = averagefirst_winners[project]
-        print(f"{project}{TAB}{min_cost}{TAB}{average}{TAB}{support_budget}{TAB}{avgmes_win}{TAB}{mes_win}{TAB}{max_cost}")
+        print("\n\n=== average_first ===\n")
+        averagefirst_winners, candidates_payments_per_voter = average_first(
+            data.voters, data.cost_min_max, data.budget, normalized_bids, use_plt=False
+        )
+        total_allocation = sum([allocation for project, allocation in averagefirst_winners.items()])
+        print(f"\naverage_first: \nwinners_allocations={averagefirst_winners}\ntotal_allocation={total_allocation}")
+
+        print("\n\n=== MES with zero minimum costs ===\n")
+        projects_zero_costs = {project:1 for project in projects_min_costs.keys()}
+        mes_zero_winners, candidates_payments_per_voter = equal_shares(data.voters, projects_zero_costs, data.budget, normalized_bids)
+        total_allocation = sum([allocation for project, allocation in mes_zero_winners.items()])
+        print(f"\nmes_zero_winners: \nwinners_allocations={mes_zero_winners}\ntotal_allocation={total_allocation}")
+
+        print("\n\n=== MES with 80% minimum costs ===\n")
+        projects_80percent_costs = {project:min_cost*0.8 for project,min_cost in projects_min_costs.items()}
+        mes_80_winners, candidates_payments_per_voter = equal_shares(data.voters, projects_80percent_costs, data.budget, normalized_bids)
+        total_allocation = sum([allocation for project, allocation in mes_80_winners.items()])
+        print(f"\nmes_80%_winners: \nwinners_allocations={mes_zero_winners}\ntotal_allocation={total_allocation}")
+
+        TAB=","
+        print(f"Project{TAB}Minimum{TAB}Average{TAB}Support{TAB}AvgThenMES{TAB}MES{TAB}MES 80%{TAB}MES 0%{TAB}Maximum")
+        for project, avg in averages.items():
+            min_cost = projects_min_costs[project]
+            max_cost = projects_max_costs[project]
+            average = averages[project]
+            support_count = map_project_to_supporter_count[project]
+            support_percent = (100*support_count)/num_voters
+            support_budget = (data.budget*support_count)/num_voters
+            support = f"{support_count} ({support_percent}%, {support_budget} ILS)"
+            mes_win = mes_winners[project]
+            mes80_win = mes_80_winners[project]
+            avgmes_win = averagefirst_winners[project]
+            meszero_win = mes_zero_winners[project]
+            print(f"{project}{TAB}{min_cost}{TAB}{average}{TAB}{support_budget}{TAB}{avgmes_win}{TAB}{mes_win}{TAB}{mes80_win}{TAB}{meszero_win}{TAB}{max_cost}")
 
 
 def run_json_and_save_output(input_json_path: str, results_json_path:str) -> None:
