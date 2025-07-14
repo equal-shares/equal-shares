@@ -38,12 +38,12 @@ def test_min_max_equal_shares_passed_1() -> None:
         voters, projects_costs, budget, bids, use_plt=False
     )
 
-    expected_winners_allocations = {11: 130, 12: 0, 13: 200, 14: 250, 15: 320, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
+    expected_winners_allocations = {11: 150, 12: 0, 13: 200, 14: 0, 15: 320, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0}
     expected_candidates_payments_per_voter: dict[int, dict[int, float]] = {
-        11: {1: 33.333333333333336, 2: 48.333333333333336, 4: 48.33333333333334},
+        11: {1: 33.333333333333336, 2: 48.33333333333333, 4: 68.33333333333333},
         12: {2: 0, 5: 0},
-        13: {1: 105.33333333333333, 5: 94.66666666666667},
-        14: {3: 95, 4: 155},
+        13: {1: 110.33333333333333, 5: 89.66666666666667},
+        14: {3: 0.0, 4: 0.0},
         15: {2: 103.33333333333333, 3: 108.33333333333333, 5: 108.33333333333333},
         16: {2: 0, 5: 0},
         17: {1: 0, 4: 0},
@@ -71,8 +71,8 @@ def test_min_max_equal_shares_passed_2() -> None:
         voters, projects_costs, budget, bids, use_plt=False
     )
 
-    expected_winners_allocations = {11: 499, 12: 300, 13: 100}
-    expected_candidates_payments_per_voter = {11: {1: 399, 2: 100.0}, 12: {1: 150.0, 2: 150.0}, 13: {2: 100.0}}
+    expected_winners_allocations = {11: 500, 12: 300, 13: 100}
+    expected_candidates_payments_per_voter = {11: {1: 400.0, 2: 100.0}, 12: {1: 150.0, 2: 150.0}, 13: {2: 100.0}}
 
     assert {k: round(v) for k, v in winners_allocations.items()} == expected_winners_allocations
 

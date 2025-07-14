@@ -1,3 +1,15 @@
+"""Equal Shares Algorithm implementation.
+
+This file contains helper constants and the two main functions:
+`equal_shares` and `equal_shares_fixed_budget`.
+
+NOTE: Linting rules are relaxed in this module because the algorithm's logic
+inevitably leads to long lines for complex dictionary literals and formatted
+logging messages.
+"""
+
+# flake8: noqa
+
 import copy
 import logging
 from typing import Any
@@ -267,15 +279,21 @@ def distribute_cost_among_voters(cost: float, voters_and_budgets: list[tuple[Any
     return voters_and_contributions
 
 
+# pylint: disable=too-many-arguments
 def equal_shares_fixed_budget(
     voters: list[int],
     projects_costs: dict[int, int],
     budget: float,
     bids: dict[int, dict[int, int]],
     max_bid_for_project: dict,
-    previous_allocations: dict[int, float],
-    tracker_callback
-) -> tuple[dict[int, int], dict[int, int], dict[int, dict[int, float]]]:
+    previous_allocations: dict[int, float] | None = None,
+    tracker_callback=None,
+    # Return types:
+) -> tuple[
+    dict[int, int],  # winners_allocations
+    dict[int, int],  # updated_cost
+    dict[int, dict[int, float]],  # candidates_payments_per_voter
+]:
     """
     Core implementation of the Method of Equal Shares (MES) algorithm for a fixed budget round.
     This function executes a single round of the MES algorithm, allocating a fixed budget
@@ -318,6 +336,10 @@ def equal_shares_fixed_budget(
                    are insufficient for project costs.
     """
     logger.warning("\n  Running ESFB: budget=%s", budget)
+    # Handle default for previous_allocations
+    if previous_allocations is None:
+        previous_allocations = {pid: 0 for pid in projects_costs.keys()}
+
     projects = projects_costs.keys()
 
     # Give each voter an equal share of the budget
