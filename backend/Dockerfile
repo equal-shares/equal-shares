@@ -3,18 +3,32 @@ FROM python:3.12 as build
 
 WORKDIR /app
 
-# install apt dependencies
+# Install system dependencies
 RUN apt-get update && \
-    apt-get install -y make
+    apt-get install -y \
+    make \
+    libmpfr-dev \
+    libmpc-dev \
+    libgmp-dev
 
 # install poetry
 RUN pip install -U pip poetry==1.7.1
 
-# install dependencies
+# Configure poetry and pip for better reliability
+RUN poetry config virtualenvs.create false && \
+    poetry config installer.max-workers 4 && \
+    pip config set global.timeout 1000
+
+# install dependencies in multiple steps to avoid timeouts
 COPY pyproject.toml poetry.lock /app/
 
-RUN poetry config virtualenvs.create false
-RUN poetry install --no-root
+# First install larger packages separately
+RUN pip install pandas matplotlib numpy
+
+# Then use poetry for the rest with retries
+RUN poetry install --no-root || \
+    poetry install --no-root || \
+    poetry install --no-root
 
 # copy files
 COPY src /app/src

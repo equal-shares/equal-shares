@@ -3,8 +3,6 @@
 import os
 from uuid import UUID, uuid4
 
-from dotenv import load_dotenv
-
 from src.exceptions import CriticalException
 
 
@@ -41,6 +39,7 @@ def _get_envioment_variable(variable_name: str) -> str:
 
 def init_config() -> None:
     """Initialize configuration from environment variables"""
+    from dotenv import load_dotenv
 
     if os.path.exists(".env"):
         load_dotenv(override=False)

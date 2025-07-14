@@ -8,6 +8,8 @@ import zipfile
 from datetime import datetime
 from enum import StrEnum
 from uuid import UUID
+import tempfile
+from pathlib import Path
 
 import pandas as pd
 import psycopg
@@ -19,6 +21,8 @@ from src.config import config
 from src.database import get_db
 from src.logger import get_logger
 from src.models import Project, Settings, VoteData, get_projects, get_settings, get_votes
+from src.algorithm.mes_visualization.mes_visualizer import MESImplementation, run_mes_visualization
+
 
 logger = get_logger()
 
@@ -226,6 +230,9 @@ def _create_report(report: Report, db: psycopg.Connection) -> None:
     try:
         settings, projects, votes = _report_load_data(report, db)
         _report_log_info(report, "Data from the database retrieved")
+        # _report_log_info(report, f'settings: {settings}')
+        # _report_log_info(report, f'projects: {projects}')
+        # _report_log_info(report, f'votes: {votes}')
     except Exception:
         return
 
@@ -385,4 +392,59 @@ def _report_save_input_for_algorithm(
 
     report.append_text_to_file(
         "input_for_algorithm.json", json.dumps(input_for_algorithm.model_dump(), indent=4, ensure_ascii=False)
+    )
+  
+@router.get("/visualization")
+def get_visualization_route(
+    admin_key: UUID = Query(description="key for authentication of admin"),
+) -> Response:
+    """Get the MES visualization HTML files."""
+    # Check authentication
+    if config.admin_key != admin_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, 
+            detail="Unauthorized"
+        )
+
+    # Get current data using existing helper function
+    with get_db() as db:
+        try:
+            settings, projects, votes = _report_load_data(Report(), db)
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Error retrieving data"
+            )
+
+    # Create zip file in memory
+    zip_file = InMemoryZip()
+    
+    # Generate visualization files
+    with tempfile.TemporaryDirectory() as temp_dir:
+        result = run_mes_visualization(
+            settings=settings,
+            projects=projects,
+            votes=votes,
+            implementation=MESImplementation.CUSTOM,
+            output_path=temp_dir
+        )
+        
+        if not result:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="Failed to generate visualization"
+            )
+
+        # Add visualization files to zip
+        vis_files = Path(temp_dir).glob('*.html')
+        for file_path in Path(temp_dir).glob('*.html'):
+            with open(file_path, 'rb') as f:
+                zip_file.add_file(file_path.name, f.read())
+
+    return Response(
+        content=zip_file.get_content(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": "attachment; filename=visualization.zip"
+        }
     )
