@@ -18,3 +18,5 @@ backend/equal-shares-api-private-key.pem
 
 # macOS
 .DS_Store
+
+*.log

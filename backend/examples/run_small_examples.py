@@ -116,6 +116,21 @@ def example4() -> None:
     print("candidates_payments_per_voter", candidates_payments_per_voter)
 
 
+
+def example6() -> None:
+    print("Running example 6")
+
+    logging.getLogger("equal_shares_logger").setLevel(logging.INFO)
+    logging.getLogger("equal_shares_logger").addHandler(logging.StreamHandler(sys.stderr))
+
+    voters = [1, 2]
+    projects_costs = {11: 100, 12: 100, 13: 100}
+    bids = {11: {1: 600, 2: 700}, 12: {1: 400, 2: 300}, 13: {1: 0, 2: 0}}
+    budget = 1000
+    # winners_allocation, candidates_payments_per_voter = equal_shares(voters, projects_costs, budget, bids,)
+    equal_shares_fixed_budget(voters, projects_costs, 1479, bids, {11:700, 12:400, 13:0})
+
+
 def test_min_max_equal_shares_passed_3() -> None:
     """
     Two projects with the same amount of voters and the price difference between them is 1
@@ -151,4 +166,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    example3()
+    example6()

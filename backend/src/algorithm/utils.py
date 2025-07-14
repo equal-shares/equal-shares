@@ -204,6 +204,34 @@ def calculate_average_bids(bids: dict[int, dict[int, int]], voters: list[int]) -
     return average_bids
 
 
+def remove_invalid_bids(voters: list, bids: dict) -> dict:
+    """
+    removes bids of voters not in the 'voters' list
+    """
+    normalized_project_bids = dict()
+    for project, project_bids in bids.items():
+        normalized_project_bids[project] = {
+            voter: bid for voter, bid in project_bids.items() if voter in voters
+        }
+    return normalized_project_bids
+
+
+
+def normalize_bids(voters: list, bids: dict, bid_sums: dict, budget: int) -> dict:
+    """
+    Multiply the bids of each voter by a factor,
+    such that the sum of all bids for each voter equals the total budget.
+    Also removes invalid voters (e.g. with negative or zero bids)
+    """
+    normalized_project_bids = dict()
+    for project, project_bids in bids.items():
+        normalized_project_bids[project] = {
+            voter: int(bid * budget / bid_sums[voter]) for voter, bid in project_bids.items() if voter in voters and bid_sums[voter]>0
+        }
+    return normalized_project_bids
+
+
+
 def plot_bid_data(
     bids: dict[int, dict[int, int]],
     cost_min_max: list[dict[int, tuple[int, int]]],
