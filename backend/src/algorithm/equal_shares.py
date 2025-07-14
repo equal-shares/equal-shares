@@ -531,7 +531,7 @@ def equal_shares_fixed_budget(
         else:
             updated_cost[chosen_candidate] = 0
             del remaining_candidates[chosen_candidate]
-            explanation_string_format += "    Candidate %s now has the maximum possible allocation: %s. New effective vote count is %s"
+            explanation_string_format += "    Candidate now has the maximum possible allocation: %s. New effective vote count is %s"
             new_effective_vote_count = 0
 
         # logger.info(
