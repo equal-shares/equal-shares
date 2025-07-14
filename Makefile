@@ -29,7 +29,7 @@ examples-run-algorithm:
 	make -C backend examples-run-algorithm
 
 # development
-serv:
+serve:
 	docker compose -f dev.docker-compose.yaml up --build
 
 ssh-to-prod:
