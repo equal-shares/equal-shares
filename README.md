@@ -30,6 +30,7 @@ For Ariel University
     - [For Development](#for-development-1)
   - [Usage](#usage)
     - [Management](#management)
+    - [Voting Rules](#voting-rules)
   - [Development](#development)
     - [Linters and Formatters](#linters-and-formatters)
     - [Testing](#testing)
@@ -425,32 +426,42 @@ You can create a token using /admin/create-token in the API Dashbord.
 
 ### Management
 
-Creating the database tables: \
-In the API Dashbord run /admin/create-tables
+Follow these steps to set up and manage the system:
 
-Change settings: \
-In the API Dashbord run /admin/set-settings
-* max_total_points - the maximum total points a voter can give to all the projects in total
-* points_step - a number that points in votes can be divided by.
-  For example if `points_step` is 100, vouter cannot give 150 points to a project but can give 100 or 200 points.
+1. **Create Database Tables**: 
+   - In the API Dashboard, run `/admin/create-tables`
 
-Delete all the projects, votes and vouters: \
-In the API Dashbord run /admin/delete-projects-and-votes
+2. **Create and Activate Poll**:
+   - Create a new poll via `/admin/polls/create`
+     - Use the `name` parameter to specify the poll name
+   - Activate the poll via `/admin/polls/set-active`
+     - Use either `poll_id` or `name` to specify which poll to activate
 
-Delete votes and voters:
-In the API Dashbord run /admin/delete-votes
+3. **Configure Settings**:
+   - Run `/admin/set-settings` with the following parameters:
+     - `max_total_points` - the maximum total points a voter can give to all the projects in total
+     - `points_step` - a number that points in votes can be divided by.
+       For example if `points_step` is 100, voter cannot give 150 points to a project but can give 100 or 200 points.
+     - `open_for_voting` - set to true to allow voting
 
-Add new projects from XLSX file: \
-In the API Dashbord run /admin/add-projects
-* xlsx_file - the XLSX file with the projects. The columns should be:
-  column 1: name of the project
-  column 2: min points of the project
-  column 3: max points of the project
-  column 4: "description 2" is not in use
-  column 5: "description 1" of the project,
+4. **Add Projects**:
+   - Use `/admin/add-projects` to upload projects from an XLSX file
+   - The XLSX file should have the following columns:
+     - Column 1: name of the project
+     - Column 2: min points of the project 
+     - Column 3: max points of the project
+     - Column 4: "description 2" is not in use
+     - Column 5: "description 1" of the project
+     - Column 6: "is fixed project" - if this column is 'v' then the project cannot be unselected.
 
-Get the Projects and Settings as JSON format: \
-In the API Dashbord run /admin/projects
+Additional Management Commands:
+- Delete all projects and votes: `/admin/delete-projects-and-votes` 
+- Delete only votes: `/admin/delete-votes`
+- Get Projects and Settings as JSON: `/admin/projects`
+
+### Voting Rules
+* All votes must allocate the entire available budget exactly
+* The system will not accept votes where the total allocated points differ from the maximum allowed points
 
 ## Development
 
