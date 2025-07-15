@@ -54,7 +54,7 @@ python-dotenv==1.0.0
 pytweening==1.0.7
 pytz==2023.3
 pywhatkit==5.4
-requests==2.31.0
+requests==2.32.4
 rich==13.4.2
 rubicon-objc==0.4.6
 selenium==4.9.1
