@@ -16,6 +16,6 @@
     "webdriver": "^8.5.1"
   },
   "devDependencies": {
-    "chromedriver": "^110.0.0"
+    "chromedriver": "^119.0.1"
   }
 }
