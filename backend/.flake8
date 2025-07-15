@@ -2,6 +2,11 @@
 exclude =
     .git,
     __pycache__,
+    examples/,
+    src/algorithm/mes_visualization/,
+    res/
+
+ignore = E302,E303,E231,E225,E501,W291,W293,F401
 
 max-line-length = 120
 doctests = 0

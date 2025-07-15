@@ -393,7 +393,8 @@ def _report_save_input_for_algorithm(
     report.append_text_to_file(
         "input_for_algorithm.json", json.dumps(input_for_algorithm.model_dump(), indent=4, ensure_ascii=False)
     )
-  
+
+
 @router.get("/visualization")
 def get_visualization_route(
     admin_key: UUID = Query(description="key for authentication of admin"),
@@ -436,7 +437,7 @@ def get_visualization_route(
             )
 
         # Add visualization files to zip
-        vis_files = Path(temp_dir).glob('*.html')
+        # vis_files = Path(temp_dir).glob('*.html')
         for file_path in Path(temp_dir).glob('*.html'):
             with open(file_path, 'rb') as f:
                 zip_file.add_file(file_path.name, f.read())

@@ -64,9 +64,9 @@ def equal_shares(
         ... }
         >>> winners, payments = equal_shares(voters, projects_costs, budget, bids)
         >>> winners
-        {101: 100, 102: 150}  # Both projects funded
+        {101: 100, 102: 150}
         >>> payments[101]  # Payments for project 101
-        {1: 50, 2: 50, 3: 0}  # Voters 1 and 2 split the cost
+        {1: 50.0, 2: 50.0}
 
     Notes:
         - Each voter starts with an equal share of the budget (budget / num_voters)

@@ -31,6 +31,12 @@ RUN poetry install --no-root || \
     poetry install --no-root
 
 # copy files
+# Copy Makefile so we can invoke it inside the container
+COPY Makefile /app/Makefile
+# Copy flake8 config
+COPY .flake8 /app/.flake8
+
+# Copy source and tests
 COPY src /app/src
 COPY tests /app/tests
 

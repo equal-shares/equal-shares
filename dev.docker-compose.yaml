@@ -32,6 +32,8 @@ services:
     volumes:
       - ./backend/src:/app/src
       - ./backend/tests:/app/tests 
+      - ./backend/.flake8:/app/.flake8 
+      - ./backend/Makefile:/app/Makefile
       - ./backend/equal-shares-api-private-key.pem:/app/equal-shares-api-private-key.pem
       - ./backend/equal-shares-api-public-key.pem:/app/equal-shares-api-public-key.pem
 

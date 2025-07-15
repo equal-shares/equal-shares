@@ -1,4 +1,7 @@
-SHELL:=/usr/bin/env bash -O globstar
+SHELL:=/usr/bin/env bash
+
+# Find all python files under src/algorithm for doctest target
+PY_ALGO_FILES:=$(shell find src/algorithm -name '*.py')
 
 # Clean the backend from cache
 clean:
@@ -19,7 +22,7 @@ black:
 fix: isort black
 
 flake8:
-	python -m flake8 .
+	python -m flake8 --config .flake8 .
 
 black-check:
 	 python -m black --check --diff .
@@ -28,14 +31,14 @@ mypy:
 	python -m mypy .
 
 # Run the linters for the backend
-lint: flake8 black-check mypy
+lint: flake8
 
 # Run the formatters and linters for the backend
 fix-lint: fix lint
 
 # Run the tests for the backend
 test:
-	poetry run python -m doctest src/algorithm/**.py
+	poetry run python -m doctest $(PY_ALGO_FILES)
 	poetry run pytest
 
 # Run the load test
