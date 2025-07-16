@@ -335,7 +335,9 @@ async def route_add_projects(
     content = await xlsx_file.read()
     file = BytesIO(content)
 
-    df = pd.read_excel(file)
+    # Read the Excel file. We set header=None so that the first row is treated as data, not as column headers.
+    # This avoids silently dropping the first project if the template does not contain a header row (the expected format).
+    df = pd.read_excel(file, header=None)
 
     # Validate the File
     if len(df.columns) < 6:

@@ -454,6 +454,23 @@ Follow these steps to set up and manage the system:
      - Column 5: "description 1" of the project
      - Column 6: "is fixed project" - if this column is 'v' then the project cannot be unselected.
 
+#### Project Template File
+
+A ready-to-use example file, `project_template.xlsx`, is available in the root directory of this project. Use this file as a template when uploading projects via the `/admin/add-projects` endpoint in the API dashboard.
+
+- **Where to find:** Root directory (`project_template.xlsx`)
+- **How to use:**
+  1. Open the file in Excel or Google Sheets.
+  2. Edit or add rows for your projects, following the column order below.
+  3. Save as `.xlsx` and upload it using the `/admin/add-projects` endpoint.
+- **Column order (no header row):**
+  1. Project name
+  2. Min points
+  3. Max points
+  4. Description 2 (can be left empty)
+  5. Description 1
+  6. Is fixed project (`v` for fixed, otherwise leave blank)
+
 Additional Management Commands:
 - Delete all projects and votes: `/admin/delete-projects-and-votes` 
 - Delete only votes: `/admin/delete-votes`
