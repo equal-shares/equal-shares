@@ -532,6 +532,15 @@ make test
 
 Or for windows run the script file `windows-test.bat`
 
+To run the backend tests inside the backend container (when using Docker Compose for local development), use:
+
+```bash
+# From the project root
+docker compose -f dev.docker-compose.yaml exec backend make test
+```
+
+This will run all backend unit tests and doctests using the Makefile inside the container.
+
 ### Examples
 
 In `backend/examples` directory you can find examples of how \
