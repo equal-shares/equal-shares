@@ -16,7 +16,6 @@ g_pool: None | psycopg_pool.ConnectionPool = None
 
 
 def _get_pool() -> psycopg_pool.ConnectionPool:
-    global g_pool
     if g_pool is None:
         raise CriticalException("Database not initialized")
     return g_pool

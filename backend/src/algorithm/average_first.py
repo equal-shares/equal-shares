@@ -46,7 +46,7 @@ def average_first(
     >>> winners_allocations, candidates_payments_per_voter = average_first(
     ...     voters, cost_min_max, 900, bids, use_plt=False
     ... )
-    >>> {k: np.round(v) for k, v in winners_allocations.items()}  # {11: 500, 12: 300, 13: 100}
+    >>> {k: int(np.round(v)) for k, v in winners_allocations.items()}  # {11: 500, 12: 300, 13: 100}
     {11: 500, 12: 300, 13: 100}
     """
     projects_min_costs = get_project_min_costs(cost_min_max)

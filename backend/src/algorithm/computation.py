@@ -37,7 +37,7 @@ def min_max_equal_shares(
     >>> winners_allocations, candidates_payments_per_voter = min_max_equal_shares(
     ...     voters, cost_min_max, 900, bids, use_plt=False
     ... )
-    >>> {k:np.round(v) for k,v in winners_allocations.items()}
+    >>> {k: int(np.round(v)) for k, v in winners_allocations.items()}
     {11: 500, 12: 300, 13: 100}
     """
     projects_min_costs = get_project_min_costs(cost_min_max)
