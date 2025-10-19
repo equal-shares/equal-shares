@@ -20,14 +20,14 @@ services:
       - db
     ports:
       - "8000:8000"
-    env_file: /app/backend.env
+    env_file: ./backend/.env
     environment:
       - PG_HOST=db
       - API_RSA_PUBLIC_KEY=/app/equal-shares-api-public-key.pem
       - API_RSA_PRIVATE_KEY=/app/equal-shares-api-private-key.pem
     volumes:
-      - /app/keys/equal-shares-api-public-key.pem:/app/equal-shares-api-public-key.pem
-      - /app/keys/equal-shares-api-private-key.pem:/app/equal-shares-api-private-key.pem
+      - ./keys/equal-shares-api-public-key.pem:/app/equal-shares-api-public-key.pem
+      - ./keys/equal-shares-api-private-key.pem:/app/equal-shares-api-private-key.pem
 
   db:
     image: postgres:16
