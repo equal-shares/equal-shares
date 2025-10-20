@@ -20,7 +20,7 @@ services:
       - db
     ports:
       - "8000:8000"
-    env_file: ./backend/.env
+    env_file: ./.env
     environment:
       - PG_HOST=db
       - API_RSA_PUBLIC_KEY=/app/equal-shares-api-public-key.pem
