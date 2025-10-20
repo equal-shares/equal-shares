@@ -38,6 +38,8 @@ services:
       timeout: 10s
       retries: 120
     environment:
+      - POSTGRES_USER=equal_shares_user
+      - POSTGRES_DB=equal_shares
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
