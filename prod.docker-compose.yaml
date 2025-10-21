@@ -6,7 +6,7 @@ services:
       context: ./frontend
       target: prod
       args:
-        - VITE_API_HOST=http://104.248.16.54:8000
+        - VITE_API_HOST=https://api.budget-sua.csariel.xyz
     restart: unless-stopped
     ports:
       - "8080:80"
